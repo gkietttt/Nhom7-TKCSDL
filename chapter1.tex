@@ -1,29 +1,316 @@
 \chapter{Phân tích yêu cầu}
-\section{Giới thiệu bài toán}
-\subsection{Bối cảnh và mục đích của hệ thống}
-\subsection{Phạm vi dữ liệu cần quản lý}
-\subsection{Các đối tượng tham gia hệ thống}
-\section{Phân tích nghiệp vụ}
-\subsection{Các nghiệp vụ chính của hệ thống}
-\subsection{Quy trình đặt dịch vụ/phòng và tài nguyên}
-\subsection{Quy trình quản lý phòng, thiết bị và tài nguyên}
-\subsection{Quy trình quản lý gói dịch vụ}
-\subsection{Quy trình quản lý phiên sử dụng}
-\subsection{Quy trình đánh giá và chia sẻ nội dung}
-\section{Xác định yêu cầu dữ liệu}
-\subsection{Các nhóm dữ liệu cần lưu trữ}
-\subsection{Thông tin người dùng và vai trò}
-\subsection{Thông tin nhà cung cấp và không gian dịch vụ}
-\subsection{Thông tin thiết bị và tài nguyên}
-\subsection{Thông tin đặt chỗ và sử dụng dịch vụ}
-\subsection{Thông tin thanh toán, đánh giá và nội dung cộng đồng}
-\section{Xác định các quy tắc nghiệp vụ}
-\subsection{Quy tắc quản lý người dùng}
-\subsection{Quy tắc quản lý tài nguyên}
-\subsection{Quy tắc đặt chỗ và tránh trùng lịch}
-\subsection{Quy tắc sử dụng và bảo trì tài nguyên}
-\subsection{Các ràng buộc nghiệp vụ khác}
-\section{Tổng hợp yêu cầu dữ liệu}
+
+\section{Tổng quan hệ thống}
+\subsection{Bối cảnh và mục tiêu}
+\subsection{Phạm vi hệ thống}
+\subsection{Đối tượng sử dụng}
+\subsection{Các nhóm nghiệp vụ chính}
+
+\section{Phân tích yêu cầu dữ liệu}
+\subsection{Nhóm dữ liệu người dùng}
+\subsection{Nhóm dữ liệu nhà cung cấp và tài nguyên}
+\subsection{Nhóm dữ liệu dịch vụ}
+\subsection{Nhóm dữ liệu đặt chỗ và sử dụng dịch vụ}
+\subsection{Nhóm dữ liệu cộng đồng}
+\subsection{Nhóm dữ liệu đánh giá và hỗ trợ}
+
+\section{Phân tích các nghiệp vụ chính}
+\subsection{Quản lý người dùng}
+\subsection{Quản lý nhà cung cấp và tài nguyên}
+\subsection{Quản lý dịch vụ}
+\subsection{Đặt và sử dụng dịch vụ}
+\subsection{Hoạt động cộng đồng}
+\subsection{Đánh giá và xử lý khiếu nại}
+
+\section{Đặc tả yêu cầu dữ liệu}
+
+Phần này xác định các nhóm thông tin mà hệ thống cần lưu trữ và quản lý để hỗ trợ các nghiệp vụ chính của nền tảng. Việc đặc tả ở giai đoạn này tập trung vào ý nghĩa nghiệp vụ và loại thông tin cần quản lý, chưa xác định cấu trúc bảng, khóa hay kiểu dữ liệu.
+
+\subsection{User}
+
+Hệ thống cần quản lý thông tin người dùng tham gia và sử dụng nền tảng.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin nhận diện và liên hệ của người dùng.
+\item Thông tin tài khoản và trạng thái hoạt động.
+\item Vai trò của người dùng trong hệ thống.
+\item Thông tin phục vụ việc sử dụng dịch vụ, đặt chỗ và tham gia cộng đồng.
+\item Lịch sử hoạt động cần thiết của người dùng như đặt dịch vụ, đánh giá, tham gia Workshop hoặc chia sẻ nội dung.
+\end{itemize}
+
+Hệ thống cần hỗ trợ các vai trò Photographer, Service Provider, Photography Expert và Administrator.
+
+\subsection{Service Provider}
+
+Hệ thống cần quản lý thông tin về các cá nhân hoặc tổ chức cung cấp dịch vụ phòng tối, phòng chụp, thiết bị và các dịch vụ sáng tạo.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin của nhà cung cấp.
+\item Thông tin liên hệ và địa điểm hoạt động.
+\item Thông tin mô tả về đơn vị cung cấp dịch vụ.
+\item Trạng thái hoạt động hoặc phê duyệt của nhà cung cấp.
+\item Thông tin phục vụ quản lý các Creative Space, Resource và Service Package thuộc nhà cung cấp.
+\item Thông tin cần thiết cho việc theo dõi hoạt động kinh doanh.
+\end{itemize}
+
+\subsection{Creative Space}
+
+Hệ thống cần quản lý thông tin về các không gian sáng tạo được cung cấp trên nền tảng, chẳng hạn như darkroom và photography studio.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin nhận diện và mô tả không gian.
+\item Loại không gian.
+\item Vị trí và thông tin liên quan đến địa điểm.
+\item Diện tích và sức chứa.
+\item Phong cách nghệ thuật.
+\item Điều kiện ánh sáng.
+\item Điều kiện thông gió và đặc điểm âm học.
+\item Thời gian hoạt động.
+\item Quy định và điều kiện sử dụng.
+\item Thông tin về giá sử dụng.
+\item Trạng thái và khả năng cung cấp dịch vụ.
+\item Thông tin về các tiện ích và thiết bị được hỗ trợ.
+\end{itemize}
+
+Dữ liệu Creative Space phải hỗ trợ việc tìm kiếm, so sánh, kiểm tra khả dụng và đặt chỗ.
+
+\subsection{Resource}
+
+Hệ thống cần quản lý các tài nguyên được sử dụng hoặc cho thuê trong quá trình cung cấp dịch vụ.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin nhận diện và mô tả tài nguyên.
+\item Loại tài nguyên.
+\item Số lượng tài nguyên.
+\item Tình trạng hoạt động.
+\item Trạng thái khả dụng.
+\item Giá thuê hoặc chi phí sử dụng.
+\item Thông tin về khả năng tương thích với các thiết bị hoặc dịch vụ khác.
+\item Thông tin phục vụ theo dõi lịch sử sử dụng.
+\item Thông tin phục vụ quản lý vòng đời tài nguyên.
+\end{itemize}
+
+Resource có thể bao gồm camera, lens, enlarger, film scanner, lighting system, tripod, background, thiết bị darkroom, hóa chất và photographic paper.
+
+\subsection{Maintenance}
+
+Hệ thống cần quản lý thông tin về hoạt động bảo trì đối với các Resource.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin về tài nguyên cần bảo trì.
+\item Loại và nội dung công việc bảo trì.
+\item Thời gian dự kiến thực hiện.
+\item Thời gian hoàn thành.
+\item Chi phí bảo trì.
+\item Trạng thái bảo trì.
+\item Thông tin phục vụ theo dõi lịch sử bảo trì và vòng đời của tài nguyên.
+\end{itemize}
+
+Dữ liệu Maintenance phải hỗ trợ việc xác định tài nguyên đang được bảo trì để tránh phân bổ tài nguyên không khả dụng cho Reservation.
+
+\subsection{Service Package}
+
+Hệ thống cần quản lý các gói dịch vụ do Service Provider xây dựng và cung cấp.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin tên và mô tả gói dịch vụ.
+\item Nội dung và phạm vi của gói.
+\item Giá và thời lượng sử dụng.
+\item Trạng thái cung cấp.
+\item Các Creative Space được bao gồm.
+\item Các Resource được bao gồm.
+\item Các dịch vụ hỗ trợ khác nếu có.
+\end{itemize}
+
+Service Package phải hỗ trợ các nhu cầu khác nhau như portrait photography, product photography, film developing, darkroom printing và educational workshops.
+
+\subsection{Promotion}
+
+Hệ thống cần quản lý các chương trình khuyến mãi được Service Provider cung cấp.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin chương trình khuyến mãi.
+\item Nội dung và điều kiện áp dụng.
+\item Hình thức giảm giá.
+\item Giá trị giảm giá.
+\item Thời gian bắt đầu và kết thúc.
+\item Trạng thái chương trình.
+\end{itemize}
+
+Dữ liệu Promotion được sử dụng để hỗ trợ việc áp dụng chính sách giá và khuyến mãi cho các dịch vụ được cung cấp trên nền tảng.
+
+\subsection{Reservation}
+
+Hệ thống cần quản lý thông tin về các yêu cầu đặt Creative Space, Resource hoặc Service Package của Photographer.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Người thực hiện đặt dịch vụ.
+\item Đối tượng và tài nguyên được đặt.
+\item Khoảng thời gian đặt.
+\item Trạng thái của Reservation.
+\item Tổng giá trị đặt dịch vụ.
+\item Thời điểm tạo yêu cầu đặt.
+\item Thông tin cần thiết để kiểm tra tình trạng khả dụng.
+\item Thông tin phục vụ theo dõi lịch sử đặt dịch vụ.
+\end{itemize}
+
+Hệ thống phải sử dụng dữ liệu Reservation để kiểm tra khả dụng và phát hiện xung đột lịch trước khi xác nhận đặt chỗ.
+
+Sau khi Reservation được xác nhận, các tài nguyên liên quan phải được giữ cho khoảng thời gian đã đặt.
+
+\subsection{Payment}
+
+Hệ thống cần quản lý thông tin về các giao dịch thanh toán phát sinh từ hoạt động đặt dịch vụ.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Reservation liên quan đến giao dịch.
+\item Số tiền thanh toán.
+\item Phương thức thanh toán.
+\item Trạng thái giao dịch.
+\item Thông tin nhận diện giao dịch.
+\item Thời điểm thanh toán.
+\item Thông tin phục vụ đối soát và theo dõi lịch sử thanh toán.
+\end{itemize}
+
+Dữ liệu Payment hỗ trợ việc quản lý giao dịch, theo dõi thanh toán và xử lý các vấn đề liên quan đến giao dịch.
+
+\subsection{Service Session}
+
+Hệ thống cần quản lý thông tin về quá trình sử dụng dịch vụ thực tế sau khi Reservation được xác nhận.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Reservation tương ứng.
+\item Thông tin check-in.
+\item Thông tin check-out.
+\item Thời lượng sử dụng thực tế.
+\item Trạng thái phiên sử dụng.
+\item Các Resource thực tế được sử dụng.
+\item Các dịch vụ bổ sung đã sử dụng nếu có.
+\end{itemize}
+
+Service Session được sử dụng để phục vụ billing, đánh giá dịch vụ, theo dõi thiết bị và giải quyết tranh chấp.
+
+\subsection{Review}
+
+Hệ thống cần quản lý phản hồi của người dùng đối với dịch vụ hoặc tài nguyên đã sử dụng.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Người thực hiện đánh giá.
+\item Đối tượng hoặc dịch vụ được đánh giá.
+\item Điểm đánh giá.
+\item Nội dung nhận xét.
+\item Thời điểm đánh giá.
+\item Thông tin cần thiết để liên kết đánh giá với quá trình sử dụng dịch vụ.
+\end{itemize}
+
+Review được sử dụng để cung cấp thông tin phản hồi cho cộng đồng và hỗ trợ đánh giá chất lượng của Service Provider và dịch vụ.
+
+\subsection{Community Content}
+
+Hệ thống cần quản lý các nội dung được người dùng chia sẻ trong cộng đồng nhiếp ảnh phim.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin về nội dung được chia sẻ.
+\item Tiêu đề và nội dung.
+\item Loại nội dung.
+\item Người tạo nội dung.
+\item Trạng thái nội dung.
+\item Thời gian tạo và cập nhật.
+\item Thông tin phục vụ tìm kiếm và tổ chức kho kiến thức cộng đồng.
+\end{itemize}
+
+Community Content có thể bao gồm educational articles, tutorials, equipment reviews, darkroom techniques, best practices và discussions.
+
+\subsection{Workshop}
+
+Hệ thống cần quản lý thông tin về các Workshop và training session được tổ chức trên nền tảng.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin Workshop.
+\item Chủ đề và nội dung.
+\item Người tổ chức.
+\item Thời gian tổ chức.
+\item Địa điểm.
+\item Số lượng người tham gia tối đa.
+\item Chi phí tham gia nếu có.
+\item Trạng thái Workshop.
+\item Thông tin về người tham gia.
+\end{itemize}
+
+Dữ liệu Workshop phải hỗ trợ việc tổ chức, đăng ký và quản lý số lượng người tham gia.
+
+\subsection{Photo}
+
+Hệ thống cần quản lý thông tin về các ảnh kỹ thuật số thuộc bộ sưu tập của người dùng.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Thông tin nhận diện và mô tả ảnh.
+\item Tên hoặc tiêu đề ảnh.
+\item Thông tin tham chiếu đến tệp ảnh.
+\item Người quản lý ảnh.
+\item Thời điểm thêm ảnh.
+\item Thời điểm cập nhật ảnh.
+\end{itemize}
+
+Dữ liệu Photo phục vụ việc quản lý bộ sưu tập ảnh kỹ thuật số và có thể được sử dụng trong các chức năng image restoration và image enhancement của hệ thống.
+
+\subsection{Complaint}
+
+Hệ thống cần quản lý các khiếu nại và tranh chấp phát sinh trong quá trình sử dụng nền tảng.
+
+Các yêu cầu dữ liệu chính:
+
+\begin{itemize}
+\item Người gửi khiếu nại.
+\item Nội dung và chủ đề khiếu nại.
+\item Đối tượng hoặc giao dịch liên quan.
+\item Trạng thái xử lý.
+\item Thời điểm tạo khiếu nại.
+\item Thời điểm giải quyết.
+\item Nội dung và kết quả xử lý.
+\end{itemize}
+
+Complaint phục vụ Administrator trong việc tiếp nhận, theo dõi và giải quyết tranh chấp giữa các bên.
+
+\section{Quy tắc nghiệp vụ}
+\subsection{Quy tắc về người dùng và vai trò}
+\subsection{Quy tắc về nhà cung cấp và tài nguyên}
+\subsection{Quy tắc về dịch vụ}
+\subsection{Quy tắc về đặt chỗ và sử dụng dịch vụ}
+\subsection{Quy tắc về cộng đồng}
+\subsection{Quy tắc về đánh giá và khiếu nại}
+\subsection{Các ràng buộc về thời gian và khả dụng}
+
+\section{Tổng hợp yêu cầu và phạm vi dữ liệu}
+\subsection{Danh sách đối tượng dữ liệu}
 \subsection{Danh sách yêu cầu dữ liệu}
 \subsection{Danh sách quy tắc nghiệp vụ}
 \subsection{Đầu vào cho thiết kế quan niệm}
