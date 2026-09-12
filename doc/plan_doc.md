@@ -1,802 +1,207 @@
-# PLAN NHÓM -- THIẾT KẾ CƠ SỞ DỮ LIỆU
+# MỤC LỤC – THIẾT KẾ CƠ SỞ DỮ LIỆU
 
-## Đề tài
+## CHƯƠNG 1. PHÂN TÍCH YÊU CẦU
 
-**Nền tảng kết nối cộng đồng nhiếp ảnh phim với các dịch vụ phòng tối và
-phòng chụp**
+### 1.1. Giới thiệu bài toán
 
-**English:** Platform Connecting the Film Photography Community with
-Darkroom and Studio Services
+* 1.1.1. Bối cảnh và mục đích của hệ thống
+* 1.1.2. Phạm vi dữ liệu cần quản lý
+* 1.1.3. Các đối tượng tham gia hệ thống
 
-------------------------------------------------------------------------
+### 1.2. Phân tích nghiệp vụ
 
-## 1. Mục tiêu của nhóm
+* 1.2.1. Các nghiệp vụ chính của hệ thống
+* 1.2.2. Quy trình đặt dịch vụ/phòng và tài nguyên
+* 1.2.3. Quy trình quản lý phòng, thiết bị và tài nguyên
+* 1.2.4. Quy trình quản lý gói dịch vụ
+* 1.2.5. Quy trình quản lý phiên sử dụng
+* 1.2.6. Quy trình đánh giá và chia sẻ nội dung
 
-Thiết kế một hệ thống cơ sở dữ liệu phục vụ nền tảng kết nối:
+### 1.3. Xác định yêu cầu dữ liệu
 
--   Người chụp ảnh phim (Photographer)
--   Nhà cung cấp dịch vụ (Service Provider)
--   Chuyên gia nhiếp ảnh (Photography Expert)
--   Quản trị viên (Administrator)
+* 1.3.1. Các nhóm dữ liệu cần lưu trữ
+* 1.3.2. Thông tin người dùng và vai trò
+* 1.3.3. Thông tin nhà cung cấp và không gian dịch vụ
+* 1.3.4. Thông tin thiết bị và tài nguyên
+* 1.3.5. Thông tin đặt chỗ và sử dụng dịch vụ
+* 1.3.6. Thông tin thanh toán, đánh giá và nội dung cộng đồng
 
-Hệ thống tập trung vào việc quản lý:
+### 1.4. Xác định các quy tắc nghiệp vụ
 
--   Không gian chụp ảnh và phòng tối
--   Thiết bị và tài nguyên
--   Đặt chỗ và phân bổ tài nguyên
--   Gói dịch vụ
--   Thanh toán
--   Quá trình sử dụng dịch vụ
--   Bảo trì thiết bị
--   Đánh giá
--   Cộng đồng và workshop
+* 1.4.1. Quy tắc quản lý người dùng
+* 1.4.2. Quy tắc quản lý tài nguyên
+* 1.4.3. Quy tắc đặt chỗ và tránh trùng lịch
+* 1.4.4. Quy tắc sử dụng và bảo trì tài nguyên
+* 1.4.5. Các ràng buộc nghiệp vụ khác
 
-> **Phạm vi của môn:** tập trung vào phân tích và thiết kế cơ sở dữ
-> liệu. Không yêu cầu nhóm lập trình ứng dụng thực tế.
+### 1.5. Tổng hợp yêu cầu dữ liệu
 
-------------------------------------------------------------------------
+* 1.5.1. Danh sách yêu cầu dữ liệu
+* 1.5.2. Danh sách quy tắc nghiệp vụ
+* 1.5.3. Đầu vào cho thiết kế quan niệm
 
-# 2. Nguyên tắc làm bài
+> **Mục tiêu Chương 1:** chưa vẽ bảng hay quyết định kiểu dữ liệu. Kết quả chính là **đặc tả yêu cầu dữ liệu và quy tắc nghiệp vụ**, đúng với slide. 
 
-Nhóm thực hiện theo thứ tự:
+---
 
-**Hiểu đề → Phân tích nghiệp vụ → Actor/Use Case → Entity → Relationship
-→ EER → Mô hình quan hệ → Chuẩn hóa → Ràng buộc → Hoàn thiện tài liệu**
+# CHƯƠNG 2. THIẾT KẾ QUAN NIỆM
 
-Không thiết kế bảng ngay từ đầu.
+### 2.1. Xác định các thực thể
 
-Không đi sâu vào: - Flutter - React/Next.js - ASP.NET/Node.js - API -
-Cloud - AI implementation - Thanh toán thực tế
+* 2.1.1. Phương pháp xác định thực thể
+* 2.1.2. Danh sách các thực thể chính
+* 2.1.3. Xác định khóa định danh cho thực thể
 
-Các nội dung trên chỉ được dùng để hiểu **hệ thống tương lai cần dữ liệu
-gì**.
+### 2.2. Xác định thuộc tính
 
-------------------------------------------------------------------------
+* 2.2.1. Thuộc tính của các thực thể
+* 2.2.2. Thuộc tính định danh
+* 2.2.3. Thuộc tính dẫn xuất/đa trị nếu có
 
-# 3. Giai đoạn 1 -- Hiểu đề và xác định phạm vi
+### 2.3. Xác định mối kết hợp
 
-## Mục tiêu
+* 2.3.1. Các mối kết hợp giữa các thực thể
+* 2.3.2. Xác định bản số 1:1
+* 2.3.3. Xác định bản số 1:N
+* 2.3.4. Xác định bản số M:N
+* 2.3.5. Xác định mức tham gia bắt buộc/tùy chọn
 
-Cả nhóm phải hiểu thống nhất hệ thống trước khi bắt đầu thiết kế.
+### 2.4. Xây dựng mô hình ERD/EER
 
-## Công việc
+* 2.4.1. ERD tổng thể
+* 2.4.2. Biểu diễn thuộc tính và khóa
+* 2.4.3. Biểu diễn bản số và mức tham gia
+* 2.4.4. Các ràng buộc nghiệp vụ trên mô hình
 
--   Đọc toàn bộ đề.
--   Xác định vấn đề hệ thống giải quyết.
--   Xác định các đối tượng tham gia.
--   Xác định các nghiệp vụ chính.
--   Xác định dữ liệu mà mỗi nghiệp vụ cần quản lý.
+### 2.5. Các trường hợp đặc biệt trong mô hình
 
-## Kết quả cần có
+* 2.5.1. Mối kết hợp M:N có thuộc tính riêng
+* 2.5.2. Thực thể yếu
+* 2.5.3. Tổng quát hóa/chuyên biệt hóa EER
 
-### Actor
+### 2.6. Kiểm chứng mô hình quan niệm
 
-1.  Photographer
-2.  Service Provider
-3.  Photography Expert
-4.  Administrator
-5.  AI Assistant (chỉ xem như chức năng hệ thống, không nhất thiết là
-    thực thể người dùng)
+* 2.6.1. Kiểm tra thực thể và thuộc tính
+* 2.6.2. Kiểm tra mối kết hợp và bản số
+* 2.6.3. Kiểm tra bằng dữ liệu mẫu và tình huống
 
-### Nhóm nghiệp vụ chính
+### 2.7. Kết quả thiết kế quan niệm
 
-1.  Quản lý người dùng
-2.  Quản lý Service Provider
-3.  Quản lý Creative Space
-4.  Quản lý Equipment
-5.  Quản lý Consumable
-6.  Quản lý Reservation
-7.  Quản lý Resource Allocation
-8.  Quản lý Service Session
-9.  Quản lý Service Package
-10. Quản lý Payment
-11. Quản lý Maintenance
-12. Quản lý Review
-13. Quản lý Community
-14. Quản lý Workshop
+* 2.7.1. ERD/EER hoàn chỉnh
+* 2.7.2. Từ điển dữ liệu
+* 2.7.3. Danh sách các ràng buộc nghiệp vụ
 
-------------------------------------------------------------------------
+Các mục trên bám khá sát Chương 2: slide nhấn mạnh **thực thể, thuộc tính, khóa, mối kết hợp, bản số, mức tham gia**, sau đó xử lý **M:N, thực thể yếu và chuyên biệt hóa/tổng quát hóa**.  
 
-# 4. Giai đoạn 2 -- Xác định Use Case
+---
 
-## Mục tiêu
-
-Xác định hệ thống phải cung cấp những chức năng gì cho từng Actor.
-
-## Photographer
-
--   Đăng ký / đăng nhập
--   Quản lý hồ sơ cá nhân
--   Tìm kiếm Creative Space
--   Xem thông tin Creative Space
--   Tìm kiếm Equipment
--   Xem Service Package
--   Đặt Creative Space
--   Đặt Equipment
--   Đặt Service Package
--   Thanh toán
--   Xem lịch sử Reservation
--   Check-in / Check-out
--   Đánh giá dịch vụ
--   Đăng bài / bình luận
--   Đăng ký Workshop
--   Quản lý bộ sưu tập ảnh
-
-## Service Provider
-
--   Quản lý hồ sơ doanh nghiệp
--   Quản lý Creative Space
--   Quản lý Equipment
--   Quản lý Consumable
--   Quản lý Service Package
--   Quản lý giá
--   Quản lý Reservation
--   Phân bổ Resource
--   Quản lý Maintenance
--   Theo dõi tình trạng Resource
--   Theo dõi lịch sử sử dụng
--   Theo dõi doanh thu
-
-## Photography Expert
-
--   Quản lý hồ sơ chuyên gia
--   Đăng Article
--   Đăng Tutorial
--   Review Equipment
--   Chia sẻ kỹ thuật
--   Tạo Workshop
--   Quản lý Workshop
-
-## Administrator
-
--   Quản lý User
--   Quản lý Provider
--   Duyệt Provider
--   Quản lý Category
--   Quản lý Community Content
--   Theo dõi Payment
--   Xử lý Complaint / Dispute
--   Quản lý hệ thống
+# CHƯƠNG 3. THIẾT KẾ LOGIC
 
-## Kết quả cần có
+### 3.1. Chuyển mô hình quan niệm sang mô hình quan hệ
 
--   Use Case Diagram tổng quát
--   Danh sách Use Case
--   Actor -- Use Case mapping
--   Mô tả ngắn các Use Case quan trọng
+* 3.1.1. Chuyển thực thể thành quan hệ
+* 3.1.2. Xác định thuộc tính của quan hệ
+* 3.1.3. Xác định khóa chính
+* 3.1.4. Chuyển mối kết hợp 1:N
+* 3.1.5. Chuyển mối kết hợp M:N
+* 3.1.6. Chuyển thực thể yếu và EER
 
-------------------------------------------------------------------------
+### 3.2. Xác định phụ thuộc hàm
 
-# 5. Giai đoạn 3 -- Phân tích nghiệp vụ
+* 3.2.1. Xác định các phụ thuộc hàm từ nghiệp vụ
+* 3.2.2. Kiểm tra phụ thuộc hàm
+* 3.2.3. Phụ thuộc đầy đủ
+* 3.2.4. Phụ thuộc bắc cầu
 
-## Mục tiêu
+### 3.3. Bao đóng và xác định khóa
 
-Mô tả hệ thống hoạt động như thế nào trong thực tế.
+* 3.3.1. Bao đóng của tập thuộc tính
+* 3.3.2. Kiểm tra suy diễn phụ thuộc hàm
+* 3.3.3. Xác định siêu khóa
+* 3.3.4. Xác định khóa ứng viên
 
-## Core Flow 1 -- Creative Space Management
+### 3.4. Phủ tối thiểu
 
-Provider tạo và quản lý Studio / Darkroom.
+* 3.4.1. Tách vế phải
+* 3.4.2. Loại thuộc tính dư
+* 3.4.3. Loại phụ thuộc hàm dư thừa
+* 3.4.4. Xác định phủ tối thiểu
 
-Thông tin cần quản lý có thể gồm:
+### 3.5. Chuẩn hóa lược đồ
 
--   Tên
--   Loại không gian
--   Mô tả
--   Diện tích
--   Sức chứa
--   Phong cách
--   Điều kiện ánh sáng
--   Thông gió
--   Âm học
--   Tiện ích
--   Giờ hoạt động
--   Giá
--   Chính sách sử dụng
--   Hình ảnh
--   Trạng thái
+* 3.5.1. Dạng chuẩn 1NF
+* 3.5.2. Dạng chuẩn 2NF
+* 3.5.3. Dạng chuẩn 3NF
+* 3.5.4. Dạng chuẩn BCNF
+* 3.5.5. Dạng chuẩn 4NF và 5NF *(nếu áp dụng cho bài toán)*
 
-## Core Flow 2 -- Resource & Equipment Management
+### 3.6. Phân rã lược đồ
 
-Provider quản lý:
+* 3.6.1. Xác định quan hệ cần phân rã
+* 3.6.2. Phân rã theo phụ thuộc hàm
+* 3.6.3. Kiểm tra bảo toàn phụ thuộc
+* 3.6.4. Kiểm tra bảo toàn kết nối
+* 3.6.5. Phương pháp Chase *(nếu cần trình bày)*
 
--   Camera
--   Lens
--   Film Scanner
--   Enlarger
--   Lighting
--   Tripod
--   Background
--   Darkroom Equipment
--   Chemical
--   Photographic Paper
+### 3.7. Lược đồ logic cuối cùng
 
-Mỗi Resource có thể cần:
+* 3.7.1. Danh sách các quan hệ
+* 3.7.2. Khóa chính và khóa ngoại
+* 3.7.3. Các ràng buộc dữ liệu
+* 3.7.4. Lược đồ quan hệ sau chuẩn hóa
 
--   Tình trạng
--   Trạng thái
--   Giá thuê
--   Lịch bảo trì
--   Lịch sử sử dụng
+**Lưu ý:** Chương 3 của slide khá nặng về **FD → bao đóng → khóa → phủ tối thiểu → chuẩn hóa → phân rã → Chase**, nên nên giữ các phần này trong mục lục nhưng **không cần chia nhỏ hơn nữa** ở cấp báo cáo.   
 
-## Core Flow 3 -- Reservation & Resource Allocation
+---
 
-Photographer:
+# CHƯƠNG 4. THIẾT KẾ VẬT LÝ
 
-**Tìm → Chọn → Kiểm tra lịch → Đặt → Thanh toán**
+### 4.1. Lựa chọn hệ quản trị cơ sở dữ liệu
 
-Hệ thống phải kiểm tra:
+* 4.1.1. DBMS được lựa chọn
+* 4.1.2. Căn cứ lựa chọn DBMS
 
--   Phòng có trống không?
--   Thiết bị có trống không?
--   Resource có đang bảo trì không?
--   Có bị trùng lịch không?
+### 4.2. Thiết kế lưu trữ vật lý
 
-## Core Flow 4 -- Service Session
+* 4.2.1. Khối và bản ghi
+* 4.2.2. Ước lượng số khối dữ liệu
+* 4.2.3. Lựa chọn tổ chức tập tin
+* 4.2.4. Heap, Sorted và Hash
 
-**Check-in → Sử dụng → Phát sinh dịch vụ/tài nguyên → Check-out**
+### 4.3. Thiết kế chỉ mục
 
-Ghi nhận:
+* 4.3.1. Xác định nhu cầu sử dụng chỉ mục
+* 4.3.2. Chỉ mục Clustered/Nonclustered
+* 4.3.3. Chỉ mục B+
+* 4.3.4. Chỉ mục Hash
+* 4.3.5. Chỉ mục kết hợp
+* 4.3.6. Lựa chọn chỉ mục theo workload
 
--   Thời gian thực tế
--   Equipment được sử dụng
--   Consumable đã sử dụng
--   Dịch vụ phát sinh
--   Trạng thái Check-out
+### 4.4. Phân vùng dữ liệu
 
-## Core Flow 5 -- Service Package
+* 4.4.1. Phân vùng ngang
+* 4.4.2. Phân vùng dọc
+* 4.4.3. Lựa chọn khóa phân vùng
 
-Provider tạo combo:
+### 4.5. Tối ưu truy vấn
 
-**Creative Space + Equipment + Consumable + Service / Instructor**
+* 4.5.1. Phân tích workload
+* 4.5.2. Cây truy vấn và tối ưu phép toán
+* 4.5.3. Ước lượng kích thước trung gian
+* 4.5.4. Ước lượng chi phí truy vấn
+* 4.5.5. Lựa chọn thuật toán kết nối
 
-Ví dụ:
+### 4.6. Lựa chọn cấu hình vật lý
 
-> Darkroom Beginner Package
+* 4.6.1. Bộ đệm (Buffer Pool)
+* 4.6.2. RAID và tổ chức lưu trữ
+* 4.6.3. Row-store và Column-store
+* 4.6.4. Đánh đổi giữa đọc, ghi và dung lượng
 
-gồm:
+### 4.7. Thiết kế vật lý cuối cùng
 
--   Darkroom
--   Enlarger
--   Chemical
--   Photographic Paper
--   Instructor
-
-## Core Flow 6 -- Community
-
-Quản lý:
-
--   Article
--   Tutorial
--   Equipment Review
--   Discussion
--   Comment
--   Workshop
--   Workshop Registration
-
-------------------------------------------------------------------------
-
-# 6. Giai đoạn 4 -- Xác định Entity
-
-## Mục tiêu
-
-Từ nghiệp vụ, tìm ra các đối tượng cần lưu trữ trong CSDL.
-
-## Entity dự kiến
-
-### Nhóm User
-
--   User
--   Role
--   UserRole
--   Photographer
--   ServiceProvider
--   PhotographyExpert
--   Administrator
-
-### Nhóm Creative Space
-
--   CreativeSpace
--   SpaceType
--   SpaceImage
--   Amenity
--   OperatingHour
--   SpacePricing
-
-### Nhóm Resource
-
--   Equipment
--   EquipmentCategory
--   Consumable
--   Maintenance
--   ResourceUsage
-
-### Nhóm Reservation
-
--   Reservation
--   ReservationEquipment
--   ReservationConsumable
--   ResourceAllocation
--   ServiceSession
-
-### Nhóm Service Package
-
--   ServicePackage
--   PackageSpace
--   PackageEquipment
--   PackageConsumable
--   PackageService
-
-### Nhóm Payment
-
--   Payment
--   PaymentTransaction
-
-### Nhóm Community
-
--   Article
--   Category
--   Comment
--   Review
--   Workshop
--   WorkshopRegistration
-
-> Danh sách trên là danh sách dự kiến. Không được coi đây là danh sách
-> bảng cuối cùng. Nhóm phải kiểm tra lại sau khi phân tích Cardinality
-> và chuẩn hóa.
-
-------------------------------------------------------------------------
-
-# 7. Giai đoạn 5 -- Xác định thuộc tính
-
-Với từng Entity, xác định:
-
--   Tên thuộc tính
--   Kiểu dữ liệu dự kiến
--   Thuộc tính bắt buộc
--   Thuộc tính tùy chọn
--   Thuộc tính đa trị
--   Thuộc tính dẫn xuất
--   Khóa chính
--   Khóa ngoại nếu có
-
-Ví dụ:
-
-## CreativeSpace
-
--   space_id
--   provider_id
--   space_type_id
--   name
--   description
--   capacity
--   area
--   style
--   lighting_condition
--   ventilation
--   acoustic
--   status
-
-## Reservation
-
--   reservation_id
--   photographer_id
--   space_id
--   start_time
--   end_time
--   status
--   total_amount
--   created_at
-
-------------------------------------------------------------------------
-
-# 8. Giai đoạn 6 -- Xác định Relationship
-
-## Mục tiêu
-
-Xác định các Entity liên hệ với nhau như thế nào.
-
-Các quan hệ dự kiến:
-
--   Provider **sở hữu** CreativeSpace
--   Provider **quản lý** Equipment
--   Provider **quản lý** Consumable
--   Equipment **thuộc** EquipmentCategory
--   Equipment **có** Maintenance
--   Photographer **tạo** Reservation
--   Reservation **đặt** CreativeSpace
--   Reservation **sử dụng** Equipment
--   Reservation **sử dụng** Consumable
--   Reservation **có** Payment
--   Reservation **tạo ra** ServiceSession
--   Provider **tạo** ServicePackage
--   ServicePackage **bao gồm** CreativeSpace
--   ServicePackage **bao gồm** Equipment
--   ServicePackage **bao gồm** Consumable
--   Photographer **viết** Review
--   Expert **tạo** Article
--   Expert **tổ chức** Workshop
--   Photographer **đăng ký** Workshop
-
-Sau đó xác định Cardinality:
-
--   1:1
--   1:N
--   N:M
-
-------------------------------------------------------------------------
-
-# 9. Giai đoạn 7 -- EER Diagram
-
-## Mục tiêu
-
-Xây dựng mô hình EER hoàn chỉnh.
-
-Nhóm cần xem xét:
-
-### Tổng quát hóa / chuyên biệt hóa
-
-Ví dụ có thể xem xét:
-
-``` text
-USER
-├── Photographer
-├── ServiceProvider
-├── PhotographyExpert
-└── Administrator
-```
-
-Hoặc:
-
-``` text
-RESOURCE
-├── Equipment
-└── Consumable
-```
-
-Nhưng chỉ sử dụng Generalization / Specialization khi thực sự phù hợp
-với nghiệp vụ.
-
-## Kết quả
-
--   EER Diagram
--   Cardinality
--   Participation
--   Primary Key
--   Các specialization/generalization nếu có
-
-------------------------------------------------------------------------
-
-# 10. Giai đoạn 8 -- Chuyển sang mô hình quan hệ
-
-Từ EER chuyển thành các Relation.
-
-Ví dụ:
-
-``` text
-USER(
-    user_id PK,
-    full_name,
-    email,
-    phone,
-    ...
-)
-```
-
-``` text
-CREATIVE_SPACE(
-    space_id PK,
-    provider_id FK,
-    space_type_id FK,
-    name,
-    capacity,
-    ...
-)
-```
-
-Đối với quan hệ N:M, tạo Relation trung gian.
-
-Ví dụ:
-
-``` text
-RESERVATION_EQUIPMENT(
-    reservation_id PK, FK,
-    equipment_id PK, FK,
-    quantity,
-    rental_price
-)
-```
-
-------------------------------------------------------------------------
-
-# 11. Giai đoạn 9 -- Chuẩn hóa
-
-Kiểm tra các Relation theo:
-
--   1NF
--   2NF
--   3NF
-
-Mục tiêu:
-
--   Không lặp dữ liệu.
--   Không có phụ thuộc bộ phận.
--   Không có phụ thuộc bắc cầu.
--   Giảm dư thừa dữ liệu.
--   Hạn chế anomaly khi Insert / Update / Delete.
-
-Không chuẩn hóa máy móc. Chỉ ra lý do tại sao Relation đạt chuẩn.
-
-------------------------------------------------------------------------
-
-# 12. Giai đoạn 10 -- Ràng buộc dữ liệu
-
-Xác định:
-
-### Entity Integrity
-
--   PK không NULL.
--   PK duy nhất.
-
-### Referential Integrity
-
--   FK phải tham chiếu đến bản ghi hợp lệ.
-
-### Domain Constraint
-
-Ví dụ:
-
--   rating từ 1 đến 5.
--   capacity \> 0.
--   price \>= 0.
--   start_time \< end_time.
-
-### Business Constraint
-
-Ví dụ:
-
-> Một Equipment không được được phân bổ cho hai Reservation bị trùng
-> thời gian.
-
-> Một Creative Space không được có hai Reservation trùng thời gian.
-
-> Equipment ở trạng thái Maintenance không được phân bổ cho Reservation.
-
-Đây là các ràng buộc nghiệp vụ quan trọng của đề.
-
-------------------------------------------------------------------------
-
-# 13. Giai đoạn 11 -- Kiểm tra mô hình
-
-Nhóm dùng các tình huống thực tế để kiểm tra CSDL.
-
-## Case 1
-
-Photographer đặt:
-
-> Darkroom A\
-> 14:00--17:00\
-> Enlarger 01
-
-→ Hệ thống phải lưu được.
-
-## Case 2
-
-Người khác muốn đặt:
-
-> Darkroom A\
-> 15:00--16:00
-
-→ Phải phát hiện trùng lịch.
-
-## Case 3
-
-Photographer đặt:
-
-> Studio A + Camera 01 + Lens 01
-
-→ Phải quản lý được tất cả Resource liên quan.
-
-## Case 4
-
-Camera 01 đang Maintenance.
-
-→ Không được phân bổ cho Reservation.
-
-## Case 5
-
-Provider tạo Package gồm:
-
-> Studio + Camera + Lens + Consumable.
-
-→ Database phải biểu diễn được Package và các thành phần.
-
-## Case 6
-
-Photographer hoàn thành Reservation.
-
-→ Có thể tạo Review.
-
-## Case 7
-
-Expert tạo Workshop.
-
-→ Photographer có thể đăng ký Workshop.
-
-------------------------------------------------------------------------
-
-# 14. Giai đoạn 12 -- Hoàn thiện báo cáo
-
-Cấu trúc báo cáo đề xuất:
-
-## Chương 1 -- Tổng quan đề tài
-
--   Bối cảnh
--   Vấn đề
--   Mục tiêu
--   Phạm vi
--   Đối tượng sử dụng
-
-## Chương 2 -- Phân tích yêu cầu
-
--   Actor
--   Use Case
--   Functional Requirements
--   Core Flows
--   Business Rules
-
-## Chương 3 -- Phân tích và thiết kế dữ liệu
-
--   Xác định Entity
--   Thuộc tính
--   Relationship
--   Cardinality
--   EER Diagram
--   Generalization / Specialization
-
-## Chương 4 -- Thiết kế mô hình quan hệ
-
--   Danh sách Relation
--   PK
--   FK
--   Constraints
--   Mapping EER → Relational Model
-
-## Chương 5 -- Chuẩn hóa
-
--   1NF
--   2NF
--   3NF
--   Giải thích kết quả
-
-## Chương 6 -- Đánh giá
-
--   Kiểm tra các nghiệp vụ
--   Kiểm tra tính toàn vẹn
--   Khả năng mở rộng
--   Hạn chế của mô hình
-
-------------------------------------------------------------------------
-
-# 15. Phân công nhóm đề xuất
-
-  Thành viên     Phụ trách
-  -------------- ---------------------------------------------------------
-  Thành viên 1   Phân tích yêu cầu + Actor + Use Case
-  Thành viên 2   Phân tích User + Provider + Creative Space
-  Thành viên 3   Phân tích Equipment + Consumable + Maintenance
-  Thành viên 4   Phân tích Reservation + Resource Allocation + Payment
-  Thành viên 5   Phân tích Package + Community + Workshop + Review
-  Cả nhóm        EER, mô hình quan hệ, chuẩn hóa, kiểm tra và hoàn thiện
-
-Nếu nhóm ít/người nhiều hơn thì chia lại theo từng module.
-
-------------------------------------------------------------------------
-
-# 16. Tiến độ đề xuất
-
-## Phase 1 -- Hiểu đề
-
-**Mục tiêu:** thống nhất phạm vi và nghiệp vụ.
-
-Deliverable: - Actor - Core Flow - Danh sách nghiệp vụ
-
-## Phase 2 -- Use Case
-
-**Mục tiêu:** xác định chức năng hệ thống.
-
-Deliverable: - Use Case Diagram - Use Case list
-
-## Phase 3 -- Entity
-
-**Mục tiêu:** xác định dữ liệu cần lưu.
-
-Deliverable: - Entity list - Attribute list
-
-## Phase 4 -- Relationship
-
-**Mục tiêu:** xác định mối quan hệ.
-
-Deliverable: - Relationship - Cardinality - Participation
-
-## Phase 5 -- EER
-
-**Mục tiêu:** hoàn thành mô hình khái niệm.
-
-Deliverable: - EER Diagram
-
-## Phase 6 -- Relational Model
-
-**Mục tiêu:** chuyển sang mô hình quan hệ.
-
-Deliverable: - Relation schemas - PK/FK
-
-## Phase 7 -- Normalization
-
-**Mục tiêu:** kiểm tra và chuẩn hóa.
-
-Deliverable: - 1NF - 2NF - 3NF
-
-## Phase 8 -- Final Review
-
-**Mục tiêu:** kiểm tra toàn bộ hệ thống.
-
-Deliverable: - ER/EER hoàn chỉnh - Relational Schema hoàn chỉnh -
-Business Constraints - Báo cáo hoàn chỉnh
-
-------------------------------------------------------------------------
-
-# 17. Checklist cuối cùng
-
--   [ ] Hiểu rõ đề tài
--   [ ] Xác định Actor
--   [ ] Xác định Use Case
--   [ ] Xác định Core Flow
--   [ ] Xác định Business Rules
--   [ ] Xác định Entity
--   [ ] Xác định Attribute
--   [ ] Xác định PK
--   [ ] Xác định Relationship
--   [ ] Xác định Cardinality
--   [ ] Xem xét Generalization / Specialization
--   [ ] Hoàn thành EER Diagram
--   [ ] Chuyển sang Relational Model
--   [ ] Xác định FK
--   [ ] Chuẩn hóa đến 3NF
--   [ ] Xác định Constraint
--   [ ] Kiểm tra các Case nghiệp vụ
--   [ ] Hoàn thiện báo cáo
-
-------------------------------------------------------------------------
-
-# 18. Thứ tự nhóm nên làm ngay bây giờ
-
-**Không làm tất cả cùng lúc.**
-
-Thứ tự nên là:
-
-``` text
-1. Hiểu đề
-      ↓
-2. Actor
-      ↓
-3. Use Case
-      ↓
-4. Mô tả nghiệp vụ
-      ↓
-5. Entity
-      ↓
-6. Attribute
-      ↓
-7. Relationship + Cardinality
-      ↓
-8. EER
-      ↓
-9. Relational Model
-      ↓
-10. Normalization
-      ↓
-11. Constraint
-      ↓
-12. Kiểm tra + Báo cáo
-```
-
+* 4.7.1. Kiểu dữ liệu
+* 4.7.2. Các ràng buộc vật lý
+* 4.7.3. Các chỉ mục
+* 4.7.4. Phân vùng/cấu hình lưu trữ
+* 4.7.5. Tổng hợp thiết kế vật lý
