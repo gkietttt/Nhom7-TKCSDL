@@ -585,66 +585,78 @@ Mỗi User chỉ có một vai trò tại một thời điểm. Tài khoản có
 
 Hệ thống quản lý 15 thực thể chính và 6 bảng kết hợp như sau:
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\caption{Danh sách thực thể của hệ thống}
-\begin{tabular}{|c|l|p{9cm}|}
+\begin{tabular}{|c|l|p{8cm}|}
 \hline
 \textbf{STT} & \textbf{Thực thể} & \textbf{Ý nghĩa nghiệp vụ} \\
 \hline
-1  & User              & Đại diện người dùng của hệ thống với các vai trò Photographer, Service Provider, Photography Expert hoặc Administrator. \\
+1 & User & Đại diện người dùng của hệ thống với các vai trò Photographer, Service Provider, Photography Expert hoặc Administrator. \\
 \hline
-2  & Service Provider  & Đại diện cá nhân hoặc tổ chức cung cấp và quản lý creative space, resource và service package. \\
+2 & Service Provider & Đại diện cá nhân hoặc tổ chức cung cấp và quản lý creative space, resource và service package. \\
 \hline
-3  & Creative Space    & Đại diện các không gian sáng tạo như darkroom và photography studio. \\
+3 & Creative Space & Đại diện các không gian sáng tạo như darkroom và photography studio. \\
 \hline
-4  & Resource          & Đại diện các tài nguyên như thiết bị chụp ảnh, thiết bị darkroom và vật tư tiêu hao. \\
+4 & Resource & Đại diện các tài nguyên như thiết bị chụp ảnh, thiết bị darkroom và vật tư tiêu hao. \\
 \hline
-5  & Maintenance       & Đại diện các hoạt động và lịch bảo trì tài nguyên. \\
+5 & Maintenance & Đại diện các hoạt động và lịch bảo trì tài nguyên. \\
 \hline
-6  & Service Package   & Đại diện các gói dịch vụ kết hợp creative space, resource và dịch vụ hỗ trợ. \\
+6 & Service Package & Đại diện các gói dịch vụ kết hợp creative space, resource và dịch vụ hỗ trợ. \\
 \hline
-7  & Promotion         & Đại diện các chương trình khuyến mãi do Service Provider cấu hình. \\
+7 & Promotion & Đại diện các chương trình khuyến mãi do Service Provider cấu hình. \\
 \hline
-8  & Reservation       & Đại diện nghiệp vụ đặt creative space, resource hoặc service package. \\
+8 & Reservation & Đại diện nghiệp vụ đặt creative space, resource hoặc service package. \\
 \hline
-9  & Payment           & Đại diện thông tin thanh toán phát sinh từ reservation. \\
+9 & Payment & Đại diện thông tin thanh toán phát sinh từ reservation. \\
 \hline
-10 & Service Session   & Đại diện phiên sử dụng dịch vụ thực tế bao gồm check-in, check-out. \\
+10 & Service Session & Đại diện phiên sử dụng dịch vụ thực tế bao gồm check-in, check-out. \\
 \hline
-11 & Review            & Đại diện đánh giá và nhận xét của người dùng sau quá trình sử dụng. \\
+11 & Review & Đại diện đánh giá và nhận xét của người dùng sau quá trình sử dụng. \\
 \hline
 12 & Community Content & Đại diện các nội dung được chia sẻ trong cộng đồng nhiếp ảnh. \\
 \hline
-13 & Workshop          & Đại diện các buổi workshop hoặc training session. \\
+13 & Workshop & Đại diện các buổi workshop hoặc training session. \\
 \hline
-14 & Photo             & Đại diện các ảnh kỹ thuật số được người dùng quản lý trên hệ thống. \\
+14 & Photo & Đại diện các ảnh kỹ thuật số được người dùng quản lý trên hệ thống. \\
 \hline
-15 & Complaint         & Đại diện các khiếu nại hoặc tranh chấp phát sinh trong quá trình sử dụng dịch vụ. \\
+15 & Complaint & Đại diện các khiếu nại hoặc tranh chấp phát sinh trong quá trình sử dụng dịch vụ. \\
 \hline
 \end{tabular}
+\caption{Danh sách thực thể của hệ thống}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\caption{Danh sách bảng kết hợp}
-\begin{tabular}{|c|l|l|p{6cm}|}
+\begin{tabular}{|c|l|p{7cm}|}
 \hline
-\textbf{STT} & \textbf{Mối kết hợp} & \textbf{Bảng kết hợp} & \textbf{Ý nghĩa nghiệp vụ} \\
+\textbf{STT} & \textbf{Mối kết hợp} & \textbf{Ý nghĩa nghiệp vụ} \\
 \hline
-1 & Service Package -- Creative Space & Package Space         & Liên kết các Creative Space được bao gồm trong Service Package. \\
+1 & Service Package \newline-- Creative Space & Liên kết các Creative Space được bao gồm trong Service Package. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Package Space} & \\
 \hline
-2 & Service Package -- Resource       & Package Resource      & Lưu số lượng Resource được sử dụng trong một Service Package. \\
+2 & Service Package \newline-- Resource & Lưu số lượng Resource được sử dụng trong một Service Package. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Package Resource} & \\
 \hline
-3 & Creative Space -- Reservation     & Reservation Space     & Liên kết các Creative Space được sử dụng trong Reservation. \\
+3 & Creative Space \newline-- Reservation & Liên kết các Creative Space được sử dụng trong Reservation. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Reservation Space} & \\
 \hline
-4 & Reservation -- Resource           & Reservation Resource  & Lưu số lượng Resource được phân bổ cho một Reservation. \\
+4 & Reservation \newline-- Resource & Lưu số lượng Resource được phân bổ cho một Reservation. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Reservation Resource} & \\
 \hline
-5 & Service Session -- Resource       & Session Resource      & Lưu số lượng Resource thực tế được sử dụng trong một Service Session. \\
+5 & Service Session \newline-- Resource & Lưu số lượng Resource thực tế được sử dụng trong một Service Session. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Session Resource} & \\
 \hline
-6 & User -- Workshop                  & Workshop Registration & Liên kết User với các Workshop mà User tham gia. \\
+6 & User \newline-- Workshop & Liên kết User với các Workshop mà User tham gia. \\
+\cline{2-3}
+& \textit{\textbf{Bảng:} Workshop Registration} & \\
 \hline
 \end{tabular}
+\caption{Danh sách bảng kết hợp}
 \end{table}
 
 \subsection{Danh sách yêu cầu dữ liệu}
@@ -668,9 +680,8 @@ Các dữ liệu cần được lưu trữ lâu dài bao gồm:
 
 \subsection{Danh sách quy tắc nghiệp vụ}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\caption{Tổng hợp các mối quan hệ và bản số}
 \begin{tabular}{|c|l|l|c|}
 \hline
 \textbf{STT} & \textbf{Mối kết hợp} & \textbf{Quan hệ} & \textbf{Bản số} \\
@@ -718,6 +729,7 @@ Các dữ liệu cần được lưu trữ lâu dài bao gồm:
 21 & User -- Complaint                   & Gửi              & 1:N    \\
 \hline
 \end{tabular}
+\caption{Tổng hợp các mối quan hệ và bản số}
 \end{table}
 
 \subsection{Đầu vào cho thiết kế quan niệm}

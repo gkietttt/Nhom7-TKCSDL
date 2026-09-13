@@ -14,7 +14,7 @@ Dựa trên mô hình quan niệm đã xây dựng ở Chương 2, hệ thống 
 
 \begin{table}[htbp]
 \centering
-\caption{Danh sách các thực thể được chuyển thành quan hệ}
+
 \begin{tabular}{|c|l|l|}
 \hline
 \textbf{STT} & \textbf{Thực thể} & \textbf{Quan hệ tương ứng} \\
@@ -50,6 +50,7 @@ Dựa trên mô hình quan niệm đã xây dựng ở Chương 2, hệ thống 
 15 & Complaint & \texttt{COMPLAINT} \\
 \hline
 \end{tabular}
+\caption{Danh sách các thực thể được chuyển thành quan hệ}
 \end{table}
 
 Việc ánh xạ này giúp bảo đảm mỗi đối tượng nghiệp vụ được quản lý bởi một quan hệ riêng. Các mối kết hợp giữa các thực thể sẽ được chuyển thành khóa ngoại hoặc các quan hệ trung gian tùy theo bản số của từng mối kết hợp.
@@ -62,7 +63,6 @@ Các thuộc tính của 15 quan hệ được xác định như sau:
 
 \begin{table}[htbp]
 \centering
-\caption{Thuộc tính của các quan hệ chính}
 \scriptsize
 \setlength{\tabcolsep}{2pt}
 \begin{tabular}{|p{.18\linewidth}|p{.72\linewidth}|}
@@ -115,6 +115,7 @@ Các thuộc tính của 15 quan hệ được xác định như sau:
 \texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \\
 \hline
 \end{tabular}
+\caption{Thuộc tính của các quan hệ chính}
 \end{table}
 
 Ở giai đoạn này, các thuộc tính được giữ theo mô hình quan niệm đã xác định. Việc lựa chọn kiểu dữ liệu cụ thể như \texttt{INT}, \texttt{VARCHAR}, \texttt{DECIMAL}, \texttt{DATETIME} hoặc \texttt{BOOLEAN} sẽ được trình bày chi tiết trong phần thiết kế lược đồ logic và từ điển dữ liệu.
@@ -134,7 +135,6 @@ Trong hệ thống đang xét, mỗi thực thể có một thuộc tính mã đ
 
 \begin{table}[htbp]
 \centering
-\caption{Khóa chính của các quan hệ chính}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{Quan hệ} & \textbf{Khóa chính} \\
@@ -170,6 +170,7 @@ Trong hệ thống đang xét, mỗi thực thể có một thuộc tính mã đ
 \texttt{COMPLAINT} & \texttt{complaint\_id} \\
 \hline
 \end{tabular}
+\caption{Khóa chính của các quan hệ chính}
 \end{table}
 
 Các khóa chính được lựa chọn đều là khóa đơn vì mỗi thực thể đã có thuộc tính mã định danh riêng. Việc sử dụng khóa đơn giúp đơn giản hóa việc tham chiếu giữa các quan hệ và thuận tiện cho quá trình chuyển các mối kết hợp sang khóa ngoại.
@@ -182,7 +183,6 @@ Trong mô hình của hệ thống, các mối kết hợp \(1:N\) được chuy
 
 \begin{table}[htbp]
 \centering
-\caption{Chuyển các mối kết hợp 1:N}
 \begin{tabular}{|p{3.2cm}|p{3.2cm}|p{5.8cm}|}
 \hline
 \textbf{Mối kết hợp} & \textbf{Khóa ngoại} & \textbf{Ý nghĩa} \\
@@ -232,6 +232,7 @@ User -- Complaint &
 Mỗi khiếu nại được gửi bởi một người dùng. \\
 \hline
 \end{tabular}
+\caption{Chuyển các mối kết hợp 1:N}
 \end{table}
 
 Ngoài các mối kết hợp \(1:N\) thông thường, mối kết hợp giữa \texttt{SERVICE\_PACKAGE} và \texttt{RESERVATION} có bản số \(N:1\). Theo đó, một gói dịch vụ có thể được chọn trong nhiều lượt đặt chỗ, trong khi mỗi lượt đặt chỗ có thể chọn không quá một gói dịch vụ.
@@ -285,7 +286,6 @@ Các mối kết hợp \(M:N\) trong hệ thống được chuyển đổi như 
 
 \begin{table}[htbp]
 \centering
-\caption{Các quan hệ trung gian cho mối kết hợp M:N}
 \begin{tabular}{|p{.25\linewidth}|p{.25\linewidth}|p{.36\linewidth}|}
 \hline
 \textbf{Mối kết hợp} & \textbf{Quan hệ trung gian} & \textbf{Thuộc tính} \\
@@ -315,6 +315,7 @@ User -- Workshop (Tham gia) &
 \texttt{user\_id}, \texttt{workshop\_id} \\
 \hline
 \end{tabular}
+\caption{Các quan hệ trung gian cho mối kết hợp M:N}
 \end{table}
 
 Các quan hệ trung gian được xác định khóa chính như sau:
