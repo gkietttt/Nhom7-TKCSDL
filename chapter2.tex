@@ -925,3 +925,90 @@ Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô t
 \subsection{ERD/EER hoàn chỉnh}
 \subsection{Từ điển dữ liệu}
 \subsection{Danh sách các ràng buộc nghiệp vụ}
+\section{Kiểm chứng mô hình quan niệm}
+Mục tiêu của bước này là rà soát lại toàn bộ mô hình ERD để đảm bảo tính đúng đắn, đầy đủ và phù hợp với các yêu cầu nghiệp vụ đã đặt ra ở Chương 1, trước khi tiến hành chuyển đổi sang mô hình logic.
+
+\subsection{Kiểm tra thực thể và thuộc tính}
+Quá trình kiểm tra tập trung vào việc loại bỏ sự dư thừa dữ liệu và đảm bảo mỗi thuộc tính được gán đúng vào thực thể chủ quản:
+\begin{itemize}
+    \item \textbf{Tính nguyên tử:} Các thuộc tính như địa chỉ của \textbf{Service Provider} tạm thời được giữ nguyên ở mức quan niệm, nhưng đã được ghi chú để tách nhỏ (số nhà, đường, quận, thành phố) ở mức logic.
+    \item \textbf{Đúng vị trí:} Thuộc tính \texttt{rental\_price} (giá thuê) được đặt đúng tại \textbf{Resource}, trong khi \texttt{total\_amount} (tổng tiền) được đặt tại \textbf{Reservation} vì tổng tiền phụ thuộc vào thời lượng và số lượng cụ thể được tính toán trong lúc đặt.
+    \item \textbf{Không dư thừa thực thể:} Các khái niệm phụ như "Hóa đơn" đã được tích hợp gọn vào thực thể \textbf{Payment}.
+\end{itemize}
+
+\subsection{Kiểm tra mối kết hợp và bản số}
+Các mối kết hợp và bản số được đối chiếu chéo với quy trình hoạt động thực tế của nền tảng:
+\begin{itemize}
+    \item Ràng buộc $0..1$ giữa \textbf{Reservation} và \textbf{Payment} phản ánh đúng thực tế: Một người dùng có thể tạo lệnh đặt chỗ nhưng chưa tiến hành thanh toán ngay.
+    \item Mối kết hợp M:N giữa \textbf{Reservation} và \textbf{Resource} có chứa thuộc tính \texttt{quantity} là hoàn toàn hợp lý, vì số lượng mượn thiết bị chỉ có ý nghĩa khi có một giao dịch đặt chỗ cụ thể xảy ra.
+    \item Thực thể \textbf{Review} bắt buộc ($1..1$) phải gắn với một \textbf{Reservation}, ngăn chặn người dùng đánh giá khống.
+\end{itemize}
+
+\subsection{Kiểm tra bằng dữ liệu mẫu và tình huống}
+Giả lập kịch bản nghiệp vụ: \textit{"Nhiếp ảnh gia A (User) đặt Phòng Tối B (Creative Space) và thuê thêm 2 Khay rửa ảnh (Resource). Sau khi dùng xong, A thanh toán và để lại đánh giá."}
+
+\textbf{Luồng liên kết dữ liệu trên mô hình:}
+\begin{enumerate}
+    \item Hệ thống tạo một \textbf{Reservation} do \textbf{User} A làm chủ.
+    \item \textbf{Reservation} liên kết với \textbf{Creative Space} (Phòng tối B).
+    \item \textbf{Reservation} liên kết với \textbf{Resource} (Khay rửa) qua mối kết hợp "Phân bổ" (\texttt{quantity = 2}).
+    \item Khi thanh toán, một \textbf{Payment} được tạo và liên kết $1:1$ với \textbf{Reservation}.
+    \item \textbf{Review} được tạo và tham chiếu trực tiếp về \textbf{Reservation} đó.
+\end{enumerate}
+Mô hình ERD hiện tại lưu trữ đầy đủ luồng thông tin này mà không gặp điểm nghẽn.
+
+\section{Kết quả thiết kế quan niệm}
+\subsection{ERD/EER hoàn chỉnh}
+Sau quá trình rà soát và kiểm chứng, mô hình Thực thể - Mối kết hợp (ERD) đã hoàn thiện, biểu diễn đầy đủ 15 thực thể và 21 mối kết hợp.
+
+\begin{figure}[H]
+    \centering
+    % Đảm bảo bạn đã lưu ảnh TKCSDL_ERD.png vào thư mục diagram/
+    \includegraphics[width=\textwidth]{diagram/TKCSDL_ERD.png}
+    \caption{Sơ đồ Thực thể - Mối kết hợp (ERD) mức quan niệm hoàn chỉnh}
+    \label{fig:erd_hoanchinh}
+\end{figure}
+
+\subsection{Từ điển dữ liệu}
+Từ điển dữ liệu dưới đây trích xuất định nghĩa cho một số thực thể cốt lõi nhất của hệ thống, làm tài liệu tham chiếu cho bước thiết kế logic.
+
+\begin{table}[H]
+    \centering
+    \caption{Từ điển dữ liệu các thực thể cốt lõi}
+    \label{tab:data_dictionary}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|l|l|l|p{6cm}|}
+        \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Kiểu DL} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{3}{*}{\textbf{User}} 
+        & \underline{user\_id} & INT & Mã định danh người dùng \\ \cline{2-4} 
+        & email & VARCHAR & Địa chỉ email đăng nhập \\ \cline{2-4} 
+        & role & VARCHAR & Vai trò (Photographer, Provider, Expert) \\ \hline
+        \multirow{3}{*}{\textbf{Reservation}} 
+        & \underline{reservation\_id} & INT & Mã giao dịch đặt chỗ \\ \cline{2-4} 
+        & start\_time & DATETIME & Thời gian bắt đầu sử dụng dịch vụ \\ \cline{2-4} 
+        & status & VARCHAR & Trạng thái đặt chỗ \\ \hline
+        \multirow{3}{*}{\textbf{Resource}} 
+        & \underline{resource\_id} & INT & Mã thiết bị \\ \cline{2-4} 
+        & resource\_name & VARCHAR & Tên gọi của thiết bị \\ \cline{2-4} 
+        & quantity & INT & Số lượng trong kho \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Danh sách các ràng buộc nghiệp vụ}
+Tổng hợp các quy tắc vận hành bắt buộc phải tuân thủ khi thao tác với dữ liệu của hệ thống:
+
+\begin{table}[H]
+    \centering
+    \caption{Danh sách Ràng buộc nghiệp vụ (Business Rules)}
+    \label{tab:business_rules}
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|c|p{3.5cm}|p{8.5cm}|}
+        \hline
+        \textbf{Mã} & \textbf{Loại ràng buộc} & \textbf{Nội dung} \\ \hline
+        \textbf{BR1} & Miền giá trị (Domain) & Thuộc tính \texttt{rating} của \textbf{Review} chỉ nhận giá trị nguyên từ 1 đến 5. \\ \hline
+        \textbf{BR2} & Liên thuộc tính & Trong \textbf{Reservation}, \texttt{end\_time} bắt buộc phải diễn ra sau \texttt{start\_time}. \\ \hline
+        \textbf{BR3} & Ràng buộc tham gia & Một khoản thanh toán (\textbf{Payment}) bắt buộc phải tham chiếu đến đúng một \textbf{Reservation}. \\ \hline
+        \textbf{BR4} & Ràng buộc số lượng & Số lượng thiết bị khách hàng đặt (thuộc tính \texttt{quantity} của mối kết hợp) không được vượt quá số lượng tồn kho của \textbf{Resource}. \\ \hline
+    \end{tabular}
+\end{table}
