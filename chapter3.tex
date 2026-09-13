@@ -1,12 +1,366 @@
 \chapter{Thiết kế logic}
 
+Chương này trình bày quá trình chuyển mô hình quan niệm của hệ thống nền tảng kết nối cộng đồng nhiếp ảnh phim với các nhà cung cấp không gian sáng tạo, thiết bị và dịch vụ hỗ trợ sang mô hình quan hệ. Nội dung được xây dựng dựa trên các thực thể, thuộc tính và mối kết hợp đã xác định ở Chương 2.
+
+Mục tiêu của thiết kế logic là xây dựng tập các quan hệ có cấu trúc rõ ràng, xác định khóa chính và khóa ngoại, đồng thời chuẩn bị cơ sở cho việc xác định phụ thuộc hàm, tìm khóa ứng viên, chuẩn hóa và phân rã lược đồ ở các phần tiếp theo.
+
 \section{Chuyển mô hình quan niệm sang mô hình quan hệ}
+
 \subsection{Chuyển thực thể thành quan hệ}
+
+Trong mô hình quan niệm, mỗi thực thể biểu diễn một đối tượng hoặc một nhóm đối tượng cần được hệ thống quản lý. Khi chuyển sang mô hình quan hệ, mỗi thực thể được ánh xạ thành một quan hệ tương ứng. Các thuộc tính của thực thể trở thành các thuộc tính của quan hệ, còn mã định danh của thực thể được sử dụng làm khóa chính.
+
+Dựa trên mô hình quan niệm đã xây dựng ở Chương 2, hệ thống gồm 15 thực thể chính. Các thực thể này được chuyển thành các quan hệ như sau:
+
+\begin{table}[htbp]
+\centering
+\caption{Danh sách các thực thể được chuyển thành quan hệ}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{STT} & \textbf{Thực thể} & \textbf{Quan hệ tương ứng} \\
+\hline
+1 & User & \texttt{USER} \\
+\hline
+2 & Service Provider & \texttt{SERVICE\_PROVIDER} \\
+\hline
+3 & Creative Space & \texttt{CREATIVE\_SPACE} \\
+\hline
+4 & Resource & \texttt{RESOURCE} \\
+\hline
+5 & Maintenance & \texttt{MAINTENANCE} \\
+\hline
+6 & Service Package & \texttt{SERVICE\_PACKAGE} \\
+\hline
+7 & Promotion & \texttt{PROMOTION} \\
+\hline
+8 & Reservation & \texttt{RESERVATION} \\
+\hline
+9 & Payment & \texttt{PAYMENT} \\
+\hline
+10 & Service Session & \texttt{SERVICE\_SESSION} \\
+\hline
+11 & Review & \texttt{REVIEW} \\
+\hline
+12 & Community Content & \texttt{COMMUNITY\_CONTENT} \\
+\hline
+13 & Workshop & \texttt{WORKSHOP} \\
+\hline
+14 & Photo & \texttt{PHOTO} \\
+\hline
+15 & Complaint & \texttt{COMPLAINT} \\
+\hline
+\end{tabular}
+\end{table}
+
+Việc ánh xạ này giúp bảo đảm mỗi đối tượng nghiệp vụ được quản lý bởi một quan hệ riêng. Các mối kết hợp giữa các thực thể sẽ được chuyển thành khóa ngoại hoặc các quan hệ trung gian tùy theo bản số của từng mối kết hợp.
+
 \subsection{Xác định thuộc tính của quan hệ}
+
+Sau khi xác định các quan hệ, các thuộc tính của từng thực thể được chuyển thành các thuộc tính tương ứng trong quan hệ. Mỗi thuộc tính cần có miền giá trị phù hợp với nội dung nghiệp vụ và phải bảo đảm giá trị trong một ô dữ liệu là nguyên tố.
+
+Các thuộc tính của 15 quan hệ được xác định như sau:
+
+\begin{table}[htbp]
+\centering
+\caption{Thuộc tính của các quan hệ chính}
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{|p{.18\linewidth}|p{.72\linewidth}|}
+\hline
+\textbf{Quan hệ} & \textbf{Các thuộc tính} \\
+\hline
+\texttt{USER} &
+\texttt{user\_id}, \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password}, \texttt{role}, \texttt{status}, \texttt{created\_at} \\
+\hline
+\texttt{SERVICE\_PROVIDER} &
+\texttt{provider\_id}, \texttt{business\_name}, \texttt{description}, \texttt{address}, \texttt{status}, \texttt{created\_at} \\
+\hline
+\texttt{CREATIVE\_SPACE} &
+\texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} \\
+\hline
+\texttt{RESOURCE} &
+\texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} \\
+\hline
+\texttt{MAINTENANCE} &
+\texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} \\
+\hline
+\texttt{SERVICE\_PACKAGE} &
+\texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at} \\
+\hline
+\texttt{PROMOTION} &
+\texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} \\
+\hline
+\texttt{RESERVATION} &
+\texttt{reservation\_id}, \texttt{user\_id}, \texttt{package\_id}, \texttt{start\_time}, \texttt{end\_time}, \texttt{status}, \texttt{total\_amount}, \texttt{created\_at} \\
+\hline
+\texttt{PAYMENT} &
+\texttt{payment\_id}, \texttt{reservation\_id}, \texttt{amount}, \texttt{payment\_method}, \texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at} \\
+\hline
+\texttt{SERVICE\_SESSION} &
+\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status} \\
+\hline
+\texttt{REVIEW} &
+\texttt{review\_id}, \texttt{user\_id}, \texttt{reservation\_id}, \texttt{rating}, \texttt{comment}, \texttt{created\_at} \\
+\hline
+\texttt{COMMUNITY\_CONTENT} &
+\texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \\
+\hline
+\texttt{WORKSHOP} &
+\texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} \\
+\hline
+\texttt{PHOTO} &
+\texttt{photo\_id}, \texttt{user\_id}, \texttt{title}, \texttt{file\_url}, \texttt{description}, \texttt{created\_at}, \texttt{updated\_at} \\
+\hline
+\texttt{COMPLAINT} &
+\texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \\
+\hline
+\end{tabular}
+\end{table}
+
+Ở giai đoạn này, các thuộc tính được giữ theo mô hình quan niệm đã xác định. Việc lựa chọn kiểu dữ liệu cụ thể như \texttt{INT}, \texttt{VARCHAR}, \texttt{DECIMAL}, \texttt{DATETIME} hoặc \texttt{BOOLEAN} sẽ được trình bày chi tiết trong phần thiết kế lược đồ logic và từ điển dữ liệu.
+
+Một số thuộc tính có thể được sử dụng để biểu diễn trạng thái hoặc phân loại đối tượng, chẳng hạn như \texttt{role}, \texttt{status}, \texttt{resource\_type}, \texttt{space\_type} và \texttt{content\_type}. Các thuộc tính này cần được giới hạn miền giá trị bằng các ràng buộc phù hợp khi triển khai cơ sở dữ liệu.
+
 \subsection{Xác định khóa chính}
+
+Khóa chính là thuộc tính hoặc tập thuộc tính dùng để định danh duy nhất mỗi bộ trong một quan hệ. Khóa chính phải bảo đảm hai tính chất:
+
+\begin{itemize}
+    \item Không có hai bộ khác nhau trong cùng một quan hệ có cùng giá trị khóa chính.
+    \item Khóa chính không được nhận giá trị \texttt{NULL}.
+\end{itemize}
+
+Trong hệ thống đang xét, mỗi thực thể có một thuộc tính mã định danh riêng. Do đó, các mã định danh này được chọn làm khóa chính cho các quan hệ tương ứng.
+
+\begin{table}[htbp]
+\centering
+\caption{Khóa chính của các quan hệ chính}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Quan hệ} & \textbf{Khóa chính} \\
+\hline
+\texttt{USER} & \texttt{user\_id} \\
+\hline
+\texttt{SERVICE\_PROVIDER} & \texttt{provider\_id} \\
+\hline
+\texttt{CREATIVE\_SPACE} & \texttt{space\_id} \\
+\hline
+\texttt{RESOURCE} & \texttt{resource\_id} \\
+\hline
+\texttt{MAINTENANCE} & \texttt{maintenance\_id} \\
+\hline
+\texttt{SERVICE\_PACKAGE} & \texttt{package\_id} \\
+\hline
+\texttt{PROMOTION} & \texttt{promotion\_id} \\
+\hline
+\texttt{RESERVATION} & \texttt{reservation\_id} \\
+\hline
+\texttt{PAYMENT} & \texttt{payment\_id} \\
+\hline
+\texttt{SERVICE\_SESSION} & \texttt{session\_id} \\
+\hline
+\texttt{REVIEW} & \texttt{review\_id} \\
+\hline
+\texttt{COMMUNITY\_CONTENT} & \texttt{content\_id} \\
+\hline
+\texttt{WORKSHOP} & \texttt{workshop\_id} \\
+\hline
+\texttt{PHOTO} & \texttt{photo\_id} \\
+\hline
+\texttt{COMPLAINT} & \texttt{complaint\_id} \\
+\hline
+\end{tabular}
+\end{table}
+
+Các khóa chính được lựa chọn đều là khóa đơn vì mỗi thực thể đã có thuộc tính mã định danh riêng. Việc sử dụng khóa đơn giúp đơn giản hóa việc tham chiếu giữa các quan hệ và thuận tiện cho quá trình chuyển các mối kết hợp sang khóa ngoại.
+
 \subsection{Chuyển mối kết hợp 1:N}
+
+Đối với mối kết hợp có bản số \(1:N\), khóa chính của quan hệ ở phía \(1\) được đưa sang quan hệ ở phía \(N\) để làm khóa ngoại. Khóa ngoại này dùng để biểu diễn việc mỗi bộ ở phía \(N\) thuộc về một bộ ở phía \(1\).
+
+Trong mô hình của hệ thống, các mối kết hợp \(1:N\) được chuyển đổi như sau:
+
+\begin{table}[htbp]
+\centering
+\caption{Chuyển các mối kết hợp 1:N}
+\begin{tabular}{|p{3.2cm}|p{3.2cm}|p{5.8cm}|}
+\hline
+\textbf{Mối kết hợp} & \textbf{Khóa ngoại} & \textbf{Ý nghĩa} \\
+\hline
+Service Provider -- Creative Space &
+\texttt{provider\_id} trong \texttt{CREATIVE\_SPACE} &
+Mỗi không gian sáng tạo thuộc về một nhà cung cấp. \\
+\hline
+Service Provider -- Resource &
+\texttt{provider\_id} trong \texttt{RESOURCE} &
+Mỗi tài nguyên do một nhà cung cấp quản lý. \\
+\hline
+Service Provider -- Service Package &
+\texttt{provider\_id} trong \texttt{SERVICE\_PACKAGE} &
+Mỗi gói dịch vụ do một nhà cung cấp tạo ra. \\
+\hline
+Service Provider -- Promotion &
+\texttt{provider\_id} trong \texttt{PROMOTION} &
+Mỗi chương trình khuyến mãi thuộc về một nhà cung cấp. \\
+\hline
+Resource -- Maintenance &
+\texttt{resource\_id} trong \texttt{MAINTENANCE} &
+Mỗi bản ghi bảo trì gắn với một tài nguyên. \\
+\hline
+User -- Reservation &
+\texttt{user\_id} trong \texttt{RESERVATION} &
+Mỗi lượt đặt chỗ được tạo bởi một người dùng. \\
+\hline
+User -- Review &
+\texttt{user\_id} trong \texttt{REVIEW} &
+Mỗi đánh giá được viết bởi một người dùng. \\
+\hline
+User -- Community Content &
+\texttt{user\_id} trong \texttt{COMMUNITY\_CONTENT} &
+Mỗi nội dung cộng đồng được tạo bởi một người dùng. \\
+\hline
+User -- Workshop (Tổ chức) &
+\texttt{user\_id} trong \texttt{WORKSHOP} &
+Mỗi workshop có một người dùng tổ chức. \\
+\hline
+User -- Photo &
+\texttt{user\_id} trong \texttt{PHOTO} &
+Mỗi ảnh được quản lý bởi một người dùng. \\
+\hline
+User -- Complaint &
+\texttt{user\_id} trong \texttt{COMPLAINT} &
+Mỗi khiếu nại được gửi bởi một người dùng. \\
+\hline
+\end{tabular}
+\end{table}
+
+Ngoài các mối kết hợp \(1:N\) thông thường, mối kết hợp giữa \texttt{SERVICE\_PACKAGE} và \texttt{RESERVATION} có bản số \(N:1\). Theo đó, một gói dịch vụ có thể được chọn trong nhiều lượt đặt chỗ, trong khi mỗi lượt đặt chỗ có thể chọn không quá một gói dịch vụ.
+
+Do đó, khóa chính \texttt{package\_id} của quan hệ \texttt{SERVICE\_PACKAGE} được đưa vào quan hệ \texttt{RESERVATION} làm khóa ngoại:
+
+\[
+\texttt{RESERVATION}(
+\underline{\texttt{reservation\_id}},
+\texttt{user\_id},
+\texttt{package\_id},
+\texttt{start\_time},
+\texttt{end\_time},
+\texttt{status},
+\texttt{total\_amount},
+\texttt{created\_at}
+)
+\]
+
+Trong trường hợp một lượt đặt chỗ chưa chọn gói dịch vụ, thuộc tính \texttt{package\_id} có thể nhận giá trị \texttt{NULL}. Nếu nghiệp vụ yêu cầu mọi lượt đặt chỗ đều phải chọn gói dịch vụ, thuộc tính này sẽ được đặt ràng buộc \texttt{NOT NULL} khi triển khai.
+
+\subsection{Chuyển mối kết hợp 1:1 và 1:0..1}
+
+Đối với các mối kết hợp một--một tùy chọn, khóa chính của quan hệ ở phía bắt buộc được đưa vào quan hệ ở phía tùy chọn làm khóa ngoại. Khóa ngoại phải có ràng buộc \texttt{UNIQUE} để bảo đảm mỗi Reservation chỉ liên kết với nhiều nhất một bản ghi tương ứng.
+
+Trong mô hình hiện tại, các quan hệ được chuyển đổi như sau:
+
+\begin{itemize}
+    \item \texttt{PAYMENT} nhận \texttt{reservation\_id} làm khóa ngoại tham chiếu \texttt{RESERVATION(reservation\_id)} và đặt \texttt{UNIQUE}.
+    \item \texttt{SERVICE\_SESSION} nhận \texttt{reservation\_id} làm khóa ngoại tham chiếu \texttt{RESERVATION(reservation\_id)} và đặt \texttt{UNIQUE}.
+    \item \texttt{REVIEW} nhận \texttt{reservation\_id} làm khóa ngoại tham chiếu \texttt{RESERVATION(reservation\_id)} và đặt \texttt{UNIQUE}; đồng thời giữ \texttt{user\_id} để xác định người viết đánh giá.
+\end{itemize}
+
+Các khóa ngoại này có thể nhận giá trị \texttt{NULL} ở phía Reservation khi giao dịch chưa thanh toán, dịch vụ chưa được sử dụng hoặc người dùng chưa gửi đánh giá.
+
 \subsection{Chuyển mối kết hợp M:N}
+
+Đối với mối kết hợp \(M:N\), không thể đưa trực tiếp khóa chính của một quan hệ vào quan hệ còn lại vì một bộ ở mỗi phía có thể liên kết với nhiều bộ ở phía kia. Vì vậy, mối kết hợp \(M:N\) được chuyển thành một quan hệ trung gian.
+
+Quan hệ trung gian thường chứa:
+
+\begin{itemize}
+    \item Khóa chính của quan hệ thứ nhất.
+    \item Khóa chính của quan hệ thứ hai.
+    \item Các thuộc tính riêng của mối kết hợp, nếu có.
+\end{itemize}
+
+Khóa chính của quan hệ trung gian thường là khóa ghép được tạo từ các khóa ngoại của hai quan hệ tham gia.
+
+Các mối kết hợp \(M:N\) trong hệ thống được chuyển đổi như sau:
+
+\begin{table}[htbp]
+\centering
+\caption{Các quan hệ trung gian cho mối kết hợp M:N}
+\begin{tabular}{|p{.25\linewidth}|p{.25\linewidth}|p{.36\linewidth}|}
+\hline
+\textbf{Mối kết hợp} & \textbf{Quan hệ trung gian} & \textbf{Thuộc tính} \\
+\hline
+Service Package -- Creative Space &
+\texttt{PACKAGE\_SPACE} &
+\texttt{package\_id}, \texttt{space\_id} \\
+\hline
+Service Package -- Resource &
+\texttt{PACKAGE\_RESOURCE} &
+\texttt{package\_id}, \texttt{resource\_id}, \texttt{quantity} \\
+\hline
+Creative Space -- Reservation &
+\texttt{RESERVATION\_SPACE} &
+\texttt{reservation\_id}, \texttt{space\_id} \\
+\hline
+Reservation -- Resource &
+\texttt{RESERVATION\_RESOURCE} &
+\texttt{reservation\_id}, \texttt{resource\_id}, \texttt{quantity} \\
+\hline
+Service Session -- Resource &
+\texttt{SESSION\_RESOURCE} &
+\texttt{session\_id}, \texttt{resource\_id}, \texttt{quantity} \\
+\hline
+User -- Workshop (Tham gia) &
+\texttt{WORKSHOP\_REGISTRATION} &
+\texttt{user\_id}, \texttt{workshop\_id} \\
+\hline
+\end{tabular}
+\end{table}
+
+Các quan hệ trung gian được xác định khóa chính như sau:
+
+\begin{align*}
+\texttt{PACKAGE\_SPACE}
+(&\underline{\texttt{package\_id}},\,
+\underline{\texttt{space\_id}})\\
+\texttt{PACKAGE\_RESOURCE}
+(&\underline{\texttt{package\_id}},\,
+\underline{\texttt{resource\_id}},\,
+\texttt{quantity})\\
+\texttt{RESERVATION\_SPACE}
+(&\underline{\texttt{reservation\_id}},\,
+\underline{\texttt{space\_id}})\\
+\texttt{RESERVATION\_RESOURCE}
+(&\underline{\texttt{reservation\_id}},\,
+\underline{\texttt{resource\_id}},\,
+\texttt{quantity})\\
+\texttt{SESSION\_RESOURCE}
+(&\underline{\texttt{session\_id}},\,
+\underline{\texttt{resource\_id}},\,
+\texttt{quantity})\\
+\texttt{WORKSHOP\_REGISTRATION}
+(&\underline{\texttt{user\_id}},\,
+\underline{\texttt{workshop\_id}})
+\end{align*}
+
+Trong đó, các thuộc tính \texttt{quantity} được sử dụng để lưu số lượng tài nguyên được bao gồm trong gói dịch vụ, được phân bổ cho lượt đặt chỗ hoặc được sử dụng thực tế trong một phiên sử dụng.
+
 \subsection{Chuyển thực thể yếu và EER}
+
+Trong mô hình quan niệm hiện tại, các thực thể chính đều có mã định danh riêng, chẳng hạn như \texttt{user\_id}, \texttt{space\_id}, \texttt{resource\_id} và \texttt{reservation\_id}. Vì vậy, chưa xác định thực thể yếu theo nghĩa một thực thể không thể tự định danh nếu không dựa vào thực thể chủ.
+
+Do đó, trong phạm vi mô hình hiện tại:
+
+\begin{itemize}
+    \item Không có thực thể yếu cần chuyển đổi riêng.
+    \item Các thực thể chính được chuyển thành các quan hệ độc lập với khóa chính riêng.
+    \item Các mối kết hợp \(M:N\) được biểu diễn bằng các quan hệ trung gian.
+    \item Các thuộc tính của mối kết hợp được đưa vào quan hệ trung gian tương ứng.
+\end{itemize}
+
+Đối với các thành phần EER, mô hình hiện tại chưa xác định một cấu trúc chuyên biệt như tổng quát hóa, chuyên biệt hóa hoặc kết hợp các lớp con. Thuộc tính \texttt{role} của quan hệ \texttt{USER} chỉ được sử dụng để biểu diễn vai trò của người dùng trong hệ thống, không được xem là một cấu trúc kế thừa EER.
+
+Vì vậy, chưa cần áp dụng các chiến lược chuyển đổi chuyên biệt cho tổng quát hóa hoặc chuyên biệt hóa. Nếu trong các bước phát triển sau này xuất hiện các lớp con có thuộc tính riêng, cần lựa chọn một trong các phương án như tạo một quan hệ cho lớp cha và các quan hệ cho lớp con, hoặc gộp các lớp con vào một quan hệ chung tùy theo yêu cầu nghiệp vụ.
 
 \section{Xác định phụ thuộc hàm}
 \subsection{Xác định các phụ thuộc hàm từ nghiệp vụ}
