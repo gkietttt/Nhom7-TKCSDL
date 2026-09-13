@@ -1,21 +1,909 @@
 \chapter{Thiết kế quan niệm}
 
 \section{Xác định các thực thể}
+
 \subsection{Phương pháp xác định thực thể}
+
+Thiết kế mô hình quan niệm bắt đầu từ việc phân tích các yêu cầu nghiệp vụ của hệ thống. Mục tiêu của bước này là xác định những đối tượng cần được quản lý lâu dài, có các đặc điểm riêng và tham gia vào các hoạt động nghiệp vụ của nền tảng.
+
+Một đối tượng được xem xét là thực thể khi đáp ứng một hoặc nhiều tiêu chí sau:
+
+\begin{itemize}
+\item Có ý nghĩa nghiệp vụ độc lập trong hệ thống.
+\item Có nhiều thể hiện cụ thể cần được lưu trữ.
+\item Có các thuộc tính riêng để mô tả đặc điểm của đối tượng.
+\item Có vòng đời tương đối độc lập và cần được tra cứu, cập nhật hoặc thống kê.
+\item Tham gia vào một hoặc nhiều mối kết hợp với các đối tượng khác.
+
+\end{itemize}
+Dựa trên yêu cầu của nền tảng kết nối cộng đồng nhiếp ảnh phim với các nhà cung cấp phòng tối, studio, thiết bị và dịch vụ sáng tạo, quá trình xác định thực thể được thực hiện theo các bước:
+
+\paragraph{Bước 1: Phân tích yêu cầu nghiệp vụ}\mbox{}\par
+Xác định các nhóm nghiệp vụ chính của hệ thống, bao gồm:
+
+\begin{itemize}
+\item Quản lý người dùng.
+\item Quản lý nhà cung cấp và tài nguyên.
+\item Quản lý đặt chỗ và sử dụng dịch vụ.
+\item Quản lý thanh toán.
+\item Quản lý cộng đồng nhiếp ảnh phim.
+\item Quản lý đánh giá, khiếu nại và các hoạt động vận hành.
+
+\end{itemize}
+\paragraph{Bước 2: Xác định các đối tượng nghiệp vụ}\mbox{}\par
+Từ các nhóm nghiệp vụ, xác định những đối tượng xuất hiện thường xuyên trong yêu cầu, chẳng hạn như người dùng, nhà cung cấp, không gian sáng tạo, tài nguyên, đặt chỗ, thanh toán, nội dung cộng đồng và workshop.
+
+\paragraph{Bước 3: Phân biệt thực thể với thuộc tính}\mbox{}\par
+Một khái niệm được xem xét là thực thể nếu nó có dữ liệu riêng, có vòng đời hoặc cần tham gia nhiều mối kết hợp. Ngược lại, nếu khái niệm chỉ dùng để mô tả đặc điểm của một đối tượng và không cần quản lý độc lập, nó có thể được xem là thuộc tính.
+
+\paragraph{Bước 4: Xác định khóa định danh}\mbox{}\par
+Mỗi thực thể cần có một thuộc tính hoặc tập thuộc tính dùng để phân biệt các thể hiện của thực thể. Trong thiết kế này, các thực thể được sử dụng khóa định danh riêng, thường có dạng mã nhận diện như user\_id, space\_id hoặc reservation\_id.
+
+\paragraph{Bước 5: Kiểm tra phạm vi và tính độc lập của thực thể}\mbox{}\par
+Các thực thể được giữ lại phải phù hợp với phạm vi nghiệp vụ đã xác định ở chương 1, có ý nghĩa quản lý riêng và không trùng lặp về vai trò dữ liệu.
+
+Kết quả của quá trình phân tích là xác định được 15 thực thể chính của hệ thống.
+
 \subsection{Danh sách các thực thể chính}
+
+Hệ thống được phân chia thành các nhóm thực thể theo chức năng nghiệp vụ như sau:
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Nhóm nghiệp vụ & Các thực thể \\
+\midrule
+Quản lý người dùng & User \\
+Quản lý nhà cung cấp và tài nguyên & Service Provider, Creative Space, Resource, Maintenance \\
+Quản lý dịch vụ và khuyến mãi & Service Package, Promotion \\
+Quản lý đặt và sử dụng dịch vụ & Reservation, Payment, Service Session \\
+Quản lý cộng đồng & Community Content, Workshop, Photo \\
+Quản lý phản hồi và khiếu nại & Review, Complaint \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+Bảng mô tả các thực thể
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.07\linewidth} p{.20\linewidth} p{.58\linewidth}}
+\toprule
+STT & Thực thể & Ý nghĩa nghiệp vụ \\
+\midrule
+1 & \textbf{User} & Đại diện cho người dùng của hệ thống. Người dùng có thể đảm nhận các vai trò như Photographer, Service Provider, Photography Expert hoặc Administrator. \\
+2 & \textbf{Service Provider} & Đại diện cho cá nhân hoặc tổ chức cung cấp và quản lý các creative space, resource và service package trên nền tảng. \\
+3 & \textbf{Creative Space} & Đại diện cho các không gian sáng tạo như darkroom và photography studio, cùng các thông tin về đặc điểm, điều kiện sử dụng, giá và thời gian hoạt động. \\
+4 & \textbf{Resource} & Đại diện cho các tài nguyên được quản lý và sử dụng trong hệ thống, bao gồm thiết bị chụp ảnh, thiết bị darkroom và vật tư tiêu hao. \\
+5 & \textbf{Maintenance} & Đại diện cho các hoạt động hoặc lịch bảo trì tài nguyên, phục vụ việc theo dõi tình trạng và vòng đời của Resource. \\
+6 & \textbf{Service Package} & Đại diện cho các gói dịch vụ do Service Provider cung cấp, có thể kết hợp creative space, resource và các dịch vụ hỗ trợ. \\
+7 & \textbf{Promotion} & Đại diện cho các chương trình khuyến mãi được Service Provider cấu hình để áp dụng trong hoạt động cung cấp dịch vụ. \\
+8 & \textbf{Reservation} & Đại diện cho nghiệp vụ đặt creative space, resource hoặc service package của Photographer trong một khoảng thời gian xác định. \\
+9 & \textbf{Payment} & Đại diện cho thông tin thanh toán phát sinh từ Reservation, bao gồm số tiền, phương thức và trạng thái thanh toán. \\
+10 & \textbf{Service Session} & Đại diện cho phiên sử dụng dịch vụ thực tế sau khi Reservation được thực hiện, bao gồm thời điểm check-in, check-out và thời lượng sử dụng. \\
+11 & \textbf{Review} & Đại diện cho đánh giá và nhận xét của người dùng đối với dịch vụ hoặc quá trình sử dụng dịch vụ. \\
+12 & \textbf{Community Content} & Đại diện cho các nội dung được chia sẻ trong cộng đồng như bài viết giáo dục, tutorial, kỹ thuật darkroom, best practices và nội dung thảo luận. \\
+13 & \textbf{Workshop} & Đại diện cho các buổi workshop hoặc training session được tổ chức bởi Photography Expert hoặc các bên cung cấp dịch vụ. \\
+14 & \textbf{Photo} & Đại diện cho các ảnh kỹ thuật số được người dùng quản lý trên hệ thống. \\
+15 & \textbf{Complaint} & Đại diện cho các khiếu nại hoặc tranh chấp phát sinh trong quá trình sử dụng dịch vụ, thanh toán hoặc giao dịch giữa các bên. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Các thực thể trên phản ánh những đối tượng có dữ liệu cần lưu trữ lâu dài và có vai trò trong các nghiệp vụ chính của nền tảng. Chúng sẽ được sử dụng làm cơ sở để xác định thuộc tính, khóa định danh và các mối kết hợp trong các phần tiếp theo.
+
 \subsection{Xác định khóa định danh cho thực thể}
 
+\paragraph{a. Khái niệm khóa định danh}
+
+Khóa định danh là thuộc tính hoặc tập thuộc tính dùng để phân biệt duy nhất mỗi thể hiện của một thực thể trong mô hình dữ liệu.
+
+Trong thiết kế quan niệm, khóa định danh cần đáp ứng các yêu cầu:
+
+\begin{itemize}
+\item Phân biệt được các thể hiện khác nhau của cùng một thực thể.
+\item Có giá trị phù hợp với đối tượng cần quản lý.
+\item Hạn chế sự trùng lặp.
+\item Có tính ổn định trong quá trình tồn tại của dữ liệu.
+\item Có thể được sử dụng làm cơ sở liên kết thực thể với các thực thể khác.
+
+\end{itemize}
+Đối với hệ thống này, mỗi thực thể được gán một thuộc tính định danh riêng. Các thuộc tính này sử dụng quy ước đặt tên theo dạng <entity>\_id.
+
+\paragraph{b. Danh sách khóa định danh}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.05\linewidth} p{.20\linewidth} p{.17\linewidth} p{.34\linewidth}}
+\toprule
+STT & Thực thể & Khóa định danh & Ý nghĩa \\
+\midrule
+1 & User & \texttt{user\_id} & Định danh duy nhất một người dùng. \\
+2 & Service Provider & \texttt{provider\_id} & Định danh duy nhất một nhà cung cấp dịch vụ. \\
+3 & Creative Space & \texttt{space\_id} & Định danh duy nhất một không gian sáng tạo. \\
+4 & Resource & \texttt{resource\_id} & Định danh duy nhất một tài nguyên. \\
+5 & Maintenance & \texttt{maintenance\_id} & Định danh duy nhất một hoạt động bảo trì. \\
+6 & Service Package & \texttt{package\_id} & Định danh duy nhất một gói dịch vụ. \\
+7 & Promotion & \texttt{promotion\_id} & Định danh duy nhất một chương trình khuyến mãi. \\
+8 & Reservation & \texttt{reservation\_id} & Định danh duy nhất một lần đặt dịch vụ. \\
+9 & Payment & \texttt{payment\_id} & Định danh duy nhất một khoản thanh toán. \\
+10 & Service Session & \texttt{session\_id} & Định danh duy nhất một phiên sử dụng dịch vụ. \\
+11 & Review & \texttt{review\_id} & Định danh duy nhất một đánh giá. \\
+12 & Community Content & \texttt{content\_id} & Định danh duy nhất một nội dung cộng đồng. \\
+13 & Workshop & \texttt{workshop\_id} & Định danh duy nhất một workshop. \\
+14 & Photo & \texttt{photo\_id} & Định danh duy nhất một ảnh được quản lý trên hệ thống. \\
+15 & Complaint & \texttt{complaint\_id} & Định danh duy nhất một khiếu nại. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Việc xác định khóa ở bước này chỉ nhằm nhận diện duy nhất các thể hiện của thực thể. Các vấn đề liên quan đến khóa chính, khóa ngoại, kiểu dữ liệu và ràng buộc toàn vẹn sẽ được trình bày ở phần thiết kế logic.
+
 \section{Xác định thuộc tính}
+
 \subsection{Thuộc tính của các thực thể}
+
+\paragraph{a. Phương pháp xác định thuộc tính}
+
+Sau khi xác định các thực thể, bước tiếp theo là phân tích các thông tin cần lưu trữ để mô tả đặc điểm và trạng thái của từng thực thể.
+
+Một thuộc tính được xác định dựa trên các tiêu chí:
+
+\begin{itemize}
+\item Có ý nghĩa mô tả một thực thể cụ thể.
+\item Phục vụ việc quản lý, tra cứu, cập nhật hoặc thống kê.
+\item Phù hợp với phạm vi nghiệp vụ của hệ thống.
+\item Có ý nghĩa độc lập trong phạm vi thực thể đang xét.
+\item Không trùng lặp với thuộc tính đã được xác định ở thực thể khác.
+
+\end{itemize}
+Các thuộc tính được lấy từ danh sách dữ liệu đã xác định ở chương 1. Ở mức quan niệm, các thuộc tính được mô tả theo ý nghĩa nghiệp vụ, chưa quy định kiểu dữ liệu cụ thể.
+
+\paragraph{b. Danh sách thuộc tính của các thực thể}
+
+\paragraph{1. Thực thể User}\mbox{}\par
+
+Thực thể User lưu trữ thông tin cơ bản của người dùng trên nền tảng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.32\linewidth} p{.58\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{user\_id} & Định danh duy nhất của người dùng. \\
+\texttt{full\_name} & Họ và tên của người dùng. \\
+\texttt{email} & Địa chỉ email của người dùng. \\
+\texttt{phone} & Số điện thoại liên hệ của người dùng. \\
+\texttt{password} & Thông tin xác thực tài khoản người dùng. \\
+\texttt{role} & Vai trò của người dùng trong hệ thống, chẳng hạn Photographer, Service Provider, Photography Expert hoặc Administrator. \\
+\texttt{status} & Trạng thái hoạt động của tài khoản. \\
+\texttt{created\_at} & Thời điểm tài khoản được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: user\_id.
+
+\paragraph{2. Thực thể Service Provider}\mbox{}\par
+
+Thực thể Service Provider lưu trữ thông tin về cá nhân hoặc tổ chức cung cấp dịch vụ sáng tạo.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{provider\_id} & Định danh duy nhất của nhà cung cấp dịch vụ. \\
+\texttt{business\_name} & Tên cá nhân, tổ chức hoặc đơn vị cung cấp dịch vụ. \\
+\texttt{description} & Mô tả về nhà cung cấp và hoạt động kinh doanh. \\
+\texttt{address} & Địa chỉ hoạt động của nhà cung cấp. \\
+\texttt{status} & Trạng thái hoạt động hoặc phê duyệt của nhà cung cấp. \\
+\texttt{created\_at} & Thời điểm hồ sơ nhà cung cấp được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: provider\_id.
+
+\paragraph{3. Thực thể Creative Space}\mbox{}\par
+
+Thực thể Creative Space lưu trữ thông tin về các không gian sáng tạo được cung cấp trên nền tảng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.30\linewidth} p{.58\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{space\_id} & Định danh duy nhất của không gian sáng tạo. \\
+\texttt{name} & Tên của darkroom, studio hoặc không gian sáng tạo. \\
+\texttt{space\_type} & Loại không gian, chẳng hạn darkroom hoặc photography studio. \\
+\texttt{description} & Mô tả chi tiết về không gian. \\
+\texttt{area} & Diện tích của không gian. \\
+\texttt{capacity} & Số người tối đa có thể sử dụng không gian. \\
+\texttt{artistic\_style} & Phong cách nghệ thuật mà không gian hướng tới hoặc phù hợp. \\
+\texttt{lighting\_condition} & Đặc điểm và điều kiện ánh sáng của không gian. \\
+\texttt{ventilation} & Thông tin về hệ thống hoặc điều kiện thông gió. \\
+\texttt{acoustic\_characteristics} & Đặc điểm về âm học của không gian. \\
+\texttt{operating\_hours} & Khoảng thời gian không gian hoạt động. \\
+\texttt{usage\_policy} & Các quy định và điều kiện khi sử dụng không gian. \\
+\texttt{pricing} & Mức giá hoặc chính sách giá sử dụng không gian. \\
+\texttt{status} & Trạng thái hoạt động của không gian. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: space\_id.
+
+\paragraph{4. Thực thể Resource}\mbox{}\par
+
+Thực thể Resource lưu trữ thông tin về các tài nguyên được nhà cung cấp quản lý và cung cấp cho người dùng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.30\linewidth} p{.58\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{resource\_id} & Định danh duy nhất của tài nguyên. \\
+\texttt{name} & Tên của tài nguyên hoặc thiết bị. \\
+\texttt{resource\_type} & Loại tài nguyên, chẳng hạn camera, lens, scanner, tripod, chemical hoặc photographic paper. \\
+\texttt{description} & Mô tả về tài nguyên và công dụng của nó. \\
+\texttt{quantity} & Số lượng tài nguyên được quản lý. \\
+\texttt{condition} & Tình trạng hiện tại của tài nguyên. \\
+\texttt{rental\_price} & Giá thuê tài nguyên. \\
+\texttt{compatibility\_information} & Thông tin về khả năng tương thích của tài nguyên với thiết bị hoặc dịch vụ khác. \\
+\texttt{status} & Trạng thái quản lý của tài nguyên. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: resource\_id.
+
+\paragraph{5. Thực thể Maintenance}\mbox{}\par
+
+Thực thể Maintenance lưu trữ thông tin về các hoạt động bảo trì tài nguyên.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{maintenance\_id} & Định danh duy nhất của hoạt động bảo trì. \\
+\texttt{maintenance\_type} & Loại hoạt động bảo trì. \\
+\texttt{description} & Nội dung hoặc mô tả công việc bảo trì. \\
+\texttt{scheduled\_at} & Thời điểm dự kiến thực hiện bảo trì. \\
+\texttt{completed\_at} & Thời điểm hoàn thành bảo trì. \\
+\texttt{cost} & Chi phí của hoạt động bảo trì. \\
+\texttt{status} & Trạng thái của hoạt động bảo trì. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: maintenance\_id.
+
+\paragraph{6. Thực thể Service Package}\mbox{}\par
+
+Thực thể Service Package lưu trữ thông tin về các gói dịch vụ do nhà cung cấp xây dựng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{package\_id} & Định danh duy nhất của gói dịch vụ. \\
+\texttt{name} & Tên của gói dịch vụ. \\
+\texttt{description} & Mô tả nội dung và phạm vi của gói dịch vụ. \\
+\texttt{price} & Giá của gói dịch vụ. \\
+\texttt{duration} & Thời lượng sử dụng hoặc cung cấp gói dịch vụ. \\
+\texttt{status} & Trạng thái của gói dịch vụ. \\
+\texttt{created\_at} & Thời điểm gói dịch vụ được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: package\_id.
+
+\paragraph{7. Thực thể Promotion}\mbox{}\par
+
+Thực thể Promotion lưu trữ thông tin về các chương trình khuyến mãi được cấu hình bởi nhà cung cấp.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{promotion\_id} & Định danh duy nhất của chương trình khuyến mãi. \\
+\texttt{name} & Tên chương trình khuyến mãi. \\
+\texttt{description} & Mô tả nội dung và điều kiện của chương trình. \\
+\texttt{discount\_type} & Loại hình giảm giá. \\
+\texttt{discount\_value} & Giá trị giảm giá của chương trình. \\
+\texttt{start\_at} & Thời điểm bắt đầu chương trình khuyến mãi. \\
+\texttt{end\_at} & Thời điểm kết thúc chương trình khuyến mãi. \\
+\texttt{status} & Trạng thái của chương trình khuyến mãi. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: promotion\_id.
+
+\paragraph{8. Thực thể Reservation}\mbox{}\par
+
+Thực thể Reservation lưu trữ thông tin về một lần đặt dịch vụ hoặc tài nguyên của người dùng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{reservation\_id} & Định danh duy nhất của lần đặt. \\
+\texttt{start\_time} & Thời điểm bắt đầu sử dụng dịch vụ hoặc tài nguyên theo đặt chỗ. \\
+\texttt{end\_time} & Thời điểm kết thúc dự kiến của đặt chỗ. \\
+\texttt{status} & Trạng thái của đặt chỗ. \\
+\texttt{total\_amount} & Tổng số tiền của lần đặt. \\
+\texttt{created\_at} & Thời điểm đặt chỗ được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: reservation\_id.
+
+\paragraph{9. Thực thể Payment}\mbox{}\par
+
+Thực thể Payment lưu trữ thông tin về các giao dịch thanh toán phát sinh từ hoạt động đặt dịch vụ.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{payment\_id} & Định danh duy nhất của khoản thanh toán. \\
+\texttt{amount} & Số tiền thanh toán. \\
+\texttt{payment\_method} & Phương thức thanh toán. \\
+\texttt{payment\_status} & Trạng thái của khoản thanh toán. \\
+\texttt{transaction\_code} & Mã dùng để nhận diện giao dịch thanh toán. \\
+\texttt{paid\_at} & Thời điểm thanh toán được thực hiện. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: payment\_id.
+
+\paragraph{10. Thực thể Service Session}\mbox{}\par
+
+Thực thể Service Session lưu trữ thông tin về phiên sử dụng dịch vụ thực tế.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{session\_id} & Định danh duy nhất của phiên sử dụng dịch vụ. \\
+\texttt{check\_in} & Thời điểm khách hàng bắt đầu sử dụng dịch vụ thực tế. \\
+\texttt{check\_out} & Thời điểm khách hàng kết thúc sử dụng dịch vụ thực tế. \\
+\texttt{actual\_usage\_duration} & Thời lượng sử dụng dịch vụ thực tế. \\
+\texttt{status} & Trạng thái của phiên sử dụng dịch vụ. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: session\_id.
+
+\paragraph{11. Thực thể Review}\mbox{}\par
+
+Thực thể Review lưu trữ đánh giá và nhận xét của người dùng đối với quá trình sử dụng dịch vụ.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{review\_id} & Định danh duy nhất của đánh giá. \\
+\texttt{rating} & Điểm đánh giá của người dùng. \\
+\texttt{comment} & Nội dung nhận xét của người dùng. \\
+\texttt{created\_at} & Thời điểm đánh giá được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: review\_id.
+
+\paragraph{12. Thực thể Community Content}\mbox{}\par
+
+Thực thể Community Content lưu trữ các nội dung được chia sẻ trong cộng đồng nhiếp ảnh phim.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{content\_id} & Định danh duy nhất của nội dung cộng đồng. \\
+\texttt{title} & Tiêu đề của nội dung. \\
+\texttt{content} & Nội dung được chia sẻ trong cộng đồng. \\
+\texttt{content\_type} & Loại nội dung, chẳng hạn article, tutorial, technique, best practice hoặc discussion. \\
+\texttt{status} & Trạng thái của nội dung. \\
+\texttt{created\_at} & Thời điểm nội dung được tạo hoặc đăng. \\
+\texttt{updated\_at} & Thời điểm nội dung được cập nhật gần nhất. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: content\_id.
+
+\paragraph{13. Thực thể Workshop}\mbox{}\par
+
+Thực thể Workshop lưu trữ thông tin về các buổi workshop hoặc training session được tổ chức trên nền tảng.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{workshop\_id} & Định danh duy nhất của workshop. \\
+\texttt{title} & Tên hoặc tiêu đề workshop. \\
+\texttt{description} & Mô tả nội dung workshop. \\
+\texttt{topic} & Chủ đề của workshop. \\
+\texttt{start\_time} & Thời điểm bắt đầu workshop. \\
+\texttt{end\_time} & Thời điểm kết thúc workshop. \\
+\texttt{capacity} & Số lượng người tham gia tối đa. \\
+\texttt{location} & Địa điểm tổ chức workshop. \\
+\texttt{price} & Chi phí tham gia workshop. \\
+\texttt{status} & Trạng thái của workshop. \\
+\texttt{created\_at} & Thời điểm workshop được tạo. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: workshop\_id.
+
+\paragraph{14. Thực thể Photo}\mbox{}\par
+
+Thực thể Photo lưu trữ thông tin về các ảnh kỹ thuật số được người dùng quản lý trên hệ thống.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{photo\_id} & Định danh duy nhất của ảnh. \\
+\texttt{title} & Tên hoặc tiêu đề của ảnh. \\
+\texttt{file\_url} & Thông tin tham chiếu đến tệp ảnh được lưu trữ. \\
+\texttt{description} & Mô tả nội dung của ảnh. \\
+\texttt{created\_at} & Thời điểm ảnh được thêm vào hệ thống. \\
+\texttt{updated\_at} & Thời điểm thông tin ảnh được cập nhật gần nhất. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: photo\_id.
+
+\paragraph{15. Thực thể Complaint}\mbox{}\par
+
+Thực thể Complaint lưu trữ thông tin về các khiếu nại hoặc tranh chấp phát sinh trong hệ thống.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thuộc tính & Ý nghĩa nghiệp vụ \\
+\midrule
+\texttt{complaint\_id} & Định danh duy nhất của khiếu nại. \\
+\texttt{subject} & Tiêu đề hoặc chủ đề của khiếu nại. \\
+\texttt{description} & Nội dung chi tiết của khiếu nại. \\
+\texttt{status} & Trạng thái xử lý khiếu nại. \\
+\texttt{created\_at} & Thời điểm khiếu nại được tạo. \\
+\texttt{resolved\_at} & Thời điểm khiếu nại được giải quyết. \\
+\texttt{resolution} & Kết quả hoặc nội dung xử lý khiếu nại. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Khóa định danh: complaint\_id.
+
 \subsection{Thuộc tính định danh}
-\subsection{Thuộc tính dẫn xuất/đa trị nếu có}
+
+Trong mô hình quan niệm, mỗi thực thể được xác định bằng một thuộc tính định danh riêng. Các thuộc tính này có vai trò phân biệt duy nhất từng thể hiện của thực thể.
+
+Danh sách thuộc tính định danh của mô hình gồm:
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.25\linewidth} p{.65\linewidth}}
+\toprule
+Thực thể & Thuộc tính định danh \\
+\midrule
+User & \texttt{user\_id} \\
+Service Provider & \texttt{provider\_id} \\
+Creative Space & \texttt{space\_id} \\
+Resource & \texttt{resource\_id} \\
+Maintenance & \texttt{maintenance\_id} \\
+Service Package & \texttt{package\_id} \\
+Promotion & \texttt{promotion\_id} \\
+Reservation & \texttt{reservation\_id} \\
+Payment & \texttt{payment\_id} \\
+Service Session & \texttt{session\_id} \\
+Review & \texttt{review\_id} \\
+Community Content & \texttt{content\_id} \\
+Workshop & \texttt{workshop\_id} \\
+Photo & \texttt{photo\_id} \\
+Complaint & \texttt{complaint\_id} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Các thuộc tính định danh được sử dụng để:
+
+\begin{itemize}
+\item Phân biệt các thể hiện của cùng một thực thể.
+\item Làm cơ sở xác định các mối kết hợp giữa các thực thể.
+\item Hỗ trợ chuyển đổi mô hình quan niệm sang mô hình logic ở chương tiếp theo.
+
+\end{itemize}
+Trong phạm vi thiết kế hiện tại, các thuộc tính định danh đều là thuộc tính đơn và được xác định trực tiếp trong từng thực thể.
 
 \section{Xác định mối kết hợp}
+
 \subsection{Các mối kết hợp giữa các thực thể}
+
+\paragraph{a. Phương pháp xác định mối kết hợp}
+
+Mối kết hợp thể hiện mối liên hệ nghiệp vụ giữa hai hoặc nhiều thực thể trong hệ thống. Các mối kết hợp được xác định bằng cách phân tích những động từ hoặc cụm động từ mô tả hoạt động giữa các đối tượng.
+
+Ví dụ:
+
+\begin{itemize}
+\item Service Provider quản lý Creative Space.
+\item User đặt Reservation.
+\item Service Package bao gồm Resource.
+\item User tham gia Workshop.
+\item Reservation có Payment.
+
+\end{itemize}
+Quá trình xác định mối kết hợp được thực hiện theo các bước:
+
+\paragraph{Bước 1: Xác định các thực thể có liên quan}\mbox{}\par
+Từ danh sách 15 thực thể, xác định những cặp hoặc nhóm thực thể có tương tác nghiệp vụ.
+
+\paragraph{Bước 2: Xác định ý nghĩa của mối liên hệ}\mbox{}\par
+Đặt tên cho mối kết hợp bằng động từ hoặc cụm động từ thể hiện rõ nghiệp vụ, chẳng hạn Quản lý, Đặt, Bao gồm, Thanh toán hoặc Tham gia.
+
+\paragraph{Bước 3: Xác định số lượng thể hiện tham gia}\mbox{}\par
+Phân tích số lượng thể hiện của mỗi thực thể có thể tham gia vào mối kết hợp. Từ đó xác định bản số 1:1, 1:N hoặc N:N.
+
+\paragraph{Bước 4: Xác định mức tham gia}\mbox{}\par
+Xem xét một thể hiện của thực thể có bắt buộc phải tham gia mối kết hợp hay có thể không tham gia. Mức tham gia được biểu diễn bằng số lượng tối thiểu và tối đa, chẳng hạn 0..1, 1..1, 0..N hoặc 1..N.
+
+\paragraph{Bước 5: Xác định thuộc tính riêng của mối kết hợp}\mbox{}\par
+Nếu một thông tin chỉ có ý nghĩa trong mối liên hệ giữa các thực thể mà không thuộc riêng về bất kỳ thực thể nào, thông tin đó được xác định là thuộc tính của mối kết hợp.
+
+\paragraph{b. Danh sách các mối kết hợp}
+
+Dựa trên yêu cầu nghiệp vụ và danh sách mối kết hợp đã xác định ở chương 1, mô hình quan niệm bao gồm 21 mối kết hợp.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.05\linewidth} p{.20\linewidth} p{.17\linewidth} p{.34\linewidth}}
+\toprule
+STT & Các thực thể tham gia & Tên mối kết hợp & Ý nghĩa nghiệp vụ \\
+\midrule
+1 & Service Provider - Creative Space & Quản lý & Nhà cung cấp quản lý các không gian sáng tạo. \\
+2 & Service Provider - Resource & Quản lý & Nhà cung cấp quản lý các tài nguyên. \\
+3 & Service Provider - Service Package & Tạo & Nhà cung cấp tạo các gói dịch vụ. \\
+4 & Service Provider - Promotion & Tạo & Nhà cung cấp tạo các chương trình khuyến mãi. \\
+5 & Resource - Maintenance & Được bảo trì & Resource có các hoạt động bảo trì trong vòng đời sử dụng. \\
+6 & Service Package - Creative Space & Bao gồm & Gói dịch vụ bao gồm các không gian sáng tạo. \\
+7 & Service Package - Resource & Bao gồm & Gói dịch vụ bao gồm các tài nguyên. \\
+8 & User - Reservation & Đặt & Người dùng tạo các lần đặt dịch vụ. \\
+9 & Creative Space - Reservation & Được đặt & Reservation sử dụng các Creative Space. \\
+10 & Service Package - Reservation & Được chọn & Reservation có thể lựa chọn một Service Package. \\
+11 & Reservation - Resource & Phân bổ & Các Resource được phân bổ cho Reservation. \\
+12 & Reservation - Payment & Có thanh toán & Reservation có thể phát sinh thông tin thanh toán. \\
+13 & Reservation - Service Session & Có phiên sử dụng & Reservation có thể có một phiên sử dụng dịch vụ thực tế. \\
+14 & Service Session - Resource & Sử dụng thực tế & Phiên sử dụng ghi nhận các Resource được sử dụng thực tế. \\
+15 & User - Review & Viết & Người dùng viết các đánh giá. \\
+16 & Reservation - Review & Được đánh giá & Reservation có thể được đánh giá sau khi sử dụng. \\
+17 & User - Community Content & Tạo & Người dùng tạo nội dung cộng đồng. \\
+18 & User - Workshop & Tổ chức & Người dùng có vai trò phù hợp tổ chức Workshop. \\
+19 & User - Workshop & Tham gia & Người dùng tham gia các Workshop. \\
+20 & User - Photo & Quản lý & Người dùng quản lý các ảnh kỹ thuật số. \\
+21 & User - Complaint & Gửi khiếu nại & Người dùng gửi các khiếu nại đến hệ thống. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
 \subsection{Xác định bản số 1:1}
+
+Bản số 1:1 thể hiện mối quan hệ trong đó mỗi thể hiện của thực thể này có thể liên kết với tối đa một thể hiện của thực thể kia và ngược lại. Khi xác định bản số, cần phân biệt giữa quan hệ một--một bắt buộc và quan hệ một--một có tham gia tùy chọn.
+
+Trong mô hình quan niệm của hệ thống, không có mối quan hệ 1:1 bắt buộc ở cả hai phía. Tuy nhiên, có ba mối quan hệ có đặc điểm một--một tùy chọn, đó là:
+
+\begin{itemize}
+
+\item \textbf{Reservation -- Service Session:} Một Reservation có thể chưa có Service Session hoặc có một Service Session. Mỗi Service Session thuộc về đúng một Reservation. Vì vậy, bản số được xác định là:
+
+\[
+\text{Reservation } (1) \longleftrightarrow (0..1) \text{ Service Session}
+\]
+
+\item \textbf{Reservation -- Review:} Một Reservation có thể chưa có Review hoặc có một Review. Mỗi Review gắn với đúng một Reservation. Vì vậy, bản số được xác định là:
+
+\[
+\text{Reservation } (1) \longleftrightarrow (0..1) \text{ Review}
+\]
+
+\item \textbf{Reservation -- Payment:} Một Reservation có thể chưa có Payment hoặc có một Payment. Mỗi Payment thuộc về đúng một Reservation. Vì vậy, bản số được xác định là:
+
+\[
+\text{Reservation } (1) \longleftrightarrow (0..1) \text{ Payment}
+\]
+
+\end{itemize}
+
+Các quan hệ trên không phải là quan hệ 1:1 bắt buộc vì phía Reservation có thể không có Service Session hoặc Review. Service Session và Review chỉ được tạo khi phát sinh phiên sử dụng thực tế hoặc khi người dùng thực hiện đánh giá.
+
+Đối với quan hệ Reservation -- Review, ràng buộc nghiệp vụ được hiểu là mỗi Reservation chỉ có tối đa một Review. Tuy nhiên, một User có thể viết nhiều Review khác nhau thông qua nhiều Reservation khác nhau. Do đó, không được đặt ràng buộc duy nhất trên thuộc tính định danh người dùng trong thực thể Review.
+
 \subsection{Xác định bản số 1:N}
+
+Bản số 1:N thể hiện một thể hiện của thực thể ở phía thứ nhất có thể liên kết với nhiều thể hiện của thực thể ở phía thứ hai, trong khi mỗi thể hiện ở phía thứ hai chỉ liên kết với một thể hiện ở phía thứ nhất.
+
+Dựa trên yêu cầu nghiệp vụ, các mối quan hệ 1:N của hệ thống được xác định như sau:
+
+\begin{enumerate}
+
+\item \textbf{Service Provider -- Creative Space:} Một Service Provider có thể quản lý nhiều Creative Space, nhưng mỗi Creative Space thuộc về đúng một Service Provider.
+
+\[
+\text{Service Provider } (1) \longrightarrow (0..N) \text{ Creative Space}
+\]
+
+\item \textbf{Service Provider -- Resource:} Một Service Provider có thể quản lý nhiều Resource, nhưng mỗi Resource thuộc về đúng một Service Provider.
+
+\[
+\text{Service Provider } (1) \longrightarrow (0..N) \text{ Resource}
+\]
+
+\item \textbf{Service Provider -- Service Package:} Một Service Provider có thể tạo nhiều Service Package, nhưng mỗi Service Package được tạo bởi đúng một Service Provider.
+
+\[
+\text{Service Provider } (1) \longrightarrow (0..N) \text{ Service Package}
+\]
+
+\item \textbf{Service Provider -- Promotion:} Một Service Provider có thể tạo nhiều Promotion, nhưng mỗi Promotion thuộc về một Service Provider.
+
+\[
+\text{Service Provider } (1) \longrightarrow (0..N) \text{ Promotion}
+\]
+
+\item \textbf{Resource -- Maintenance:} Một Resource có thể có nhiều hoạt động bảo trì trong suốt vòng đời. Mỗi Maintenance gắn với đúng một Resource.
+
+\[
+\text{Resource } (1) \longrightarrow (0..N) \text{ Maintenance}
+\]
+
+\item \textbf{User -- Reservation:} Một User với vai trò Photographer có thể tạo nhiều Reservation. Mỗi Reservation được tạo bởi đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Reservation}
+\]
+
+\item \textbf{Service Package -- Reservation:} Một Service Package có thể được lựa chọn trong nhiều Reservation. Mỗi Reservation có thể không chọn Service Package hoặc chọn một Service Package.
+
+\[
+\text{Service Package } (1) \longrightarrow (0..N) \text{ Reservation}
+\]
+
+Theo hướng ngược lại, mỗi Reservation tham gia quan hệ với tối đa một Service Package, tức là có bản số $0..1$ ở phía Reservation.
+
+\item \textbf{User -- Review:} Một User có thể viết nhiều Review. Mỗi Review được viết bởi đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Review}
+\]
+
+Một User có thể viết nhiều Review vì người dùng có thể thực hiện nhiều lần đặt và sử dụng dịch vụ khác nhau. Do đó, thuộc tính liên kết đến User trong Review không được đặt ràng buộc UNIQUE.
+
+\item \textbf{User -- Community Content:} Một User có thể tạo nhiều Community Content. Mỗi Community Content được tạo bởi đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Community Content}
+\]
+
+\item \textbf{User -- Workshop, quan hệ Tổ chức:} Một User có vai trò Photography Expert hoặc vai trò phù hợp có thể tổ chức nhiều Workshop. Mỗi Workshop được tổ chức bởi đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Workshop}
+\]
+
+\item \textbf{User -- Photo:} Một User có thể quản lý nhiều Photo. Mỗi Photo thuộc về đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Photo}
+\]
+
+\item \textbf{User -- Complaint:} Một User có thể gửi nhiều Complaint. Mỗi Complaint được tạo bởi đúng một User.
+
+\[
+\text{User } (1) \longrightarrow (0..N) \text{ Complaint}
+\]
+
+\end{enumerate}
+
+Như vậy, các quan hệ 1:N chủ yếu được sử dụng để mô tả quan hệ quản lý, tạo lập, sở hữu hoặc phát sinh dữ liệu từ một đối tượng chính. Khi chuyển sang mô hình logic, khóa định danh của thực thể ở phía 1 sẽ được sử dụng làm khóa ngoại trong thực thể ở phía N.
+
 \subsection{Xác định bản số M:N}
+
+Bản số M:N, hay N:N, thể hiện mối quan hệ trong đó một thể hiện của thực thể thứ nhất có thể liên kết với nhiều thể hiện của thực thể thứ hai, đồng thời một thể hiện của thực thể thứ hai cũng có thể liên kết với nhiều thể hiện của thực thể thứ nhất.
+
+Trong mô hình quan niệm của hệ thống, các mối quan hệ M:N được xác định như sau:
+
+\begin{enumerate}
+
+\item \textbf{Service Package -- Creative Space:} Một Service Package có thể bao gồm nhiều Creative Space và một Creative Space có thể được sử dụng trong nhiều Service Package.
+
+\item \textbf{Service Package -- Resource:} Một Service Package có thể bao gồm nhiều Resource và một Resource có thể xuất hiện trong nhiều Service Package. Quan hệ này có thuộc tính riêng là \texttt{quantity}, dùng để lưu số lượng Resource cần thiết trong từng Service Package.
+
+\item \textbf{Creative Space -- Reservation:} Một Reservation có thể sử dụng nhiều Creative Space và một Creative Space có thể xuất hiện trong nhiều Reservation ở các thời điểm khác nhau.
+
+\item \textbf{Reservation -- Resource:} Một Reservation có thể phân bổ nhiều Resource và một Resource có thể được phân bổ cho nhiều Reservation ở các thời điểm khác nhau. Quan hệ này có thuộc tính riêng là \texttt{quantity}, dùng để lưu số lượng Resource được phân bổ cho từng Reservation.
+
+\item \textbf{Service Session -- Resource:} Một Service Session có thể sử dụng nhiều Resource và một Resource có thể được sử dụng trong nhiều Service Session ở các thời điểm khác nhau. Quan hệ này có thuộc tính riêng là \texttt{quantity}, dùng để lưu số lượng Resource thực tế được sử dụng.
+
+\item \textbf{User -- Workshop, quan hệ Tham gia:} Một User có thể tham gia nhiều Workshop và một Workshop có thể có nhiều User tham gia.
+
+\end{enumerate}
+
+Các quan hệ M:N được biểu diễn thông qua các bảng kết hợp khi chuyển sang mô hình logic. Danh sách các bảng kết hợp và thuộc tính riêng được xác định như sau:
+
+\begin{center}
+
+\scriptsize
+
+\begin{tabular}{p{.23\linewidth} p{.20\linewidth} p{.14\linewidth} p{.28\linewidth}}
+
+\toprule
+
+Mối quan hệ & Bảng kết hợp & Thuộc tính riêng & Ghi chú \\
+
+\midrule
+
+Service Package -- Creative Space & \texttt{Package Space} & Không có & Liên kết Package với Creative Space \\
+
+Service Package -- Resource & \texttt{Package Resource} & \texttt{quantity} & Lưu số lượng Resource trong Package \\
+
+Creative Space -- Reservation & \texttt{Reservation Space} & Không có & Liên kết Reservation với Creative Space \\
+
+Reservation -- Resource & \texttt{Reservation Resource} & \texttt{quantity} & Lưu số lượng Resource được phân bổ \\
+
+Service Session -- Resource & \texttt{Session Resource} & \texttt{quantity} & Lưu số lượng Resource sử dụng thực tế \\
+
+User -- Workshop & \texttt{Workshop Registration} & Không có & Liên kết User với Workshop tham gia \\
+
+\bottomrule
+
+\end{tabular}
+
+\end{center}
+
+Đối với các bảng kết hợp có thuộc tính \texttt{quantity}, thuộc tính này không thuộc riêng về một thực thể đơn lẻ. Nó chỉ có ý nghĩa khi xét đồng thời hai thực thể tham gia vào mối quan hệ. Vì vậy, \texttt{quantity} được xác định là thuộc tính của mối kết hợp.
+
 \subsection{Xác định mức tham gia bắt buộc/tùy chọn}
+
+Mức tham gia thể hiện số lượng tối thiểu và tối đa các thể hiện của một thực thể có thể tham gia vào một mối quan hệ. Mức tham gia được biểu diễn bằng dạng:
+
+\[
+\text{min}..\text{max}
+\]
+
+Trong đó:
+
+\begin{itemize}
+
+\item $0$ thể hiện việc tham gia là tùy chọn.
+
+\item $1$ thể hiện việc tham gia là bắt buộc.
+
+\item $N$ thể hiện một thực thể có thể tham gia với nhiều thể hiện khác.
+
+\end{itemize}
+
+Dựa trên yêu cầu nghiệp vụ hiện tại, mức tham gia của các mối quan hệ được xác định như sau:
+
+\begin{center}
+
+\scriptsize
+
+\begin{tabular}{p{.20\linewidth} p{.18\linewidth} p{.18\linewidth} p{.24\linewidth}}
+
+\toprule
+
+Mối quan hệ & Phía thực thể thứ nhất & Phía thực thể thứ hai & Ghi chú \\
+
+\midrule
+
+Service Provider -- Creative Space & $0..N$ & $1..1$ & Mỗi Creative Space thuộc một Provider \\
+
+Service Provider -- Resource & $0..N$ & $1..1$ & Mỗi Resource thuộc một Provider \\
+
+Service Provider -- Service Package & $0..N$ & $1..1$ & Mỗi Package thuộc một Provider \\
+
+Service Provider -- Promotion & $0..N$ & $1..1$ & Mỗi Promotion thuộc một Provider \\
+
+Resource -- Maintenance & $0..N$ & $1..1$ & Mỗi Maintenance gắn với một Resource \\
+
+Service Package -- Creative Space & $0..N$ & $0..N$ & Quan hệ bao gồm \\
+
+Service Package -- Resource & $0..N$ & $0..N$ & Có thuộc tính \texttt{quantity} \\
+
+User -- Reservation & $0..N$ & $1..1$ & Mỗi Reservation do một User tạo \\
+
+Service Package -- Reservation & $0..N$ & $0..1$ & Reservation có thể không chọn Package \\
+
+Creative Space -- Reservation & $0..N$ & $0..N$ & Một Reservation có thể sử dụng nhiều Space \\
+
+Reservation -- Resource & $0..N$ & $0..N$ & Có thuộc tính \texttt{quantity} \\
+
+Reservation -- Payment & $0..1$ & $1..1$ & Mỗi Reservation có tối đa một Payment \\
+
+Reservation -- Service Session & $0..1$ & $1..1$ & Mỗi Session thuộc một Reservation \\
+
+Service Session -- Resource & $0..N$ & $0..N$ & Có thuộc tính \texttt{quantity} \\
+
+User -- Review & $0..N$ & $1..1$ & Một User có thể viết nhiều Review \\
+
+Reservation -- Review & $0..1$ & $1..1$ & Mỗi Reservation có tối đa một Review \\
+
+User -- Community Content & $0..N$ & $1..1$ & Mỗi Content do một User tạo \\
+
+User -- Workshop, Tổ chức & $0..N$ & $1..1$ & Mỗi Workshop có một người tổ chức \\
+
+User -- Workshop, Tham gia & $0..N$ & $0..N$ & Quan hệ nhiều--nhiều \\
+
+User -- Photo & $0..N$ & $1..1$ & Mỗi Photo thuộc một User \\
+
+User -- Complaint & $0..N$ & $1..1$ & Mỗi Complaint do một User gửi \\
+
+\bottomrule
+
+\end{tabular}
+
+\end{center}
+
+Trong bảng trên, đối với những quan hệ có bản số $0..1$ hoặc $0..N$, việc tham gia của thực thể là tùy chọn. Đối với những quan hệ có bản số $1..1$, mỗi thể hiện của thực thể phải tham gia ít nhất một lần vào mối quan hệ tương ứng.
+
+Một số quan hệ cần được diễn giải theo hướng nghiệp vụ như sau:
+
+\begin{itemize}
+
+\item \textbf{Reservation -- Payment:} Theo mô hình hiện tại, một Reservation có thể chưa có Payment hoặc có một Payment. Vì vậy, phía Reservation có mức tham gia $0..1$, còn mỗi Payment bắt buộc phải gắn với một Reservation.
+
+\item \textbf{Reservation -- Service Session:} Một Reservation có thể chưa có Service Session vì dịch vụ có thể chưa được sử dụng. Khi dịch vụ được sử dụng, Reservation có thể phát sinh một Service Session.
+
+\item \textbf{Reservation -- Review:} Một Reservation có thể chưa được đánh giá hoặc đã có một Review. Mỗi Review phải gắn với một Reservation. Ràng buộc này bảo đảm một lần đặt dịch vụ không phát sinh nhiều đánh giá trùng lặp.
+
+\item \textbf{User -- Review:} Một User có thể viết nhiều Review thông qua nhiều lần sử dụng dịch vụ. Vì vậy, quan hệ User -- Review là 1:N và không đặt ràng buộc duy nhất trên User trong thực thể Review.
+
+\item \textbf{User -- Workshop:} Hai mối quan hệ giữa User và Workshop cần được phân biệt rõ. Quan hệ ``Tổ chức'' là 1:N, trong khi quan hệ ``Tham gia'' là N:N. Một User có thể tổ chức nhiều Workshop và đồng thời có thể tham gia nhiều Workshop khác.
+
+\item \textbf{Các quan hệ M:N:} Các quan hệ giữa Service Package, Creative Space, Resource, Reservation, Service Session và Workshop cần được chuyển thành các bảng kết hợp trong mô hình logic. Các bảng kết hợp có thuộc tính \texttt{quantity} phải lưu thuộc tính này cùng với các khóa tham chiếu đến hai thực thể tham gia.
+
+\end{itemize}
+
+Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô tả rõ không chỉ số lượng liên kết giữa các thực thể mà còn thể hiện được trường hợp một đối tượng có thể chưa phát sinh dữ liệu liên quan. Đây là cơ sở để xác định khóa ngoại, ràng buộc \texttt{NOT NULL}, \texttt{UNIQUE} và các ràng buộc toàn vẹn trong mô hình logic.
 
 \section{Xây dựng mô hình ERD/EER}
 \subsection{ERD tổng thể}
