@@ -301,16 +301,231 @@ Các yêu cầu dữ liệu chính:
 Complaint phục vụ Administrator trong việc tiếp nhận, theo dõi và giải quyết tranh chấp giữa các bên.
 
 \section{Quy tắc nghiệp vụ}
+
 \subsection{Quy tắc về người dùng và vai trò}
+
+Hệ thống quản lý người dùng thông qua thực thể \textbf{User}, mỗi tài khoản được gán một trong bốn vai trò sau:
+
+\begin{itemize}
+    \item \textbf{Photographer}: có thể tìm kiếm, đặt Creative Space, Resource hoặc Service Package; thực hiện thanh toán; tham gia Workshop; quản lý Photo cá nhân; viết Review và gửi Complaint.
+    \item \textbf{Service Provider}: có thể tạo và quản lý Creative Space, Resource, Service Package và Promotion; xem lịch đặt chỗ và phiên sử dụng dịch vụ.
+    \item \textbf{Photography Expert}: có thể tạo Community Content và tổ chức Workshop.
+    \item \textbf{Administrator}: quản lý toàn bộ hệ thống, phê duyệt tài khoản Service Provider và xử lý Complaint.
+\end{itemize}
+
+Mỗi User chỉ có một vai trò tại một thời điểm. Tài khoản có thể ở trạng thái hoạt động hoặc bị khoá tuỳ theo quyết định của Administrator.
+
 \subsection{Quy tắc về nhà cung cấp và tài nguyên}
+
+\begin{itemize}
+    \item Một \textbf{Service Provider} có thể quản lý nhiều \textbf{Creative Space}, nhiều \textbf{Resource}, nhiều \textbf{Service Package} và nhiều \textbf{Promotion}. Mỗi đối tượng trong số này chỉ thuộc về đúng một Service Provider.
+    \item Mỗi \textbf{Resource} có thể trải qua nhiều lần bảo trì (\textbf{Maintenance}) trong vòng đời của nó. Mỗi Maintenance chỉ gắn với một Resource duy nhất.
+    \item Khi một Resource đang trong trạng thái bảo trì, Resource đó không được phân bổ cho bất kỳ Reservation nào.
+    \item Thông tin về số lượng (\texttt{quantity}), tình trạng (\texttt{condition}) và trạng thái (\texttt{status}) của Resource phải được cập nhật kịp thời để phản ánh đúng khả dụng thực tế.
+\end{itemize}
+
 \subsection{Quy tắc về dịch vụ}
+
+\begin{itemize}
+    \item Một \textbf{Service Package} có thể bao gồm nhiều \textbf{Creative Space} và nhiều \textbf{Resource}; ngược lại, một Creative Space hoặc Resource cũng có thể thuộc nhiều Service Package (quan hệ N:N).
+    \item Khi tạo Service Package, Service Provider phải chỉ định ít nhất một Creative Space hoặc một Resource.
+    \item Một \textbf{Promotion} do Service Provider tạo ra, có thời gian hiệu lực xác định (\texttt{start\_at}, \texttt{end\_at}) và chỉ được áp dụng trong khoảng thời gian đó.
+    \item Promotion có thể thuộc loại giảm theo phần trăm hoặc giảm theo số tiền cố định, được xác định qua \texttt{discount\_type} và \texttt{discount\_value}.
+\end{itemize}
+
 \subsection{Quy tắc về đặt chỗ và sử dụng dịch vụ}
+
+\begin{itemize}
+    \item Một \textbf{Reservation} được tạo bởi đúng một User có vai trò Photographer. Một User có thể tạo nhiều Reservation.
+    \item Một Reservation có thể đặt nhiều Creative Space và nhiều Resource đồng thời (quan hệ N:N). Reservation cũng có thể sử dụng một Service Package hoặc không.
+    \item Trước khi xác nhận Reservation, hệ thống phải kiểm tra khả dụng của Creative Space và Resource trong khoảng thời gian \texttt{start\_time} đến \texttt{end\_time}. Nếu phát hiện xung đột lịch, Reservation không được xác nhận.
+    \item Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc: $\texttt{start\_time} < \texttt{end\_time}$.
+    \item Một Reservation có thể có tối đa một \textbf{Payment}. Payment chỉ được tạo sau khi Reservation được xác nhận.
+    \item Một Reservation có thể có tối đa một \textbf{Service Session}. Service Session chỉ được tạo sau khi Payment hoàn tất.
+    \item Trong Service Session, \texttt{check\_out} phải lớn hơn \texttt{check\_in}; \texttt{actual\_usage\_duration} được tính từ hiệu số đó.
+\end{itemize}
+
 \subsection{Quy tắc về cộng đồng}
+
+\begin{itemize}
+    \item Một \textbf{User} có thể tạo nhiều \textbf{Community Content}. Mỗi Community Content chỉ thuộc về một User.
+    \item Community Content có thể thuộc các loại: article, tutorial, technique, best practice hoặc discussion, được xác định qua thuộc tính \texttt{content\_type}.
+    \item Một User có vai trò Photography Expert có thể tổ chức nhiều \textbf{Workshop}. Mỗi Workshop được tổ chức bởi đúng một User.
+    \item Một User có thể tham gia nhiều Workshop; một Workshop có thể có nhiều User tham gia (quan hệ N:N). Số lượng người tham gia không được vượt quá \texttt{capacity} của Workshop.
+    \item Một User, đặc biệt là Photographer, có thể quản lý nhiều \textbf{Photo}. Mỗi Photo chỉ thuộc về một User.
+\end{itemize}
+
 \subsection{Quy tắc về đánh giá và khiếu nại}
+
+\begin{itemize}
+    \item Một \textbf{Review} chỉ có thể được tạo sau khi Reservation tương ứng đã hoàn thành. Mỗi Reservation có tối đa một Review.
+    \item Review phải được viết bởi chính User đã tạo Reservation đó.
+    \item Một \textbf{Complaint} được tạo bởi một User. Một User có thể gửi nhiều Complaint; mỗi Complaint chỉ thuộc về một User.
+    \item Complaint phải được Administrator tiếp nhận và xử lý. Khi xử lý xong, trường \texttt{resolved\_at} và \texttt{resolution} được cập nhật, trạng thái chuyển sang đã giải quyết.
+\end{itemize}
+
 \subsection{Các ràng buộc về thời gian và khả dụng}
 
+\begin{itemize}
+    \item \textbf{Ràng buộc thời gian Reservation}: \texttt{start\_time} $<$ \texttt{end\_time}; thời gian đặt không được nằm trong quá khứ tại thời điểm tạo Reservation.
+    \item \textbf{Ràng buộc khả dụng Creative Space}: Tại cùng một khoảng thời gian, một Creative Space không thể xuất hiện trong hai Reservation đang hoạt động cùng lúc.
+    \item \textbf{Ràng buộc khả dụng Resource}: Tổng số lượng Resource được phân bổ cho các Reservation đang hoạt động không được vượt quá \texttt{quantity} hiện có.
+    \item \textbf{Ràng buộc Promotion}: Promotion chỉ có hiệu lực khi \texttt{start\_at} $\leq$ thời điểm đặt $\leq$ \texttt{end\_at} và trạng thái là đang hoạt động.
+    \item \textbf{Ràng buộc Workshop}: Số lượng User đăng ký tham gia không được vượt quá \texttt{capacity}; \texttt{start\_time} $<$ \texttt{end\_time}.
+    \item \textbf{Ràng buộc Maintenance}: Khoảng thời gian bảo trì của một Resource không được trùng với khoảng thời gian Resource đó được phân bổ trong Reservation.
+\end{itemize}
+
 \section{Tổng hợp yêu cầu và phạm vi dữ liệu}
+
 \subsection{Danh sách đối tượng dữ liệu}
+
+Hệ thống quản lý 15 thực thể chính và 6 bảng kết hợp như sau:
+
+\begin{table}[H]
+\centering
+\caption{Danh sách thực thể của hệ thống}
+\begin{tabular}{|c|l|p{9cm}|}
+\hline
+\textbf{STT} & \textbf{Thực thể} & \textbf{Ý nghĩa nghiệp vụ} \\
+\hline
+1  & User              & Đại diện người dùng của hệ thống với các vai trò Photographer, Service Provider, Photography Expert hoặc Administrator. \\
+\hline
+2  & Service Provider  & Đại diện cá nhân hoặc tổ chức cung cấp và quản lý creative space, resource và service package. \\
+\hline
+3  & Creative Space    & Đại diện các không gian sáng tạo như darkroom và photography studio. \\
+\hline
+4  & Resource          & Đại diện các tài nguyên như thiết bị chụp ảnh, thiết bị darkroom và vật tư tiêu hao. \\
+\hline
+5  & Maintenance       & Đại diện các hoạt động và lịch bảo trì tài nguyên. \\
+\hline
+6  & Service Package   & Đại diện các gói dịch vụ kết hợp creative space, resource và dịch vụ hỗ trợ. \\
+\hline
+7  & Promotion         & Đại diện các chương trình khuyến mãi do Service Provider cấu hình. \\
+\hline
+8  & Reservation       & Đại diện nghiệp vụ đặt creative space, resource hoặc service package. \\
+\hline
+9  & Payment           & Đại diện thông tin thanh toán phát sinh từ reservation. \\
+\hline
+10 & Service Session   & Đại diện phiên sử dụng dịch vụ thực tế bao gồm check-in, check-out. \\
+\hline
+11 & Review            & Đại diện đánh giá và nhận xét của người dùng sau quá trình sử dụng. \\
+\hline
+12 & Community Content & Đại diện các nội dung được chia sẻ trong cộng đồng nhiếp ảnh. \\
+\hline
+13 & Workshop          & Đại diện các buổi workshop hoặc training session. \\
+\hline
+14 & Photo             & Đại diện các ảnh kỹ thuật số được người dùng quản lý trên hệ thống. \\
+\hline
+15 & Complaint         & Đại diện các khiếu nại hoặc tranh chấp phát sinh trong quá trình sử dụng dịch vụ. \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Danh sách bảng kết hợp}
+\begin{tabular}{|c|l|l|p{6cm}|}
+\hline
+\textbf{STT} & \textbf{Mối kết hợp} & \textbf{Bảng kết hợp} & \textbf{Ý nghĩa nghiệp vụ} \\
+\hline
+1 & Service Package -- Creative Space & Package Space         & Liên kết các Creative Space được bao gồm trong Service Package. \\
+\hline
+2 & Service Package -- Resource       & Package Resource      & Lưu số lượng Resource được sử dụng trong một Service Package. \\
+\hline
+3 & Creative Space -- Reservation     & Reservation Space     & Liên kết các Creative Space được sử dụng trong Reservation. \\
+\hline
+4 & Reservation -- Resource           & Reservation Resource  & Lưu số lượng Resource được phân bổ cho một Reservation. \\
+\hline
+5 & Service Session -- Resource       & Session Resource      & Lưu số lượng Resource thực tế được sử dụng trong một Service Session. \\
+\hline
+6 & User -- Workshop                  & Workshop Registration & Liên kết User với các Workshop mà User tham gia. \\
+\hline
+\end{tabular}
+\end{table}
+
 \subsection{Danh sách yêu cầu dữ liệu}
+
+Các yêu cầu dữ liệu được xác định dựa trên các nhóm nghiệp vụ chính của hệ thống:
+
+\begin{itemize}
+    \item \textbf{Quản lý người dùng}: lưu thông tin tài khoản, vai trò, trạng thái và thông tin cơ bản của người dùng.
+    \item \textbf{Quản lý nhà cung cấp và tài nguyên}: quản lý Service Provider, Creative Space, Resource, Maintenance, Service Package và Promotion.
+    \item \textbf{Quản lý đặt và sử dụng dịch vụ}: quản lý Reservation, Payment và Service Session nhằm theo dõi toàn bộ vòng đời của một lần sử dụng dịch vụ.
+    \item \textbf{Quản lý cộng đồng}: quản lý Community Content, Workshop, Photo và các hoạt động chia sẻ kiến thức.
+    \item \textbf{Quản lý phản hồi và khiếu nại}: quản lý Review và Complaint để hỗ trợ đánh giá chất lượng dịch vụ và xử lý tranh chấp.
+\end{itemize}
+
+Các dữ liệu cần được lưu trữ lâu dài bao gồm:
+\begin{itemize}
+    \item \textbf{Dữ liệu chủ}: User, Service Provider, Creative Space, Resource, Service Package.
+    \item \textbf{Dữ liệu giao dịch}: Reservation, Payment, Service Session, Maintenance, Review, Promotion, Complaint.
+    \item \textbf{Dữ liệu nội dung}: Community Content, Workshop, Photo.
+\end{itemize}
+
 \subsection{Danh sách quy tắc nghiệp vụ}
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp các mối quan hệ và bản số}
+\begin{tabular}{|c|l|l|c|}
+\hline
+\textbf{STT} & \textbf{Mối kết hợp} & \textbf{Quan hệ} & \textbf{Bản số} \\
+\hline
+1  & Service Provider -- Creative Space  & Quản lý          & 1:N    \\
+\hline
+2  & Service Provider -- Resource        & Quản lý          & 1:N    \\
+\hline
+3  & Service Provider -- Service Package & Tạo              & 1:N    \\
+\hline
+4  & Service Provider -- Promotion       & Tạo              & 1:N    \\
+\hline
+5  & Resource -- Maintenance             & Được bảo trì     & 1:N    \\
+\hline
+6  & Service Package -- Creative Space   & Bao gồm          & N:N    \\
+\hline
+7  & Service Package -- Resource         & Bao gồm          & N:N    \\
+\hline
+8  & User -- Reservation                 & Đặt              & 1:N    \\
+\hline
+9  & Creative Space -- Reservation       & Được đặt         & N:N    \\
+\hline
+10 & Service Package -- Reservation      & Được chọn        & N:1    \\
+\hline
+11 & Reservation -- Resource             & Phân bổ          & N:N    \\
+\hline
+12 & Reservation -- Payment              & Có thanh toán    & 1:0..1 \\
+\hline
+13 & Reservation -- Service Session      & Có phiên sử dụng & 1:0..1 \\
+\hline
+14 & Service Session -- Resource         & Sử dụng thực tế  & N:N    \\
+\hline
+15 & User -- Review                      & Viết             & 1:N    \\
+\hline
+16 & Reservation -- Review               & Được đánh giá    & 1:0..1 \\
+\hline
+17 & User -- Community Content           & Tạo              & 1:N    \\
+\hline
+18 & User -- Workshop                    & Tổ chức          & 1:N    \\
+\hline
+19 & User -- Workshop                    & Tham gia         & N:N    \\
+\hline
+20 & User -- Photo                       & Quản lý          & 1:N    \\
+\hline
+21 & User -- Complaint                   & Gửi              & 1:N    \\
+\hline
+\end{tabular}
+\end{table}
+
 \subsection{Đầu vào cho thiết kế quan niệm}
+
+Dựa trên kết quả phân tích yêu cầu, các thành phần đầu vào cho giai đoạn thiết kế quan niệm bao gồm:
+
+\begin{itemize}
+    \item \textbf{Danh sách 15 thực thể} đã được xác định cùng với các thuộc tính và khoá chính tương ứng.
+    \item \textbf{Danh sách 21 mối quan hệ} giữa các thực thể, bao gồm tên quan hệ, bản số và ràng buộc tham gia.
+    \item \textbf{Danh sách 6 bảng kết hợp} cho các quan hệ N:N, một số có thuộc tính riêng như \texttt{quantity}.
+    \item \textbf{Các quy tắc nghiệp vụ và ràng buộc} về thời gian, khả dụng, vai trò và trạng thái.
+    \item \textbf{Từ điển dữ liệu} mô tả ý nghĩa nghiệp vụ của từng thuộc tính trong mỗi thực thể.
+\end{itemize}
+
+Toàn bộ thông tin trên sẽ được sử dụng làm nền tảng để xây dựng sơ đồ EER và thiết kế cơ sở dữ liệu ở mức quan niệm.
