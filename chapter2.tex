@@ -906,15 +906,214 @@ Một số quan hệ cần được diễn giải theo hướng nghiệp vụ nh
 Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô tả rõ không chỉ số lượng liên kết giữa các thực thể mà còn thể hiện được trường hợp một đối tượng có thể chưa phát sinh dữ liệu liên quan. Đây là cơ sở để xác định khóa ngoại, ràng buộc \texttt{NOT NULL}, \texttt{UNIQUE} và các ràng buộc toàn vẹn trong mô hình logic.
 
 \section{Xây dựng mô hình ERD/EER}
+
 \subsection{ERD/EER tổng thể}
+
+Mô hình dữ liệu được xây dựng và biểu diễn thông qua hai sơ đồ:
+\textbf{ERD} và \textbf{EER}. Hai sơ đồ được xây dựng dựa trên các
+thực thể, thuộc tính, mối kết hợp, bản số, mức tham gia và các ràng buộc
+nghiệp vụ đã được xác định ở Chương 0 và Chương 1.
+
+\subsubsection{Sơ đồ ERD}
+
+Sơ đồ ERD biểu diễn các thực thể, thuộc tính và mối kết hợp giữa các
+đối tượng dữ liệu của hệ thống ở mức quan niệm. Sơ đồ thể hiện tổng
+quan cấu trúc dữ liệu của hệ thống và các mối quan hệ giữa các thực thể.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{diagram/TKCSDL_ERD.drawio.png}
+	\caption{Sơ đồ ERD tổng thể}
+	\label{fig}
+\end{figure}
+
+\subsubsection{Sơ đồ EER}
+
+Sơ đồ EER được xây dựng trên cơ sở mở rộng mô hình ER, nhằm biểu diễn
+đầy đủ hơn các đặc điểm và ràng buộc của mô hình dữ liệu. Trong phạm vi
+hệ thống, sơ đồ EER được sử dụng để thể hiện các mối kết hợp M có
+thuộc tính riêng và hỗ trợ kiểm tra các đặc điểm của mô hình ở mức quan
+niệm.
+
+Đối với mô hình hiện tại, không sử dụng thực thể yếu và không áp dụng
+cơ chế tổng quát hóa/chuyên biệt hóa giữa các thực thể. Các vai trò
+khác nhau của người dùng được quản lý thông qua thuộc tính \textit{role}
+của thực thể \textit{User}, thay vì xây dựng các thực thể con riêng biệt.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{diagram/TKCSDL_EER.drawio.png}
+	\caption{Sơ đồ EER tổng thể}
+	\label{fig}
+\end{figure}
+
 \subsection{Biểu diễn thuộc tính và khóa}
+
+Trong mô hình ERD/EER, mỗi thực thể được biểu diễn cùng các thuộc tính mô tả đặc điểm nghiệp vụ. Các thuộc tính được kế thừa từ kết quả xác định thuộc tính ở Chương 1, không bổ sung thêm thuộc tính ngoài phạm vi đã xác định.
+
+Mỗi thực thể có một thuộc tính định danh riêng:
+
+\begin{center}
+	\scriptsize
+	\begin{tabular}{p{.30\linewidth} p{.30\linewidth} p{.30\linewidth}}
+		\toprule
+		\textbf{Thực thể} & \textbf{Thuộc tính định danh} & \textbf{Ý nghĩa} \\
+		\midrule
+		User & \texttt{user\_id} & Định danh User \\
+		Service Provider & \texttt{provider\_id} & Định danh Service Provider \\
+		Creative Space & \texttt{space\_id} & Định danh Creative Space \\
+		Resource & \texttt{resource\_id} & Định danh Resource \\
+		Maintenance & \texttt{maintenance\_id} & Định danh Maintenance \\
+		Service Package & \texttt{package\_id} & Định danh Service Package \\
+		Promotion & \texttt{promotion\_id} & Định danh Promotion \\
+		Reservation & \texttt{reservation\_id} & Định danh Reservation \\
+		Payment & \texttt{payment\_id} & Định danh Payment \\
+		Service Session & \texttt{session\_id} & Định danh Service Session \\
+		Review & \texttt{review\_id} & Định danh Review \\
+		Community Content & \texttt{content\_id} & Định danh Community Content \\
+		Workshop & \texttt{workshop\_id} & Định danh Workshop \\
+		Photo & \texttt{photo\_id} & Định danh Photo \\
+		Complaint & \texttt{complaint\_id} & Định danh Complaint \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+Các thuộc tính định danh được sử dụng để phân biệt các thể hiện của cùng một thực thể. Ở mức quan niệm, khóa được xem xét dưới góc độ định danh nghiệp vụ; các chi tiết về khóa chính, khóa ngoại và kiểu dữ liệu thuộc phạm vi thiết kế logic.
+
+Đối với các mối kết hợp có thuộc tính riêng, thuộc tính được đặt trên chính mối kết hợp vì giá trị của nó phụ thuộc vào sự tham gia của hai thực thể. Trong mô hình này, thuộc tính \texttt{quantity} xuất hiện ở các mối kết hợp \textit{Service Package--Resource}, \textit{Reservation--Resource} và \textit{Service Session--Resource}.
+
 \subsection{Biểu diễn bản số và mức tham gia}
+
+Bản số và mức tham gia mô tả số lượng thể hiện tối thiểu và tối đa của một thực thể có thể tham gia vào một mối kết hợp. Ký hiệu được sử dụng là:
+
+\[
+\text{min..max}
+\]
+
+Trong đó:
+
+\begin{itemize}
+	\item $0$ thể hiện tham gia tùy chọn;
+	\item $1$ thể hiện tham gia bắt buộc;
+	\item $N$ thể hiện có thể liên kết với nhiều thể hiện.
+\end{itemize}
+
+Các mối kết hợp trong mô hình được biểu diễn theo kết quả đã xác định ở Chương 1:
+
+\begin{center}
+	\scriptsize
+	\begin{tabular}{p{.31\linewidth} p{.16\linewidth} p{.16\linewidth} p{.27\linewidth}}
+		\toprule
+		\textbf{Mối kết hợp} & \textbf{Phía 1} & \textbf{Phía 2} & \textbf{Diễn giải} \\
+		\midrule
+		Service Provider -- Creative Space & $0..N$ & $1..1$ & Mỗi Creative Space thuộc một Provider. \\
+		Service Provider -- Resource & $0..N$ & $1..1$ & Mỗi Resource thuộc một Provider. \\
+		Service Provider -- Service Package & $0..N$ & $1..1$ & Mỗi Package thuộc một Provider. \\
+		Service Provider -- Promotion & $0..N$ & $1..1$ & Mỗi Promotion thuộc một Provider. \\
+		Resource -- Maintenance & $0..N$ & $1..1$ & Mỗi Maintenance gắn với một Resource. \\
+		Service Package -- Creative Space & $0..N$ & $0..N$ & Quan hệ M:N. \\
+		Service Package -- Resource & $0..N$ & $0..N$ & Quan hệ M:N, có \texttt{quantity}. \\
+		User -- Reservation & $0..N$ & $1..1$ & Mỗi Reservation do một User tạo. \\
+		Service Package -- Reservation & $0..N$ & $0..1$ & Reservation có thể không chọn Package. \\
+		Creative Space -- Reservation & $0..N$ & $0..N$ & Quan hệ M:N. \\
+		Reservation -- Resource & $0..N$ & $0..N$ & Quan hệ M:N, có \texttt{quantity}. \\
+		Reservation -- Payment & $0..1$ & $1..1$ & Reservation có thể chưa có Payment. \\
+		Reservation -- Service Session & $0..1$ & $1..1$ & Reservation có thể chưa có Session. \\
+		Service Session -- Resource & $0..N$ & $0..N$ & Quan hệ M:N, có \texttt{quantity}. \\
+		User -- Review & $0..N$ & $1..1$ & Một User có thể viết nhiều Review. \\
+		Reservation -- Review & $0..1$ & $1..1$ & Reservation có thể chưa có Review. \\
+		User -- Community Content & $0..N$ & $1..1$ & Mỗi Content do một User tạo. \\
+		User -- Workshop (Tổ chức) & $0..N$ & $1..1$ & Mỗi Workshop có một người tổ chức. \\
+		User -- Workshop (Tham gia) & $0..N$ & $0..N$ & Quan hệ M:N. \\
+		User -- Photo & $0..N$ & $1..1$ & Mỗi Photo thuộc một User. \\
+		User -- Complaint & $0..N$ & $1..1$ & Mỗi Complaint do một User gửi. \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+
+Các mức tham gia trên phản ánh các trường hợp nghiệp vụ đã xác định. Ví dụ, Reservation có thể chưa phát sinh Payment, Service Session hoặc Review; trong khi mỗi Payment, Service Session và Review khi tồn tại đều phải gắn với một Reservation.
+
 \subsection{Các ràng buộc nghiệp vụ trên mô hình}
 
+Ngoài bản số và mức tham gia, mô hình cần phản ánh các ràng buộc xuất phát từ nghiệp vụ:
+
+\begin{itemize}
+	\item \textbf{Vai trò User:} mỗi User có một vai trò nghiệp vụ; các vai trò chính gồm Photographer, Service Provider, Photography Expert và Administrator.
+	\item \textbf{Thời gian Reservation:} \texttt{start\_time} phải trước \texttt{end\_time}.
+	\item \textbf{Không trùng lịch Creative Space:} một Creative Space không được được sử dụng trong các Reservation có thời gian bị trùng.
+	\item \textbf{Không trùng lịch Resource:} một Resource không được được phân bổ cho các Reservation có thời gian bị trùng.
+	\item \textbf{Bảo trì Resource:} Resource đang trong thời gian bảo trì không được phân bổ cho Reservation hoặc sử dụng trong Service Session.
+	\item \textbf{Service Package:} một Reservation có thể không sử dụng hoặc sử dụng một Service Package.
+	\item \textbf{Review:} giá trị \texttt{rating} phải nằm trong phạm vi từ $1$ đến $5$.
+	\item \textbf{Workshop:} số người tham gia không được vượt quá \texttt{capacity}.
+	\item \textbf{Tổ chức Workshop:} User thực hiện nghiệp vụ tổ chức Workshop phải có vai trò Photography Expert.
+\end{itemize}
+
+Các ràng buộc trên được dùng để kiểm tra tính phù hợp giữa mô hình dữ liệu và nghiệp vụ thực tế. Những ràng buộc phụ thuộc vào cách triển khai hệ quản trị cơ sở dữ liệu sẽ được cụ thể hóa ở thiết kế logic.
+
 \section{Các trường hợp đặc biệt trong mô hình}
+
 \subsection{Mối kết hợp M:N có thuộc tính riêng}
+
+Trong mô hình hiện tại có ba mối kết hợp M:N có thuộc tính riêng là \textit{Service Package--Resource}, \textit{Reservation--Resource} và \textit{Service Session--Resource}.
+
+\begin{enumerate}
+	\item \textbf{Service Package -- Resource:} thuộc tính \texttt{quantity} biểu diễn số lượng Resource cần thiết trong một Service Package.
+	\item \textbf{Reservation -- Resource:} thuộc tính \texttt{quantity} biểu diễn số lượng Resource được phân bổ cho một Reservation.
+	\item \textbf{Service Session -- Resource:} thuộc tính \texttt{quantity} biểu diễn số lượng Resource thực tế được sử dụng trong một Service Session.
+\end{enumerate}
+
+Thuộc tính \texttt{quantity} không thuộc riêng về Resource hoặc Service Package/Reservation/Service Session mà phụ thuộc vào từng lần hai thực thể tham gia vào mối kết hợp. Vì vậy, thuộc tính này được biểu diễn trên mối kết hợp.
+
+Ngoài ba mối kết hợp trên, các mối kết hợp M:N \textit{Service Package--Creative Space}, \textit{Creative Space--Reservation} và \textit{User--Workshop (Tham gia)} không có thuộc tính riêng trong thiết kế hiện tại.
+
 \subsection{Thực thể yếu}
+
+Thực thể yếu là thực thể không thể được định danh duy nhất chỉ bằng các thuộc tính của chính nó và cần dựa vào một thực thể chủ cùng một mối quan hệ định danh.
+
+Dựa trên danh sách thực thể ở Chương 1, mô hình hiện tại \textbf{không sử dụng thực thể yếu}. Mỗi thực thể đều đã có một thuộc tính định danh riêng:
+
+\begin{itemize}
+	\item User -- \texttt{user\_id};
+	\item Service Provider -- \texttt{provider\_id};
+	\item Creative Space -- \texttt{space\_id};
+	\item Resource -- \texttt{resource\_id};
+	\item Maintenance -- \texttt{maintenance\_id};
+	\item Service Package -- \texttt{package\_id};
+	\item Promotion -- \texttt{promotion\_id};
+	\item Reservation -- \texttt{reservation\_id};
+	\item Payment -- \texttt{payment\_id};
+	\item Service Session -- \texttt{session\_id};
+	\item Review -- \texttt{review\_id};
+	\item Community Content -- \texttt{content\_id};
+	\item Workshop -- \texttt{workshop\_id};
+	\item Photo -- \texttt{photo\_id};
+	\item Complaint -- \texttt{complaint\_id}.
+\end{itemize}
+
+Do đó, các quan hệ như \textit{Resource--Maintenance} hoặc \textit{Reservation--Payment} chỉ thể hiện sự liên kết và phụ thuộc nghiệp vụ, không làm cho Maintenance hoặc Payment trở thành thực thể yếu.
+
+Vì vậy, sơ đồ EER không sử dụng ký hiệu thực thể yếu hoặc mối quan hệ định danh.
+
 \subsection{Tổng quát hóa/chuyên biệt hóa EER}
+
+Tổng quát hóa/chuyên biệt hóa được sử dụng khi một nhóm thực thể có các thuộc tính chung nhưng có những đặc điểm riêng theo từng loại.
+
+Trong mô hình hiện tại, \textbf{không áp dụng tổng quát hóa/chuyên biệt hóa cho User}. Theo thiết kế mức quan niệm ở Chương 1, User là thực thể chung và thuộc tính \texttt{role} được sử dụng để xác định vai trò nghiệp vụ của người dùng.
+
+Các vai trò chính gồm:
+
+\begin{itemize}
+	\item Photographer;
+	\item Service Provider;
+	\item Photography Expert;
+	\item Administrator.
+\end{itemize}
+
+Service Provider đồng thời được mô hình hóa thành một thực thể nghiệp vụ riêng để quản lý thông tin của cá nhân hoặc tổ chức cung cấp dịch vụ. Cách mô hình hóa này được giữ nguyên theo Chương 1, không chuyển Service Provider thành một thực thể con của User.
+
+Các ứng dụng AI như recommendation, semantic search, demand forecasting, resource allocation optimization và image restoration/enhancement cũng không được mô hình hóa thành thực thể độc lập trong phạm vi thiết kế hiện tại, vì đây là các chức năng hỗ trợ của hệ thống.
+
 
 
 \section{Kiểm chứng mô hình quan niệm}
