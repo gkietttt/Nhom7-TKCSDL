@@ -906,7 +906,7 @@ Một số quan hệ cần được diễn giải theo hướng nghiệp vụ nh
 Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô tả rõ không chỉ số lượng liên kết giữa các thực thể mà còn thể hiện được trường hợp một đối tượng có thể chưa phát sinh dữ liệu liên quan. Đây là cơ sở để xác định khóa ngoại, ràng buộc \texttt{NOT NULL}, \texttt{UNIQUE} và các ràng buộc toàn vẹn trong mô hình logic.
 
 \section{Xây dựng mô hình ERD/EER}
-\subsection{ERD tổng thể}
+\subsection{ERD/EER tổng thể}
 \subsection{Biểu diễn thuộc tính và khóa}
 \subsection{Biểu diễn bản số và mức tham gia}
 \subsection{Các ràng buộc nghiệp vụ trên mô hình}
@@ -916,15 +916,7 @@ Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô t
 \subsection{Thực thể yếu}
 \subsection{Tổng quát hóa/chuyên biệt hóa EER}
 
-\section{Kiểm chứng mô hình quan niệm}
-\subsection{Kiểm tra thực thể và thuộc tính}
-\subsection{Kiểm tra mối kết hợp và bản số}
-\subsection{Kiểm tra bằng dữ liệu mẫu và tình huống}
 
-\section{Kết quả thiết kế quan niệm}
-\subsection{ERD/EER hoàn chỉnh}
-\subsection{Từ điển dữ liệu}
-\subsection{Danh sách các ràng buộc nghiệp vụ}
 \section{Kiểm chứng mô hình quan niệm}
 Mục tiêu của bước này là rà soát lại toàn bộ mô hình ERD để đảm bảo tính đúng đắn, đầy đủ và phù hợp với các yêu cầu nghiệp vụ đã đặt ra ở Chương 1, trước khi tiến hành chuyển đổi sang mô hình logic.
 
@@ -955,10 +947,10 @@ Giả lập kịch bản nghiệp vụ: \textit{"Nhiếp ảnh gia A (User) đ�
     \item Khi thanh toán, một \textbf{Payment} được tạo và liên kết $1:1$ với \textbf{Reservation}.
     \item \textbf{Review} được tạo và tham chiếu trực tiếp về \textbf{Reservation} đó.
 \end{enumerate}
-Mô hình ERD hiện tại lưu trữ đầy đủ luồng thông tin này mà không gặp điểm nghẽn.
 
 \section{Kết quả thiết kế quan niệm}
-\subsection{ERD/EER hoàn chỉnh}
+
+\subsection{ERD/EER/UML hoàn chỉnh}
 Sau quá trình rà soát và kiểm chứng, mô hình Thực thể - Mối kết hợp (ERD) đã hoàn thiện, biểu diễn đầy đủ 15 thực thể và 21 mối kết hợp.
 
 \begin{figure}[htbp]
