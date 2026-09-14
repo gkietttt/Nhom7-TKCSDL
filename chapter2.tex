@@ -1114,38 +1114,188 @@ Service Provider đồng thời được mô hình hóa thành một thực th�
 
 Các ứng dụng AI như recommendation, semantic search, demand forecasting, resource allocation optimization và image restoration/enhancement cũng không được mô hình hóa thành thực thể độc lập trong phạm vi thiết kế hiện tại, vì đây là các chức năng hỗ trợ của hệ thống.
 
-
-
 \section{Kiểm chứng mô hình quan niệm}
-Mục tiêu của bước này là rà soát lại toàn bộ mô hình ERD để đảm bảo tính đúng đắn, đầy đủ và phù hợp với các yêu cầu nghiệp vụ đã đặt ra ở Chương 1, trước khi tiến hành chuyển đổi sang mô hình logic.
+
+Mục tiêu của bước này là rà soát lại toàn bộ mô hình ERD để đảm bảo tính đúng đắn, đầy đủ và phù hợp với các yêu cầu nghiệp vụ đã xác định ở Chương 1, trước khi chuyển sang mô hình logic. Việc kiểm chứng được thực hiện trên ba khía cạnh chính: thực thể và thuộc tính, mối kết hợp và bản số, và khả năng biểu diễn các dữ liệu mẫu và tình huống nghiệp vụ thực tế.
 
 \subsection{Kiểm tra thực thể và thuộc tính}
-Quá trình kiểm tra tập trung vào việc loại bỏ sự dư thừa dữ liệu và đảm bảo mỗi thuộc tính được gán đúng vào thực thể chủ quản:
+
+Quá trình kiểm tra tập trung vào việc xác định mỗi thuộc tính có được đặt đúng thực thể hoặc mối kết hợp hay không, đồng thời hạn chế dư thừa và những thuộc tính có thể gây mâu thuẫn dữ liệu.
+
 \begin{itemize}
-    \item \textbf{Tính nguyên tử:} Các thuộc tính như địa chỉ của \textbf{Service Provider} tạm thời được giữ nguyên ở mức quan niệm, nhưng đã được ghi chú để tách nhỏ (số nhà, đường, quận, thành phố) ở mức logic.
-    \item \textbf{Đúng vị trí:} Thuộc tính \texttt{rental\_price} (giá thuê) được đặt đúng tại \textbf{Resource}, trong khi \texttt{total\_amount} (tổng tiền) được đặt tại \textbf{Reservation} vì tổng tiền phụ thuộc vào thời lượng và số lượng cụ thể được tính toán trong lúc đặt.
-    \item \textbf{Không dư thừa thực thể:} Các khái niệm phụ như "Hóa đơn" đã được tích hợp gọn vào thực thể \textbf{Payment}.
+
+\item \textbf{Tính nguyên tử:} Thuộc tính địa chỉ của \textbf{Service Provider} hiện được giữ ở mức quan niệm như một thông tin địa chỉ tổng thể. Khi chuyển sang mô hình logic, nếu hệ thống cần tìm kiếm, lọc hoặc thống kê độc lập theo từng thành phần địa chỉ, thuộc tính này sẽ được phân rã thành các thành phần phù hợp như số nhà, đường, quận/huyện và thành phố/tỉnh. Đây là định hướng xử lý ở bước thiết kế logic, không phải một thuộc tính đã được tách sẵn trong ERD hiện tại.
+
+\item \textbf{Đúng vị trí của thuộc tính:} Thuộc tính \texttt{rental\_price} được đặt tại \textbf{Resource} vì đây là thông tin mô tả mức giá thuê của Resource. Ngược lại, \texttt{quantity} không thuộc riêng về Resource mà chỉ có ý nghĩa trong từng lần Resource được đưa vào Service Package, Reservation hoặc Service Session. Vì vậy, \texttt{quantity} được đặt trên các mối kết hợp tương ứng.
+
+\item \textbf{Đúng vị trí của tổng tiền:} Thuộc tính \texttt{total\_amount} được đặt tại \textbf{Reservation}. Giá trị này phản ánh tổng số tiền của một lần đặt cụ thể, phụ thuộc vào thời gian sử dụng, Resource được phân bổ, số lượng và các dịch vụ liên quan tại thời điểm đặt. Do đó, không nên đặt \texttt{total\_amount} tại Resource hoặc Creative Space.
+
+\item \textbf{Thuộc tính dẫn xuất và dữ liệu tính toán:} Những giá trị có thể tính chính xác từ các dữ liệu khác không nên tự động xem là thuộc tính lưu trữ độc lập. Trong trường hợp tổng tiền được hệ thống tính từ các thành phần của Reservation, cần xác định rõ ở bước logic/triển khai liệu giá trị này được lưu để chốt giá giao dịch hay được tính lại từ dữ liệu chi tiết.
+
+\item \textbf{Không dư thừa thực thể:} Không bổ sung thực thể ``Hóa đơn'' độc lập trong mô hình hiện tại. Thông tin liên quan đến giao dịch thanh toán được quản lý thông qua thực thể \textbf{Payment}, phù hợp với phạm vi dữ liệu đã xác định.
+
 \end{itemize}
+
+Như vậy, các thực thể trong mô hình hiện tại đều có định danh riêng và các thuộc tính được gắn theo ý nghĩa nghiệp vụ. Những quyết định liên quan đến việc phân rã thuộc tính phức hợp hoặc lưu/không lưu thuộc tính dẫn xuất sẽ được cụ thể hóa ở bước thiết kế logic.
 
 \subsection{Kiểm tra mối kết hợp và bản số}
-Các mối kết hợp và bản số được đối chiếu chéo với quy trình hoạt động thực tế của nền tảng:
+
+Theo phương pháp thiết kế quan niệm, bản số cần được kiểm tra ở cả hai phía của mối kết hợp và phải xác định rõ trường hợp tham gia bắt buộc hay tùy chọn. Bản số trong mô hình được biểu diễn theo dạng $\text{min}..\text{max}$, trong đó $0$ thể hiện tham gia tùy chọn, còn $1$ thể hiện tham gia bắt buộc.
+
+Các mối kết hợp quan trọng được kiểm tra như sau:
+
 \begin{itemize}
-    \item Ràng buộc $0..1$ giữa \textbf{Reservation} và \textbf{Payment} phản ánh đúng thực tế: Một người dùng có thể tạo lệnh đặt chỗ nhưng chưa tiến hành thanh toán ngay.
-    \item Mối kết hợp M:N giữa \textbf{Reservation} và \textbf{Resource} có chứa thuộc tính \texttt{quantity} là hoàn toàn hợp lý, vì số lượng mượn thiết bị chỉ có ý nghĩa khi có một giao dịch đặt chỗ cụ thể xảy ra.
-    \item Thực thể \textbf{Review} bắt buộc ($1..1$) phải gắn với một \textbf{Reservation}, ngăn chặn người dùng đánh giá khống.
+
+\item \textbf{Service Provider -- Creative Space:} Một Service Provider có thể quản lý nhiều Creative Space, trong khi mỗi Creative Space thuộc đúng một Service Provider. Do đó, bản số là $0..N$ ở phía Service Provider và $1..1$ ở phía Creative Space.
+
+\item \textbf{Service Provider -- Resource:} Một Service Provider có thể quản lý nhiều Resource và mỗi Resource phải thuộc đúng một Service Provider. Bản số là $0..N$ -- $1..1$.
+
+\item \textbf{User -- Reservation:} Một User có thể chưa tạo Reservation nào hoặc có nhiều Reservation; mỗi Reservation phải do đúng một User tạo. Vì vậy, bản số là $0..N$ ở phía User và $1..1$ ở phía Reservation.
+
+\item \textbf{Service Package -- Reservation:} Một Reservation có thể không sử dụng Service Package hoặc sử dụng một Service Package; một Service Package có thể được lựa chọn trong nhiều Reservation. Do đó, bản số là $0..N$ ở phía Service Package và $0..1$ ở phía Reservation.
+
+\item \textbf{Creative Space -- Reservation:} Một Reservation có thể sử dụng nhiều Creative Space và một Creative Space có thể xuất hiện trong nhiều Reservation ở các thời điểm khác nhau. Đây là mối kết hợp M:N, được biểu diễn thông qua quan hệ trung gian \texttt{Reservation Space} khi chuyển sang mô hình logic.
+
+\item \textbf{Reservation -- Resource:} Một Reservation có thể không sử dụng Resource bổ sung hoặc có nhiều Resource; một Resource có thể được phân bổ cho nhiều Reservation ở các thời điểm khác nhau. Đây là mối kết hợp M:N và có thuộc tính \texttt{quantity}. Giá trị này biểu diễn số lượng Resource được phân bổ cho một Reservation cụ thể.
+
+\item \textbf{Reservation -- Payment:} Một Reservation có thể chưa phát sinh Payment hoặc có một Payment. Ngược lại, mỗi Payment phải gắn với đúng một Reservation. Vì vậy, bản số là $0..1$ ở phía Reservation và $1..1$ ở phía Payment. Điều này phản ánh trường hợp người dùng có thể tạo Reservation trước rồi mới thực hiện thanh toán.
+
+\item \textbf{Reservation -- Service Session:} Một Reservation có thể chưa phát sinh Service Session nếu dịch vụ chưa được sử dụng; khi dịch vụ được thực hiện, Reservation có thể phát sinh một Service Session. Mỗi Service Session phải thuộc đúng một Reservation. Vì vậy, bản số là $0..1$ ở phía Reservation và $1..1$ ở phía Service Session.
+
+\item \textbf{Reservation -- Review:} Một Reservation có thể chưa có Review hoặc có tối đa một Review; mỗi Review phải gắn với đúng một Reservation. Vì vậy, bản số là $0..1$ ở phía Reservation và $1..1$ ở phía Review. Ràng buộc này giúp mỗi Reservation không phát sinh nhiều Review trong mô hình hiện tại.
+
+\item \textbf{User -- Review:} Một User có thể viết nhiều Review và mỗi Review do đúng một User tạo. Do đó, bản số là $0..N$ ở phía User và $1..1$ ở phía Review.
+
+\item \textbf{Service Session -- Resource:} Một Service Session có thể sử dụng nhiều Resource và một Resource có thể được sử dụng trong nhiều Service Session ở các thời điểm khác nhau. Đây là mối kết hợp M:N có thuộc tính \texttt{quantity}, biểu diễn số lượng Resource thực tế được sử dụng trong một Service Session.
+
+\item \textbf{User -- Workshop:} Hai mối kết hợp giữa User và Workshop được kiểm tra riêng. Quan hệ ``Tổ chức'' là 1:N: một User có thể tổ chức nhiều Workshop, mỗi Workshop có đúng một người tổ chức. Quan hệ ``Tham gia'' là M:N: một User có thể tham gia nhiều Workshop và một Workshop có thể có nhiều User tham gia.
+
 \end{itemize}
 
-\subsection{Kiểm tra bằng dữ liệu mẫu và tình huống}
-Giả lập kịch bản nghiệp vụ: \textit{"Nhiếp ảnh gia A (User) đặt Phòng Tối B (Creative Space) và thuê thêm 2 Khay rửa ảnh (Resource). Sau khi dùng xong, A thanh toán và để lại đánh giá."}
+Qua kiểm tra, các bản số trên phù hợp với các quan hệ đã xác định trong mô hình quan niệm. Đặc biệt, các quan hệ M:N đều đã được nhận diện để chuyển thành quan hệ trung gian khi xây dựng mô hình logic. Điều này phù hợp với nguyên tắc: mối kết hợp M:N có thuộc tính riêng phải được biểu diễn bằng một quan hệ trung gian chứa khóa của hai thực thể và các thuộc tính của mối kết hợp.
 
-\textbf{Luồng liên kết dữ liệu trên mô hình:}
+\subsection{Kiểm tra bằng dữ liệu mẫu và tình huống}
+
+Sau khi kiểm tra thực thể, thuộc tính và bản số, mô hình được thử nghiệm bằng dữ liệu mẫu và các tình huống nghiệp vụ. Mục đích là xác định mô hình có biểu diễn được các trường hợp bình thường, trường hợp chưa phát sinh liên kết và các trường hợp có nhiều liên kết hay không.
+
+\subsubsection{Dữ liệu mẫu}
+
+Có thể sử dụng một tập dữ liệu mẫu rút gọn như sau:
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.20\linewidth} p{.25\linewidth} p{.42\linewidth}}
+\toprule
+\textbf{Thực thể} & \textbf{Mã mẫu} & \textbf{Thông tin minh họa} \\
+\midrule
+User & U001 & Photographer A \\
+Service Provider & P001 & Darkroom B Provider \\
+Creative Space & CS001 & Phòng tối B \\
+Resource & R001 & Khay rửa ảnh \\
+Reservation & RSV001 & Reservation của U001 \\
+Payment & PAY001 & Thanh toán cho RSV001 \\
+Service Session & SS001 & Phiên sử dụng của RSV001 \\
+Review & RV001 & Review của U001 cho RSV001 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Với các dữ liệu trên, mối kết hợp \textbf{Reservation -- Resource} có thể chứa bản ghi:
+
+$$
+(\texttt{RSV001},\texttt{R001},2)
+$$
+
+trong đó \texttt{quantity = 2} cho biết Reservation RSV001 được phân bổ hai đơn vị của Resource R001.
+
+Tương tự, sau khi khách hàng thực hiện thanh toán, có thể xuất hiện:
+
+$$
+(\texttt{RSV001},\texttt{PAY001})
+$$
+
+và sau khi hoàn thành việc sử dụng dịch vụ:
+
+$$
+(\texttt{RSV001},\texttt{SS001})
+$$
+
+Cuối cùng, nếu khách hàng đủ điều kiện đánh giá, có thể phát sinh:
+
+$$
+(\texttt{RSV001},\texttt{RV001})
+$$
+
+Các dữ liệu này cho thấy một Reservation có thể lần lượt liên kết với Creative Space, Resource, Payment, Service Session và Review mà không làm thay đổi bản chất của các thực thể.
+
+\subsubsection{Tình huống nghiệp vụ bình thường}
+
+Xét tình huống: \textit{Photographer A đặt Phòng Tối B trong một khoảng thời gian xác định, đồng thời thuê thêm 2 Khay rửa ảnh. Sau khi sử dụng dịch vụ, A thanh toán và để lại đánh giá.}
+
+Luồng dữ liệu trên mô hình được kiểm tra như sau:
+
 \begin{enumerate}
-    \item Hệ thống tạo một \textbf{Reservation} do \textbf{User} A làm chủ.
-    \item \textbf{Reservation} liên kết với \textbf{Creative Space} (Phòng tối B).
-    \item \textbf{Reservation} liên kết với \textbf{Resource} (Khay rửa) qua mối kết hợp "Phân bổ" (\texttt{quantity = 2}).
-    \item Khi thanh toán, một \textbf{Payment} được tạo và liên kết $1:1$ với \textbf{Reservation}.
-    \item \textbf{Review} được tạo và tham chiếu trực tiếp về \textbf{Reservation} đó.
+
+\item Tạo User \texttt{U001} đại diện cho Photographer A.
+
+\item Tạo Creative Space \texttt{CS001} thuộc Service Provider \texttt{P001}.
+
+\item Tạo Resource \texttt{R001} đại diện cho Khay rửa ảnh.
+
+\item Tạo Reservation \texttt{RSV001} do User \texttt{U001} tạo và liên kết với Creative Space \texttt{CS001}.
+
+\item Tạo liên kết giữa Reservation \texttt{RSV001} và Resource \texttt{R001} với \texttt{quantity = 2}. Điều này kiểm chứng được mối kết hợp M:N và thuộc tính riêng của mối kết hợp.
+
+\item Trước khi thanh toán, Reservation \texttt{RSV001} chưa có Payment. Trường hợp này kiểm chứng bản số $0..1$ của Reservation -- Payment.
+
+\item Sau khi thanh toán, tạo Payment \texttt{PAY001} và liên kết Payment này với đúng Reservation \texttt{RSV001}. Mỗi Payment chỉ thuộc một Reservation.
+
+\item Khi dịch vụ thực sự được sử dụng, tạo Service Session \texttt{SS001} thuộc Reservation \texttt{RSV001}.
+
+\item Sau khi hoàn thành dịch vụ, tạo Review \texttt{RV001} liên kết với Reservation \texttt{RSV001} và User \texttt{U001}.
+
 \end{enumerate}
+
+Kết quả cho thấy mô hình có thể biểu diễn đầy đủ vòng đời cơ bản của một Reservation từ lúc tạo đặt chỗ, phân bổ Resource, thanh toán, sử dụng dịch vụ đến đánh giá.
+
+\subsubsection{Các tình huống biên dùng để kiểm chứng}
+
+Ngoài tình huống bình thường, mô hình được kiểm tra với các trường hợp sau:
+
+\begin{itemize}
+
+\item \textbf{User chưa từng đặt dịch vụ:} Có thể tồn tại User \texttt{U002} chưa có Reservation nào. Trường hợp này hợp lệ vì User có bản số $0..N$ trong quan hệ với Reservation.
+
+\item \textbf{Reservation chưa thanh toán:} Reservation \texttt{RSV002} được tạo nhưng chưa có Payment. Trường hợp này phải được chấp nhận vì Payment là quan hệ tùy chọn đối với Reservation.
+
+\item \textbf{Reservation chưa sử dụng dịch vụ:} Reservation có thể chưa có Service Session. Điều này phù hợp với bản số $0..1$ ở phía Reservation.
+
+\item \textbf{Reservation chưa đánh giá:} Sau khi hoàn thành hoặc ngay sau khi tạo Reservation, hệ thống có thể chưa có Review. Trường hợp này phù hợp với bản số $0..1$ ở phía Reservation.
+
+\item \textbf{Một Reservation có nhiều Resource:} Reservation \texttt{RSV001} có thể đồng thời sử dụng Resource \texttt{R001}, \texttt{R002} và \texttt{R003}. Điều này kiểm chứng bản chất M:N của Reservation -- Resource.
+
+\item \textbf{Một Resource xuất hiện trong nhiều Reservation:} Resource \texttt{R001} có thể xuất hiện trong \texttt{RSV001} và \texttt{RSV002} nếu các Reservation diễn ra ở những thời điểm khác nhau. Điều này phù hợp với nghiệp vụ sử dụng lại Resource theo thời gian.
+
+\item \textbf{Một Service Package có nhiều Resource:} Một Service Package có thể yêu cầu nhiều Resource với số lượng khác nhau. Ví dụ, một Package có thể yêu cầu 2 Khay rửa ảnh và 1 Máy quét phim. Điều này kiểm chứng thuộc tính \texttt{quantity} thuộc về mối kết hợp Service Package -- Resource.
+
+\item \textbf{Không cho phép trùng lịch:} Nếu một Creative Space hoặc Resource đã được phân bổ cho một Reservation trong một khoảng thời gian, hệ thống không được cho phép một Reservation khác sử dụng cùng tài nguyên trong khoảng thời gian bị chồng lấn. Đây là ràng buộc nghiệp vụ cần được kiểm soát ở mức logic/triển khai.
+
+\item \textbf{Resource đang bảo trì:} Nếu Resource đang nằm trong khoảng thời gian bảo trì, Resource đó không được phân bổ cho Reservation hoặc sử dụng trong Service Session. Đây là ràng buộc nghiệp vụ bổ sung ngoài bản số.
+
+\item \textbf{Đánh giá không thuộc Reservation của người viết:} Một Review không chỉ cần tham chiếu tới một Reservation mà còn phải bảo đảm User viết Review chính là User đã tạo Reservation đó. Ràng buộc này cần được kiểm soát ở mức toàn vẹn dữ liệu hoặc logic nghiệp vụ vì bản số của hai quan hệ User -- Review và Reservation -- Review không tự biểu diễn được điều kiện này.
+
+\end{itemize}
+
+\subsection{Kết luận kiểm chứng}
+
+Qua việc kiểm tra thực thể, thuộc tính, mối kết hợp, bản số và thử nghiệm bằng dữ liệu mẫu, mô hình quan niệm hiện tại đáp ứng được các luồng nghiệp vụ cốt lõi của hệ thống gồm quản lý Creative Space, quản lý Resource, tạo Reservation, phân bổ Resource, thanh toán, thực hiện Service Session và đánh giá.
+
+Các mối kết hợp M:N quan trọng đã được xác định rõ và có thuộc tính riêng ở những trường hợp cần thiết. Các quan hệ tùy chọn như Reservation -- Payment, Reservation -- Service Session và Reservation -- Review cũng đã được thể hiện bằng bản số $0..1$ ở phía Reservation.
+
+Một số ràng buộc nghiệp vụ như không trùng lịch Resource/Creative Space, không sử dụng Resource đang bảo trì và bảo đảm User chỉ đánh giá Reservation của chính mình không thể được biểu diễn đầy đủ chỉ bằng bản số ERD. Các ràng buộc này sẽ được cụ thể hóa ở mô hình logic thông qua khóa ngoại, \texttt{NOT NULL}, \texttt{UNIQUE}, ràng buộc kiểm tra và/hoặc logic nghiệp vụ phù hợp.
+
+Do đó, mô hình quan niệm sau bước kiểm chứng đủ cơ sở để chuyển sang thiết kế logic và xây dựng lược đồ quan hệ.
+
 
 \section{Kết quả thiết kế quan niệm}
 

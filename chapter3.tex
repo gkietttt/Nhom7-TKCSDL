@@ -1566,7 +1566,7 @@ Phụ thuộc bộ phận chỉ phát sinh khi khóa chính là khóa ghép. Cá
 
 \textbf{Kiểm tra các quan hệ trung gian có khóa ghép:}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Kiểm tra 2NF cho các quan hệ trung gian}
 \begin{tabular}{|l|l|l|c|}
@@ -1617,7 +1617,7 @@ Trong thiết kế hiện tại, \texttt{actual\_usage\_duration} được giữ
 
 \textbf{Kiểm tra các quan hệ còn lại:}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Kiểm tra 3NF cho các quan hệ chính}
 \begin{tabular}{|l|p{5cm}|c|}
@@ -1669,7 +1669,7 @@ BCNF là dạng chuẩn mạnh hơn 3NF. Một quan hệ đạt 3NF nhưng chưa
 
 Trong hệ thống hiện tại, mỗi quan hệ chính chỉ có một khóa ứng viên duy nhất là khóa định danh (\texttt{user\_id}, \texttt{space\_id},...). Do đó, với mỗi phụ thuộc hàm $X \rightarrow Y$ đã xác định, $X$ luôn là khóa chính, tức là siêu khóa.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Kiểm tra BCNF cho một số quan hệ tiêu biểu}
 \begin{tabular}{|l|l|l|c|}
@@ -1731,7 +1731,7 @@ Dựa trên kết quả kiểm tra chuẩn hóa, phần này xác định các q
 
 Từ kết quả kiểm tra chuẩn hóa ở phần trên, hầu hết các quan hệ trong hệ thống đã đạt BCNF và không cần phân rã. Trường hợp duy nhất cần xem xét là quan hệ \texttt{SERVICE\_SESSION} do có thuộc tính dẫn xuất \texttt{actual\_usage\_duration}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Tổng hợp kết quả kiểm tra chuẩn hóa}
 \begin{tabular}{|l|c|c|c|c|}
