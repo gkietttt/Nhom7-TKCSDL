@@ -1515,16 +1515,892 @@ Như vậy, tập phụ thuộc hàm đã xác định trong phần này sẽ đ
 
 
 \section{Bao đóng và xác định khóa}
+
+Trong thiết kế mức logic, bao đóng của tập thuộc tính được sử dụng để xác định
+các thuộc tính có thể suy diễn từ một tập thuộc tính ban đầu dựa trên tập
+phụ thuộc hàm $F$. Kết quả bao đóng được sử dụng để kiểm tra siêu khóa,
+xác định khóa ứng viên và hỗ trợ quá trình xử lý phủ tối thiểu.
+
+Các quan hệ và tập phụ thuộc hàm được sử dụng trong chương này được lấy trực
+tiếp từ lược đồ quan hệ và các phụ thuộc hàm đã xác định ở Chương 2. Chương
+này không bổ sung thêm thực thể hoặc thuộc tính mới ngoài thiết kế mức logic.
+
 \subsection{Bao đóng của tập thuộc tính}
+
+Cho quan hệ $R(U)$ và tập phụ thuộc hàm $F$. Bao đóng của tập thuộc tính
+$X$ theo $F$, ký hiệu $X^+_F$, là tập tất cả các thuộc tính có thể suy diễn
+từ $X$ bằng các phụ thuộc hàm thuộc $F$.
+
+Quy trình tính bao đóng của $X$ được thực hiện như sau:
+
+\begin{enumerate}
+	\item Khởi tạo $X^+ = X$.
+	\item Xét các phụ thuộc hàm $Y \rightarrow Z$ thuộc $F$.
+	\item Nếu $Y \subseteq X^+$ thì thêm các thuộc tính trong $Z$ vào $X^+$.
+	\item Lặp lại cho đến khi không thể bổ sung thêm thuộc tính nào.
+\end{enumerate}
+
+Trong mô hình dữ liệu của hệ thống, mỗi quan hệ chính trong Chương 2 có một
+thuộc tính định danh làm khóa chính. Các phụ thuộc hàm tương ứng có dạng:
+
+\[
+K \rightarrow A_1,A_2,\ldots,A_n
+\]
+
+trong đó $K$ là thuộc tính định danh của quan hệ và
+$A_1,A_2,\ldots,A_n$ là các thuộc tính còn lại của quan hệ.
+
+Ví dụ, xét quan hệ:
+
+\[
+\begin{aligned}
+	User(&user\_id,\ full\_name,\ email,\ phone,\ password,\\
+	&role,\ status,\ created\_at)
+\end{aligned}
+\]
+
+với tập phụ thuộc hàm:
+
+\[
+\begin{aligned}
+	F_{User}=\{&
+	user\_id \rightarrow full\_name,\\
+	&user\_id \rightarrow email,\\
+	&user\_id \rightarrow phone,\\
+	&user\_id \rightarrow password,\\
+	&user\_id \rightarrow role,\\
+	&user\_id \rightarrow status,\\
+	&user\_id \rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Tính bao đóng của $\{user\_id\}$:
+
+\[
+user\_id^+ = \{user\_id\}
+\]
+
+Áp dụng:
+
+\[
+user\_id \rightarrow full\_name
+\]
+
+suy ra:
+
+\[
+user\_id^+ =
+\{user\_id,full\_name\}
+\]
+
+Tiếp tục áp dụng các phụ thuộc hàm còn lại:
+
+\[
+\begin{aligned}
+	user\_id^+ = \{&
+	user\_id,\ full\_name,\ email,\ phone,\\
+	&password,\ role,\ status,\ created\_at
+	\}
+\end{aligned}
+\]
+
+Do $user\_id^+$ chứa toàn bộ thuộc tính của quan hệ $User$, ta có:
+
+\[
+user\_id^+ = U_{User}
+\]
+
+Do đó, $user\_id$ là siêu khóa của quan hệ $User$.
+
+Tương tự, đối với các quan hệ có khóa đơn trong Chương 2:
+
+\[
+\begin{aligned}
+	provider\_id^+ &= U_{ServiceProvider}\\
+	space\_id^+ &= U_{CreativeSpace}\\
+	resource\_id^+ &= U_{Resource}\\
+	maintenance\_id^+ &= U_{Maintenance}\\
+	package\_id^+ &= U_{ServicePackage}\\
+	promotion\_id^+ &= U_{Promotion}\\
+	reservation\_id^+ &= U_{Reservation}\\
+	payment\_id^+ &= U_{Payment}\\
+	session\_id^+ &= U_{ServiceSession}\\
+	review\_id^+ &= U_{Review}\\
+	content\_id^+ &= U_{CommunityContent}\\
+	workshop\_id^+ &= U_{Workshop}\\
+	photo\_id^+ &= U_{Photo}\\
+	complaint\_id^+ &= U_{Complaint}
+\end{aligned}
+\]
+
+Trong đó $U_R$ là tập toàn bộ thuộc tính của quan hệ $R$.
+
+Đối với các quan hệ kết hợp gồm hai thuộc tính khóa ngoại như
+\texttt{WorkshopParticipation}, \texttt{PackageSpace},
+\texttt{PackageResource}, \texttt{ReservationSpace},
+\texttt{ReservationResource} và \texttt{SessionResource}, Chương 2 xác định
+khóa chính là tổ hợp của hai thuộc tính. Các quan hệ này không có thêm
+thuộc tính không khóa trong lược đồ logic hiện tại.
+
+Ví dụ:
+
+\[
+WorkshopParticipation(user\_id,workshop\_id)
+\]
+
+với khóa:
+
+\[
+\{user\_id,workshop\_id\}
+\]
+
+Khi đó:
+
+\[
+\{user\_id,workshop\_id\}^+
+=
+\{user\_id,workshop\_id\}
+\]
+
+Do bao đóng chứa toàn bộ thuộc tính của quan hệ nên
+$\{user\_id,workshop\_id\}$ là siêu khóa.
+
+Tương tự:
+
+\[
+\begin{aligned}
+	\{package\_id,space\_id\}^+
+	&= \{package\_id,space\_id\}\\
+	\{package\_id,resource\_id\}^+
+	&= \{package\_id,resource\_id\}\\
+	\{reservation\_id,space\_id\}^+
+	&= \{reservation\_id,space\_id\}\\
+	\{reservation\_id,resource\_id\}^+
+	&= \{reservation\_id,resource\_id\}\\
+	\{session\_id,resource\_id\}^+
+	&= \{session\_id,resource\_id\}
+\end{aligned}
+\]
+
+Các kết quả trên phù hợp với các khóa chính ghép đã được xác định trong
+thiết kế mức logic.
+
 \subsection{Kiểm tra suy diễn phụ thuộc hàm}
+
+Một phụ thuộc hàm $X \rightarrow Y$ được suy diễn từ tập phụ thuộc hàm $F$
+khi:
+
+\[
+F \models X \rightarrow Y
+\]
+
+Để kiểm tra một phụ thuộc hàm có được suy diễn từ $F$ hay không, ta tính
+bao đóng $X^+_F$. Nếu:
+
+\[
+Y \subseteq X^+_F
+\]
+
+thì:
+
+\[
+F \models X \rightarrow Y
+\]
+
+Ngược lại, nếu tồn tại thuộc tính của $Y$ không thuộc $X^+_F$ thì phụ thuộc
+hàm $X \rightarrow Y$ không được suy diễn từ $F$.
+
+Xét quan hệ $User$ ở trên. Từ:
+
+\[
+user\_id \rightarrow full\_name
+\]
+
+ta có:
+
+\[
+full\_name \in user\_id^+
+\]
+
+nên phụ thuộc hàm:
+
+\[
+user\_id \rightarrow full\_name
+\]
+
+được suy diễn từ $F_{User}$.
+
+Tương tự:
+
+\[
+\begin{aligned}
+	email &\in user\_id^+\\
+	phone &\in user\_id^+\\
+	password &\in user\_id^+\\
+	role &\in user\_id^+\\
+	status &\in user\_id^+\\
+	created\_at &\in user\_id^+
+\end{aligned}
+\]
+
+Do đó các phụ thuộc hàm tương ứng đều được suy diễn từ $F_{User}$.
+
+Ngược lại, không thể kết luận:
+
+\[
+email \rightarrow user\_id
+\]
+
+từ tập phụ thuộc hàm đã xác định nếu không có phụ thuộc hàm tương ứng trong
+$F$. Việc một thuộc tính có thể có giá trị duy nhất trong dữ liệu thực tế
+không được tự động xem là một phụ thuộc hàm nếu chưa được xác định bởi
+nghiệp vụ hoặc thiết kế logic.
+
+Đối với các quan hệ khác, việc kiểm tra suy diễn được thực hiện tương tự:
+tính bao đóng của vế trái và kiểm tra xem vế phải có thuộc bao đóng hay không.
+
 \subsection{Xác định siêu khóa}
+
+Một tập thuộc tính $K$ là siêu khóa của quan hệ $R(U)$ nếu:
+
+\[
+K^+_F = U
+\]
+
+Nói cách khác, $K$ phải xác định được toàn bộ thuộc tính của quan hệ.
+
+Dựa trên các phụ thuộc hàm đã xác định ở Chương 2, các thuộc tính định danh
+của các quan hệ chính đều có bao đóng bằng toàn bộ tập thuộc tính của
+quan hệ tương ứng.
+
+\begin{table}[H]
+	\centering
+	\caption{Kết quả xác định siêu khóa}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\textbf{STT} & \textbf{Quan hệ} & \textbf{Siêu khóa} \\
+		\hline
+		1 & User & $\{user\_id\}$ \\
+		\hline
+		2 & ServiceProvider & $\{provider\_id\}$ \\
+		\hline
+		3 & CreativeSpace & $\{space\_id\}$ \\
+		\hline
+		4 & Resource & $\{resource\_id\}$ \\
+		\hline
+		5 & Maintenance & $\{maintenance\_id\}$ \\
+		\hline
+		6 & ServicePackage & $\{package\_id\}$ \\
+		\hline
+		7 & Promotion & $\{promotion\_id\}$ \\
+		\hline
+		8 & Reservation & $\{reservation\_id\}$ \\
+		\hline
+		9 & Payment & $\{payment\_id\}$ \\
+		\hline
+		10 & ServiceSession & $\{session\_id\}$ \\
+		\hline
+		11 & Review & $\{review\_id\}$ \\
+		\hline
+		12 & CommunityContent & $\{content\_id\}$ \\
+		\hline
+		13 & Workshop & $\{workshop\_id\}$ \\
+		\hline
+		14 & Photo & $\{photo\_id\}$ \\
+		\hline
+		15 & Complaint & $\{complaint\_id\}$ \\
+		\hline
+		16 & WorkshopParticipation &
+		$\{user\_id,workshop\_id\}$ \\
+		\hline
+		17 & PackageSpace &
+		$\{package\_id,space\_id\}$ \\
+		\hline
+		18 & PackageResource &
+		$\{package\_id,resource\_id\}$ \\
+		\hline
+		19 & ReservationSpace &
+		$\{reservation\_id,space\_id\}$ \\
+		\hline
+		20 & ReservationResource &
+		$\{reservation\_id,resource\_id\}$ \\
+		\hline
+		21 & SessionResource &
+		$\{session\_id,resource\_id\}$ \\
+		\hline
+	\end{tabular}
+\end{table}
+
+Ngoài các tập thuộc tính tối thiểu ở trên, mọi tập thuộc tính chứa một siêu
+khóa cũng là siêu khóa. Ví dụ, đối với quan hệ $User$, nếu
+$\{user\_id\}$ là siêu khóa thì:
+
+\[
+\{user\_id,email\}
+\]
+
+cũng là siêu khóa.
+
+Tuy nhiên, tập thuộc tính này không tối thiểu vì có thể loại bỏ
+\texttt{email} mà vẫn giữ được khả năng xác định toàn bộ quan hệ.
+
 \subsection{Xác định khóa ứng viên}
 
+Khóa ứng viên là một siêu khóa tối thiểu. Một tập thuộc tính $K$ là khóa
+ứng viên nếu thỏa mãn:
+
+\[
+K^+_F = U
+\]
+
+và không tồn tại tập con thực sự $K' \subset K$ sao cho:
+
+\[
+K'^+_F = U
+\]
+
+Đối với các quan hệ có khóa đơn, thuộc tính định danh có bao đóng bằng toàn
+bộ thuộc tính của quan hệ và không thể loại bỏ thuộc tính nào khỏi tập khóa.
+Do đó các thuộc tính này là khóa ứng viên.
+
+Đối với các quan hệ kết hợp, khóa ứng viên là khóa ghép gồm hai thuộc tính
+theo thiết kế logic ở Chương 2.
+
+\begin{table}[H]
+	\centering
+	\caption{Khóa ứng viên của các quan hệ}
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{STT} & \textbf{Khóa ứng viên} \\
+		\hline
+		1 & $user\_id$ \\
+		\hline
+		2 & $provider\_id$ \\
+		\hline
+		3 & $space\_id$ \\
+		\hline
+		4 & $resource\_id$ \\
+		\hline
+		5 & $maintenance\_id$ \\
+		\hline
+		6 & $package\_id$ \\
+		\hline
+		7 & $promotion\_id$ \\
+		\hline
+		8 & $reservation\_id$ \\
+		\hline
+		9 & $payment\_id$ \\
+		\hline
+		10 & $session\_id$ \\
+		\hline
+		11 & $review\_id$ \\
+		\hline
+		12 & $content\_id$ \\
+		\hline
+		13 & $workshop\_id$ \\
+		\hline
+		14 & $photo\_id$ \\
+		\hline
+		15 & $complaint\_id$ \\
+		\hline
+		16 & $(user\_id,workshop\_id)$ \\
+		\hline
+		17 & $(package\_id,space\_id)$ \\
+		\hline
+		18 & $(package\_id,resource\_id)$ \\
+		\hline
+		19 & $(reservation\_id,space\_id)$ \\
+		\hline
+		20 & $(reservation\_id,resource\_id)$ \\
+		\hline
+		21 & $(session\_id,resource\_id)$ \\
+		\hline
+	\end{tabular}
+\end{table}
+
+Kết quả trên thống nhất với khóa chính đã xác định ở Chương 2. Các quan hệ
+độc lập sử dụng khóa đơn, trong khi các quan hệ kết hợp được ánh xạ từ các
+mối quan hệ N:N sử dụng khóa chính ghép.
+
 \section{Phủ tối thiểu}
+
+Phủ tối thiểu của một tập phụ thuộc hàm $F$ là một tập phụ thuộc hàm
+$F_{min}$ tương đương với $F$ nhưng không còn các thành phần dư thừa.
+
+Trong phạm vi thiết kế mức logic của hệ thống, tập phụ thuộc hàm được lấy từ
+mục 2.6 của Chương 2. Việc xác định phủ tối thiểu được thực hiện theo ba
+bước:
+
+\begin{enumerate}
+	\item Tách vế phải để mỗi phụ thuộc hàm chỉ có một thuộc tính ở vế phải.
+	\item Kiểm tra và loại bỏ thuộc tính dư ở vế trái.
+	\item Kiểm tra và loại bỏ phụ thuộc hàm dư thừa.
+\end{enumerate}
+
+Kết quả cuối cùng phải bảo toàn tập phụ thuộc hàm ban đầu:
+
+\[
+F_{min}^{+}=F^{+}
+\]
+
 \subsection{Tách vế phải}
+
+Một phụ thuộc hàm có nhiều thuộc tính ở vế phải:
+
+\[
+X \rightarrow A_1,A_2,\ldots,A_n
+\]
+
+được tách thành các phụ thuộc hàm:
+
+\[
+\begin{aligned}
+	X &\rightarrow A_1\\
+	X &\rightarrow A_2\\
+	&\vdots\\
+	X &\rightarrow A_n
+\end{aligned}
+\]
+
+Việc tách vế phải không làm thay đổi ý nghĩa của tập phụ thuộc hàm.
+
+Ví dụ, đối với quan hệ $User$:
+
+\[
+\begin{aligned}
+	user\_id \rightarrow
+	full\_name,email,phone,password,role,status,created\_at
+\end{aligned}
+\]
+
+được tách thành:
+
+\[
+\begin{aligned}
+	user\_id &\rightarrow full\_name\\
+	user\_id &\rightarrow email\\
+	user\_id &\rightarrow phone\\
+	user\_id &\rightarrow password\\
+	user\_id &\rightarrow role\\
+	user\_id &\rightarrow status\\
+	user\_id &\rightarrow created\_at
+\end{aligned}
+\]
+
+Tương tự, đối với quan hệ $CreativeSpace$:
+
+\[
+\begin{aligned}
+	space\_id &\rightarrow provider\_id\\
+	space\_id &\rightarrow name\\
+	space\_id &\rightarrow space\_type\\
+	space\_id &\rightarrow description\\
+	space\_id &\rightarrow area\\
+	space\_id &\rightarrow capacity\\
+	space\_id &\rightarrow artistic\_style\\
+	space\_id &\rightarrow lighting\_condition\\
+	space\_id &\rightarrow ventilation\\
+	space\_id &\rightarrow acoustic\_characteristics\\
+	space\_id &\rightarrow operating\_hours\\
+	space\_id &\rightarrow usage\_policy\\
+	space\_id &\rightarrow pricing\\
+	space\_id &\rightarrow status
+\end{aligned}
+\]
+
+Các phụ thuộc hàm của những quan hệ còn lại cũng được tách theo cùng
+nguyên tắc.
+
+Sau bước này, tất cả phụ thuộc hàm đều có dạng:
+
+\[
+X \rightarrow A
+\]
+
+trong đó $A$ là một thuộc tính đơn.
+
 \subsection{Loại thuộc tính dư}
+
+Một thuộc tính $A$ trong vế trái của phụ thuộc hàm:
+
+\[
+X \rightarrow B
+\]
+
+được gọi là thuộc tính dư nếu:
+
+\[
+B \subseteq (X-\{A\})^+_F
+\]
+
+Nói cách khác, nếu bỏ $A$ khỏi vế trái mà vẫn suy diễn được $B$ thì $A$
+không cần thiết trong phụ thuộc hàm đó.
+
+Trong tập phụ thuộc hàm của các quan hệ chính trong Chương 2, vế trái của
+các FD đều là một thuộc tính định danh duy nhất, ví dụ:
+
+\[
+user\_id \rightarrow email
+\]
+
+hoặc:
+
+\[
+reservation\_id \rightarrow start\_time
+\]
+
+Do vế trái chỉ gồm một thuộc tính nên không thể loại bỏ thuộc tính này mà
+vẫn duy trì được phụ thuộc hàm. Vì vậy, các FD này không có thuộc tính dư ở
+vế trái.
+
+Đối với các quan hệ kết hợp, Chương 2 xác định khóa chính ghép nhưng các
+quan hệ này hiện không có thuộc tính không khóa. Vì vậy không phát sinh
+phụ thuộc hàm có vế trái gồm nhiều thuộc tính cần kiểm tra thuộc tính dư.
+
+Do đó, trong tập FD được xác định ở Chương 2, không có thuộc tính dư cần
+loại bỏ khỏi vế trái.
+
 \subsection{Loại phụ thuộc hàm dư thừa}
+
+Một phụ thuộc hàm $f$ trong $F$ được gọi là dư thừa nếu:
+
+\[
+F-\{f\}\models f
+\]
+
+Để kiểm tra một FD có dư thừa hay không, tạm thời loại bỏ FD đó khỏi tập
+phụ thuộc hàm và tính bao đóng của vế trái theo tập FD còn lại.
+
+Xét phụ thuộc hàm:
+
+\[
+user\_id \rightarrow email
+\]
+
+Ta loại bỏ FD này khỏi tập phụ thuộc hàm:
+
+\[
+F' = F_{User}-\{user\_id\rightarrow email\}
+\]
+
+Khi tính:
+
+\[
+user\_id^+_{F'}
+\]
+
+các phụ thuộc hàm còn lại chỉ cho phép suy diễn:
+
+\[
+\begin{aligned}
+	full\_name,\ phone,\ password,\ role,\ status,\ created\_at
+\end{aligned}
+\]
+
+nhưng không suy diễn được:
+
+\[
+email
+\]
+
+Do đó:
+
+\[
+email \notin user\_id^+_{F'}
+\]
+
+và:
+
+\[
+user\_id\rightarrow email
+\]
+
+không phải là phụ thuộc hàm dư thừa.
+
+Các FD khác được kiểm tra theo cùng nguyên tắc. Mỗi FD xác định một thuộc
+tính cụ thể từ thuộc tính định danh của quan hệ. Khi loại bỏ FD tương ứng,
+thuộc tính ở vế phải không thể được suy diễn từ các FD còn lại trong quan hệ.
+
+Vì vậy, các phụ thuộc hàm được xác định ở mục 2.6 không có FD dư thừa theo
+tập FD đang xét.
+
+Lưu ý rằng các ràng buộc nghiệp vụ như không cho phép trùng lịch
+Reservation, Resource đang bảo trì không được phân bổ, giới hạn sức chứa
+Workshop và điều kiện $start\_time < end\_time$ là các ràng buộc toàn vẹn
+nghiệp vụ, không được chuyển thành phụ thuộc hàm nếu chúng không biểu diễn
+quan hệ xác định giữa các thuộc tính.
+
 \subsection{Xác định phủ tối thiểu}
+
+Sau khi thực hiện ba bước tách vế phải, loại thuộc tính dư và loại phụ thuộc
+hàm dư thừa, tập phụ thuộc hàm thu được là phủ tối thiểu $F_{min}$.
+
+Đối với quan hệ $User$, phủ tối thiểu là:
+
+\[
+\begin{aligned}
+	F_{min}^{User}=\{&
+	user\_id\rightarrow full\_name,\\
+	&user\_id\rightarrow email,\\
+	&user\_id\rightarrow phone,\\
+	&user\_id\rightarrow password,\\
+	&user\_id\rightarrow role,\\
+	&user\_id\rightarrow status,\\
+	&user\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $ServiceProvider$:
+
+\[
+\begin{aligned}
+	F_{min}^{ServiceProvider}=\{&
+	provider\_id\rightarrow business\_name,\\
+	&provider\_id\rightarrow description,\\
+	&provider\_id\rightarrow address,\\
+	&provider\_id\rightarrow status,\\
+	&provider\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $CreativeSpace$:
+
+\[
+\begin{aligned}
+	F_{min}^{CreativeSpace}=\{&
+	space\_id\rightarrow provider\_id,\\
+	&space\_id\rightarrow name,\\
+	&space\_id\rightarrow space\_type,\\
+	&space\_id\rightarrow description,\\
+	&space\_id\rightarrow area,\\
+	&space\_id\rightarrow capacity,\\
+	&space\_id\rightarrow artistic\_style,\\
+	&space\_id\rightarrow lighting\_condition,\\
+	&space\_id\rightarrow ventilation,\\
+	&space\_id\rightarrow acoustic\_characteristics,\\
+	&space\_id\rightarrow operating\_hours,\\
+	&space\_id\rightarrow usage\_policy,\\
+	&space\_id\rightarrow pricing,\\
+	&space\_id\rightarrow status
+	\}
+\end{aligned}
+\]
+
+Đối với $Resource$:
+
+\[
+\begin{aligned}
+	F_{min}^{Resource}=\{&
+	resource\_id\rightarrow provider\_id,\\
+	&resource\_id\rightarrow name,\\
+	&resource\_id\rightarrow resource\_type,\\
+	&resource\_id\rightarrow description,\\
+	&resource\_id\rightarrow quantity,\\
+	&resource\_id\rightarrow condition,\\
+	&resource\_id\rightarrow rental\_price,\\
+	&resource\_id\rightarrow compatibility\_information,\\
+	&resource\_id\rightarrow status
+	\}
+\end{aligned}
+\]
+
+Đối với $Maintenance$:
+
+\[
+\begin{aligned}
+	F_{min}^{Maintenance}=\{&
+	maintenance\_id\rightarrow resource\_id,\\
+	&maintenance\_id\rightarrow maintenance\_type,\\
+	&maintenance\_id\rightarrow description,\\
+	&maintenance\_id\rightarrow scheduled\_at,\\
+	&maintenance\_id\rightarrow completed\_at,\\
+	&maintenance\_id\rightarrow cost,\\
+	&maintenance\_id\rightarrow status
+	\}
+\end{aligned}
+\]
+
+Đối với $ServicePackage$:
+
+\[
+\begin{aligned}
+	F_{min}^{ServicePackage}=\{&
+	package\_id\rightarrow provider\_id,\\
+	&package\_id\rightarrow name,\\
+	&package\_id\rightarrow description,\\
+	&package\_id\rightarrow price,\\
+	&package\_id\rightarrow duration,\\
+	&package\_id\rightarrow status,\\
+	&package\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $Promotion$:
+
+\[
+\begin{aligned}
+	F_{min}^{Promotion}=\{&
+	promotion\_id\rightarrow provider\_id,\\
+	&promotion\_id\rightarrow name,\\
+	&promotion\_id\rightarrow description,\\
+	&promotion\_id\rightarrow discount\_value,\\
+	&promotion\_id\rightarrow start\_at,\\
+	&promotion\_id\rightarrow end\_at,\\
+	&promotion\_id\rightarrow status
+	\}
+\end{aligned}
+\]
+
+Đối với $Reservation$:
+
+\[
+\begin{aligned}
+	F_{min}^{Reservation}=\{&
+	reservation\_id\rightarrow user\_id,\\
+	&reservation\_id\rightarrow package\_id,\\
+	&reservation\_id\rightarrow start\_time,\\
+	&reservation\_id\rightarrow end\_time,\\
+	&reservation\_id\rightarrow status,\\
+	&reservation\_id\rightarrow total\_amount,\\
+	&reservation\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $Payment$:
+
+\[
+\begin{aligned}
+	F_{min}^{Payment}=\{&
+	payment\_id\rightarrow reservation\_id,\\
+	&payment\_id\rightarrow amount,\\
+	&payment\_id\rightarrow payment\_method,\\
+	&payment\_id\rightarrow payment\_status,\\
+	&payment\_id\rightarrow transaction\_code,\\
+	&payment\_id\rightarrow paid\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $ServiceSession$:
+
+\[
+\begin{aligned}
+	F_{min}^{ServiceSession}=\{&
+	session\_id\rightarrow reservation\_id,\\
+	&session\_id\rightarrow check\_in,\\
+	&session\_id\rightarrow check\_out,\\
+	&session\_id\rightarrow actual\_usage\_duration,\\
+	&session\_id\rightarrow status
+	\}
+\end{aligned}
+\]
+
+Đối với $Review$:
+
+\[
+\begin{aligned}
+	F_{min}^{Review}=\{&
+	review\_id\rightarrow user\_id,\\
+	&review\_id\rightarrow reservation\_id,\\
+	&review\_id\rightarrow rating,\\
+	&review\_id\rightarrow comment,\\
+	&review\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $CommunityContent$:
+
+\[
+\begin{aligned}
+	F_{min}^{CommunityContent}=\{&
+	content\_id\rightarrow user\_id,\\
+	&content\_id\rightarrow title,\\
+	&content\_id\rightarrow content,\\
+	&content\_id\rightarrow content\_type,\\
+	&content\_id\rightarrow status,\\
+	&content\_id\rightarrow created\_at,\\
+	&content\_id\rightarrow updated\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $Workshop$:
+
+\[
+\begin{aligned}
+	F_{min}^{Workshop}=\{&
+	workshop\_id\rightarrow user\_id,\\
+	&workshop\_id\rightarrow title,\\
+	&workshop\_id\rightarrow description,\\
+	&workshop\_id\rightarrow topic,\\
+	&workshop\_id\rightarrow start\_time,\\
+	&workshop\_id\rightarrow end\_time,\\
+	&workshop\_id\rightarrow capacity,\\
+	&workshop\_id\rightarrow location,\\
+	&workshop\_id\rightarrow price,\\
+	&workshop\_id\rightarrow status,\\
+	&workshop\_id\rightarrow created\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $Photo$:
+
+\[
+\begin{aligned}
+	F_{min}^{Photo}=\{&
+	photo\_id\rightarrow user\_id,\\
+	&photo\_id\rightarrow title,\\
+	&photo\_id\rightarrow file\_url,\\
+	&photo\_id\rightarrow description,\\
+	&photo\_id\rightarrow created\_at,\\
+	&photo\_id\rightarrow updated\_at
+	\}
+\end{aligned}
+\]
+
+Đối với $Complaint$:
+
+\[
+\begin{aligned}
+	F_{min}^{Complaint}=\{&
+	complaint\_id\rightarrow user\_id,\\
+	&complaint\_id\rightarrow subject,\\
+	&complaint\_id\rightarrow description,\\
+	&complaint\_id\rightarrow status,\\
+	&complaint\_id\rightarrow created\_at,\\
+	&complaint\_id\rightarrow resolved\_at,\\
+	&complaint\_id\rightarrow resolution
+	\}
+\end{aligned}
+\]
+
+Đối với sáu quan hệ kết hợp:
+
+\[
+\begin{aligned}
+	WorkshopParticipation
+	&(user\_id,workshop\_id)\\
+	PackageSpace
+	&(package\_id,space\_id)\\
+	PackageResource
+	&(package\_id,resource\_id)\\
+	ReservationSpace
+	&(reservation\_id,space\_id)\\
+	ReservationResource
+	&(reservation\_id,resource\_id)\\
+	SessionResource
+	&(session\_id,resource\_id)
+\end{aligned}
+\]
+
+
 
 \section{Chuẩn hóa lược đồ}
 
