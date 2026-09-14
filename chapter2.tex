@@ -1308,7 +1308,25 @@ Sau quá trình rà soát và kiểm chứng, mô hình Thực thể - Mối k�
     \caption{Sơ đồ Thực thể - Mối kết hợp (ERD) mức quan niệm hoàn chỉnh}
     \label{fig:erd_hoanchinh}
 \end{figure}
+\subsubsection*{Mô hình Thực thể - Mối kết hợp mở rộng (EER)}
+Mô hình EER (Enhanced Entity-Relationship) nâng cấp ERD bằng cách bổ sung cơ chế Tổng quát hóa/Chuyên biệt hóa (Generalization/Specialization). Trong hệ thống, thực thể \textbf{User} được phân tích thành một siêu lớp (Superclass), chứa các định danh và thuộc tính dùng chung. Dựa vào vai trò trên hệ thống, \textbf{User} được chuyên biệt hóa thành các tập con (Subclass) bao gồm: \textbf{Photographer} (Người thuê dịch vụ), \textbf{Service Provider} (Chủ không gian/thiết bị), và \textbf{Photography Expert} (Người tổ chức Workshop). Các tập con này thừa kế toàn bộ đặc tính của \textbf{User} và phát triển các mối kết hợp đặc thù riêng.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{diagram/TKCSDL_EER.drawio.png}
+    \caption{Sơ đồ Thực thể - Mối kết hợp mở rộng (EER)}
+    \label{fig:eer_hoanchinh}
+\end{figure}
+
+\subsubsection*{Mô hình Lớp (UML Class Diagram)}
+Sơ đồ Lớp UML cung cấp góc nhìn hướng đối tượng (Object-Oriented) cho thiết kế dữ liệu. Các thực thể ERD được ánh xạ thành các Lớp (Class). Điểm mạnh của mô hình UML trong phân tích này là ngoài việc xác định rõ cấu trúc thuộc tính (kèm tính đóng gói), nó còn phác thảo các phương thức/hành vi dự kiến của hệ thống và biểu diễn tính đa hình, liên kết (Association), tập hợp (Aggregation) bằng các bản số (Multiplicity) theo chuẩn quốc tế.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{diagram/TKCSDL_UML.drawio.png}
+    \caption{Sơ đồ Lớp (UML Class Diagram) của hệ thống}
+    \label{fig:uml_hoanchinh}
+\end{figure}
 \subsection{Từ điển dữ liệu}
 Từ điển dữ liệu dưới đây trích xuất định nghĩa cho một số thực thể cốt lõi nhất của hệ thống, làm tài liệu tham chiếu cho bước thiết kế logic.
 
