@@ -2699,7 +2699,84 @@ Tuy nhiên, như đã quyết định ở phần trước, hệ thống không t
 \textbf{Kết luận chung:} Toàn bộ các quan hệ trong hệ thống không cần phân rã hoặc đã được xử lý phù hợp. Tính bảo toàn kết nối được đảm bảo trong mọi trường hợp.
 
 \section{Lược đồ logic cuối cùng}
+Sau quá trình chuyển đổi từ mô hình quan niệm và thực hiện kiểm tra chuẩn hóa (đạt BCNF), hệ thống chốt lại lược đồ logic bao gồm 21 quan hệ (15 quan hệ thực thể độc lập và 6 quan hệ trung gian).
+
 \subsection{Danh sách các quan hệ}
+Dưới đây là danh sách các lược đồ quan hệ cuối cùng với khóa chính được gạch chân:
+\begin{itemize}
+    \item \texttt{USER}(\underline{\texttt{user\_id}}, \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password}, \texttt{role}, \texttt{status}, \texttt{created\_at})
+    \item \texttt{SERVICE\_PROVIDER}(\underline{\texttt{provider\_id}}, \texttt{business\_name}, \texttt{description}, \texttt{address}, \texttt{status}, \texttt{created\_at})
+    \item \texttt{CREATIVE\_SPACE}(\underline{\texttt{space\_id}}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status})
+    \item \texttt{RESOURCE}(\underline{\texttt{resource\_id}}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status})
+    \item \texttt{MAINTENANCE}(\underline{\texttt{maintenance\_id}}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status})
+    \item \texttt{SERVICE\_PACKAGE}(\underline{\texttt{package\_id}}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at})
+    \item \texttt{PROMOTION}(\underline{\texttt{promotion\_id}}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status})
+    \item \texttt{RESERVATION}(\underline{\texttt{reservation\_id}}, \texttt{user\_id}, \texttt{package\_id}, \texttt{start\_time}, \texttt{end\_time}, \texttt{status}, \texttt{total\_amount}, \texttt{created\_at})
+    \item \texttt{PAYMENT}(\underline{\texttt{payment\_id}}, \texttt{reservation\_id}, \texttt{amount}, \texttt{payment\_method}, \texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at})
+    \item \texttt{SERVICE\_SESSION}(\underline{\texttt{session\_id}}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status})
+    \item \texttt{REVIEW}(\underline{\texttt{review\_id}}, \texttt{user\_id}, \texttt{reservation\_id}, \texttt{rating}, \texttt{comment}, \texttt{created\_at})
+    \item \texttt{COMMUNITY\_CONTENT}(\underline{\texttt{content\_id}}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at})
+    \item \texttt{WORKSHOP}(\underline{\texttt{workshop\_id}}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at})
+    \item \texttt{PHOTO}(\underline{\texttt{photo\_id}}, \texttt{user\_id}, \texttt{title}, \texttt{file\_url}, \texttt{description}, \texttt{created\_at}, \texttt{updated\_at})
+    \item \texttt{COMPLAINT}(\underline{\texttt{complaint\_id}}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution})
+    \item \texttt{PACKAGE\_SPACE}(\underline{\texttt{package\_id}}, \underline{\texttt{space\_id}})
+    \item \texttt{PACKAGE\_RESOURCE}(\underline{\texttt{package\_id}}, \underline{\texttt{resource\_id}}, \texttt{quantity})
+    \item \texttt{RESERVATION\_SPACE}(\underline{\texttt{reservation\_id}}, \underline{\texttt{space\_id}})
+    \item \texttt{RESERVATION\_RESOURCE}(\underline{\texttt{reservation\_id}}, \underline{\texttt{resource\_id}}, \texttt{quantity})
+    \item \texttt{SESSION\_RESOURCE}(\underline{\texttt{session\_id}}, \underline{\texttt{resource\_id}}, \texttt{quantity})
+    \item \texttt{WORKSHOP\_REGISTRATION}(\underline{\texttt{user\_id}}, \underline{\texttt{workshop\_id}})
+\end{itemize}
+
 \subsection{Khóa chính và khóa ngoại}
+\begin{table}[H]
+    \centering
+    \caption{Tổng hợp Khóa chính và Khóa ngoại}
+    \renewcommand{\arraystretch}{1.2}
+    \scriptsize
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Quan hệ} & \textbf{Khóa chính (PK)} & \textbf{Khóa ngoại (FK) - Tham chiếu đến} \\ \hline
+        \texttt{USER} & \texttt{user\_id} & -- \\ \hline
+        \texttt{SERVICE\_PROVIDER} & \texttt{provider\_id} & -- \\ \hline
+        \texttt{CREATIVE\_SPACE} & \texttt{space\_id} & \texttt{provider\_id} $\rightarrow$ \texttt{SERVICE\_PROVIDER} \\ \hline
+        \texttt{RESOURCE} & \texttt{resource\_id} & \texttt{provider\_id} $\rightarrow$ \texttt{SERVICE\_PROVIDER} \\ \hline
+        \texttt{MAINTENANCE} & \texttt{maintenance\_id} & \texttt{resource\_id} $\rightarrow$ \texttt{RESOURCE} \\ \hline
+        \texttt{SERVICE\_PACKAGE} & \texttt{package\_id} & \texttt{provider\_id} $\rightarrow$ \texttt{SERVICE\_PROVIDER} \\ \hline
+        \texttt{PROMOTION} & \texttt{promotion\_id} & \texttt{provider\_id} $\rightarrow$ \texttt{SERVICE\_PROVIDER} \\ \hline
+        \texttt{RESERVATION} & \texttt{reservation\_id} & \texttt{user\_id} $\rightarrow$ \texttt{USER}, \texttt{package\_id} $\rightarrow$ \texttt{SERVICE\_PACKAGE} \\ \hline
+        \texttt{PAYMENT} & \texttt{payment\_id} & \texttt{reservation\_id} $\rightarrow$ \texttt{RESERVATION} (UNIQUE) \\ \hline
+        \texttt{SERVICE\_SESSION} & \texttt{session\_id} & \texttt{reservation\_id} $\rightarrow$ \texttt{RESERVATION} (UNIQUE) \\ \hline
+        \texttt{REVIEW} & \texttt{review\_id} & \texttt{user\_id} $\rightarrow$ \texttt{USER}, \texttt{reservation\_id} $\rightarrow$ \texttt{RESERVATION} (UNIQUE) \\ \hline
+        \texttt{WORKSHOP} & \texttt{workshop\_id} & \texttt{organizer\_id} $\rightarrow$ \texttt{USER} \\ \hline
+        \texttt{PACKAGE\_RESOURCE} & \texttt{package\_id, resource\_id} & \texttt{package\_id} $\rightarrow$ \texttt{SERVICE\_PACKAGE}, \texttt{resource\_id} $\rightarrow$ \texttt{RESOURCE} \\ \hline
+        \texttt{RESERVATION\_SPACE} & \texttt{reservation\_id, space\_id} & \texttt{reservation\_id} $\rightarrow$ \texttt{RESERVATION}, \texttt{space\_id} $\rightarrow$ \texttt{CREATIVE\_SPACE} \\ \hline
+    \end{tabular}
+\end{table}
+\textit{*(Các quan hệ trung gian khác áp dụng quy tắc khóa ngoại ghép tương tự tương ứng với thực thể liên kết).}
+
 \subsection{Các ràng buộc dữ liệu}
+\begin{itemize}
+    \item \textbf{Ràng buộc miền giá trị (Domain Constraints):}
+    \begin{itemize}
+        \item \texttt{REVIEW.rating}: Bắt buộc thuộc tập $\{1, 2, 3, 4, 5\}$.
+        \item \texttt{USER.role}: Phân loại cứng thành \texttt{'Photographer'}, \texttt{'Service Provider'}, hoặc \texttt{'Expert'}.
+        \item \texttt{*.status}: Các trường trạng thái chỉ nhận chuỗi quy định (VD: \texttt{'Pending'}, \texttt{'Confirmed'}, \texttt{'Cancelled'}).
+    \end{itemize}
+    \item \textbf{Ràng buộc liên thuộc tính (Inter-attribute Constraints):}
+    \begin{itemize}
+        \item Trong \texttt{RESERVATION} và \texttt{WORKSHOP}: \texttt{end\_time} $>=$ \texttt{start\_time}.
+        \item Trong \texttt{SERVICE\_SESSION}: \texttt{check\_out} $>=$ \texttt{check\_in}. Thuộc tính \texttt{actual\_usage\_duration} phải khớp với hiệu số của hai mốc thời gian này.
+    \end{itemize}
+    \item \textbf{Ràng buộc tham chiếu $1:1$:} Các trường \texttt{reservation\_id} trong bảng \texttt{PAYMENT}, \texttt{SERVICE\_SESSION} và \texttt{REVIEW} phải được gán \texttt{UNIQUE} constraint.
+\end{itemize}
+
 \subsection{Lược đồ quan hệ sau chuẩn hóa}
+Hình bên dưới minh họa trực quan Lược đồ logic quan hệ (Relational Schema) sau khi đã triệt tiêu các mối kết hợp nhiều-nhiều (M:N) thành các bảng chi tiết, đồng thời biểu diễn rõ các đường nối khóa ngoại (Foreign Key).
+
+\begin{figure}[H]
+    \centering
+    
+    \includegraphics[width=\textwidth]{diagram/TKCSDL_Logical.png} 
+    \caption{Sơ đồ Lược đồ logic quan hệ cuối cùng (Relational Schema)}
+    \label{fig:logic_hoanchinh}
+\end{figure}
