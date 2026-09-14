@@ -1527,17 +1527,300 @@ Như vậy, tập phụ thuộc hàm đã xác định trong phần này sẽ đ
 \subsection{Xác định phủ tối thiểu}
 
 \section{Chuẩn hóa lược đồ}
+
+Chuẩn hóa là quá trình tổ chức lại các quan hệ trong cơ sở dữ liệu nhằm giảm thiểu dư thừa dữ liệu và tránh các bất thường khi thêm, xóa hoặc cập nhật dữ liệu. Quá trình này dựa trên tập phụ thuộc hàm đã xác định ở phần trước.
+
 \subsection{Dạng chuẩn 1NF}
+
+\textbf{Định nghĩa:} Một quan hệ đạt dạng chuẩn 1NF khi và chỉ khi mọi thuộc tính trong quan hệ đều có miền giá trị nguyên tố, tức là không chứa tập hợp hay danh sách giá trị trong một ô dữ liệu.
+
+\textbf{Kiểm tra các quan hệ trong hệ thống:}
+
+Tất cả 15 quan hệ chính và 6 quan hệ trung gian trong hệ thống đều đạt 1NF vì:
+
+\begin{itemize}
+    \item Mỗi thuộc tính chỉ chứa một giá trị nguyên tố tại một thời điểm. Ví dụ, \texttt{role} trong \texttt{USER} chỉ lưu một vai trò duy nhất, không lưu danh sách vai trò.
+    \item Các mối kết hợp M:N đã được tách thành các quan hệ trung gian riêng, tránh việc lưu nhiều giá trị trong một ô. Ví dụ, một Reservation có thể đặt nhiều Creative Space, nhưng thay vì lưu danh sách \texttt{space\_id} trong \texttt{RESERVATION}, hệ thống sử dụng quan hệ trung gian \texttt{RESERVATION\_SPACE}.
+    \item Không có thuộc tính đa trị hay thuộc tính phức hợp chưa được tách nhỏ trong các quan hệ.
+\end{itemize}
+
+\textbf{Lưu ý về thuộc tính địa chỉ:}
+
+Thuộc tính \texttt{address} trong quan hệ \texttt{SERVICE\_PROVIDER} hiện được lưu dưới dạng chuỗi ký tự đơn. Ở mức thiết kế logic, nên tách thành các thành phần nguyên tố: \texttt{street\_number}, \texttt{street}, \texttt{district}, \texttt{city} để hỗ trợ tìm kiếm và lọc theo vị trí địa lý.
+
+\textbf{Kết luận:} Toàn bộ các quan hệ trong hệ thống đạt dạng chuẩn 1NF.
+
 \subsection{Dạng chuẩn 2NF}
+
+\textbf{Định nghĩa:} Một quan hệ đạt dạng chuẩn 2NF khi và chỉ khi:
+\begin{itemize}
+    \item Quan hệ đạt 1NF.
+    \item Mọi thuộc tính không khóa đều phụ thuộc đầy đủ vào khóa chính, tức là không tồn tại phụ thuộc bộ phận.
+\end{itemize}
+
+Phụ thuộc bộ phận chỉ phát sinh khi khóa chính là khóa ghép. Các quan hệ có khóa đơn tự động đạt 2NF nếu đã đạt 1NF.
+
+\textbf{Kiểm tra các quan hệ khóa đơn:}
+
+15 quan hệ chính đều có khóa đơn (\texttt{user\_id}, \texttt{space\_id}, \texttt{reservation\_id},...). Do đó, tất cả đều tự động đạt 2NF.
+
+\textbf{Kiểm tra các quan hệ trung gian có khóa ghép:}
+
+\begin{table}[H]
+\centering
+\caption{Kiểm tra 2NF cho các quan hệ trung gian}
+\begin{tabular}{|l|l|l|c|}
+\hline
+\textbf{Quan hệ} & \textbf{Khóa ghép} & \textbf{Thuộc tính không khóa} & \textbf{Phụ thuộc đầy đủ?} \\
+\hline
+\texttt{PACKAGE\_SPACE} & \texttt{package\_id, space\_id} & Không có & -- \\
+\hline
+\texttt{PACKAGE\_RESOURCE} & \texttt{package\_id, resource\_id} & \texttt{quantity} & Có \\
+\hline
+\texttt{RESERVATION\_SPACE} & \texttt{reservation\_id, space\_id} & Không có & -- \\
+\hline
+\texttt{RESERVATION\_RESOURCE} & \texttt{reservation\_id, resource\_id} & \texttt{quantity} & Có \\
+\hline
+\texttt{SESSION\_RESOURCE} & \texttt{session\_id, resource\_id} & \texttt{quantity} & Có \\
+\hline
+\texttt{WORKSHOP\_REGISTRATION} & \texttt{user\_id, workshop\_id} & Không có & -- \\
+\hline
+\end{tabular}
+\end{table}
+
+Như đã phân tích ở phần phụ thuộc đầy đủ, thuộc tính \texttt{quantity} trong cả ba quan hệ trung gian đều phụ thuộc đầy đủ vào toàn bộ khóa ghép, không phụ thuộc bộ phận vào riêng \texttt{package\_id}, \texttt{reservation\_id} hay \texttt{session\_id}.
+
+\textbf{Kết luận:} Toàn bộ các quan hệ trong hệ thống đạt dạng chuẩn 2NF.
+
 \subsection{Dạng chuẩn 3NF}
+
+\textbf{Định nghĩa:} Một quan hệ đạt dạng chuẩn 3NF khi và chỉ khi:
+\begin{itemize}
+    \item Quan hệ đạt 2NF.
+    \item Không tồn tại phụ thuộc bắc cầu giữa các thuộc tính không khóa, tức là không có thuộc tính không khóa nào phụ thuộc vào một thuộc tính không khóa khác.
+\end{itemize}
+
+\textbf{Kiểm tra các quan hệ chính:}
+
+Như đã phân tích ở phần phụ thuộc bắc cầu, phần lớn các quan hệ chính không có phụ thuộc bắc cầu nội bộ. Trường hợp cần xem xét là quan hệ \texttt{SERVICE\_SESSION}:
+
+$$\texttt{session\_id} \rightarrow \{\texttt{check\_in}, \texttt{check\_out}\} \rightarrow \texttt{actual\_usage\_duration}$$
+
+Thuộc tính \texttt{actual\_usage\_duration} có thể được dẫn xuất từ \texttt{check\_in} và \texttt{check\_out}, tạo ra phụ thuộc bắc cầu. Để xử lý, có hai hướng:
+
+\begin{itemize}
+    \item \textbf{Loại bỏ thuộc tính dẫn xuất:} Không lưu \texttt{actual\_usage\_duration}, tính toán khi cần từ \texttt{check\_in} và \texttt{check\_out}.
+    \item \textbf{Giữ nguyên có kiểm soát:} Nếu cần lưu để tối ưu truy vấn, cần đảm bảo tính nhất quán bằng trigger hoặc ràng buộc ứng dụng.
+\end{itemize}
+
+Trong thiết kế hiện tại, \texttt{actual\_usage\_duration} được giữ lại để phục vụ báo cáo và thống kê, nhưng được xác định là thuộc tính dẫn xuất cần kiểm soát tính nhất quán.
+
+\textbf{Kiểm tra các quan hệ còn lại:}
+
+\begin{table}[H]
+\centering
+\caption{Kiểm tra 3NF cho các quan hệ chính}
+\begin{tabular}{|l|p{5cm}|c|}
+\hline
+\textbf{Quan hệ} & \textbf{Phụ thuộc bắc cầu} & \textbf{Đạt 3NF?} \\
+\hline
+\texttt{USER} & Không có & Có \\
+\hline
+\texttt{SERVICE\_PROVIDER} & Không có & Có \\
+\hline
+\texttt{CREATIVE\_SPACE} & Không có & Có \\
+\hline
+\texttt{RESOURCE} & Không có & Có \\
+\hline
+\texttt{MAINTENANCE} & Không có & Có \\
+\hline
+\texttt{SERVICE\_PACKAGE} & Không có & Có \\
+\hline
+\texttt{PROMOTION} & Không có & Có \\
+\hline
+\texttt{RESERVATION} & Không có & Có \\
+\hline
+\texttt{PAYMENT} & Không có & Có \\
+\hline
+\texttt{SERVICE\_SESSION} & \texttt{check\_in, check\_out} $\rightarrow$ \texttt{actual\_usage\_duration} (dẫn xuất) & Cần kiểm soát \\
+\hline
+\texttt{REVIEW} & Không có & Có \\
+\hline
+\texttt{COMMUNITY\_CONTENT} & Không có & Có \\
+\hline
+\texttt{WORKSHOP} & Không có & Có \\
+\hline
+\texttt{PHOTO} & Không có & Có \\
+\hline
+\texttt{COMPLAINT} & Không có & Có \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Kết luận:} Hầu hết các quan hệ đạt 3NF. Quan hệ \texttt{SERVICE\_SESSION} cần xử lý thuộc tính dẫn xuất \texttt{actual\_usage\_duration}.
+
 \subsection{Dạng chuẩn BCNF}
+
+\textbf{Định nghĩa:} Một quan hệ đạt dạng chuẩn Boyce-Codd (BCNF) khi và chỉ khi với mọi phụ thuộc hàm không tầm thường $X \rightarrow Y$, $X$ phải là siêu khóa của quan hệ.
+
+BCNF là dạng chuẩn mạnh hơn 3NF. Một quan hệ đạt 3NF nhưng chưa chắc đạt BCNF nếu có nhiều khóa ứng viên và các khóa ứng viên đó có thuộc tính chung (overlapping candidate keys).
+
+\textbf{Kiểm tra các quan hệ trong hệ thống:}
+
+Trong hệ thống hiện tại, mỗi quan hệ chính chỉ có một khóa ứng viên duy nhất là khóa định danh (\texttt{user\_id}, \texttt{space\_id},...). Do đó, với mỗi phụ thuộc hàm $X \rightarrow Y$ đã xác định, $X$ luôn là khóa chính, tức là siêu khóa.
+
+\begin{table}[H]
+\centering
+\caption{Kiểm tra BCNF cho một số quan hệ tiêu biểu}
+\begin{tabular}{|l|l|l|c|}
+\hline
+\textbf{Quan hệ} & \textbf{Phụ thuộc hàm} & \textbf{Vế trái là siêu khóa?} & \textbf{Đạt BCNF?} \\
+\hline
+\texttt{USER} & \texttt{user\_id} $\rightarrow$ các thuộc tính & Có & Có \\
+\hline
+\texttt{CREATIVE\_SPACE} & \texttt{space\_id} $\rightarrow$ các thuộc tính & Có & Có \\
+\hline
+\texttt{RESERVATION} & \texttt{reservation\_id} $\rightarrow$ các thuộc tính & Có & Có \\
+\hline
+\texttt{PACKAGE\_RESOURCE} & \texttt{\{package\_id, resource\_id\}} $\rightarrow$ \texttt{quantity} & Có & Có \\
+\hline
+\texttt{SERVICE\_SESSION} & \texttt{\{check\_in, check\_out\}} $\rightarrow$ \texttt{actual\_usage\_duration} & Không (không là siêu khóa) & Cần xem xét \\
+\hline
+\end{tabular}
+\end{table}
+
+Trường hợp \texttt{SERVICE\_SESSION}: phụ thuộc $\{\texttt{check\_in}, \texttt{check\_out}\} \rightarrow \texttt{actual\_usage\_duration}$ có vế trái không phải siêu khóa, vi phạm BCNF. Tuy nhiên, do \texttt{actual\_usage\_duration} là thuộc tính dẫn xuất được lưu có chủ đích phục vụ hiệu năng truy vấn, vi phạm này được chấp nhận có kiểm soát.
+
+\textbf{Kết luận:} Hầu hết các quan hệ đạt BCNF. Trường hợp \texttt{SERVICE\_SESSION} được xử lý bằng cách xác định \texttt{actual\_usage\_duration} là thuộc tính dẫn xuất có kiểm soát.
+
 \subsection{Dạng chuẩn 4NF và 5NF}
 
+\textbf{Dạng chuẩn 4NF:}
+
+Một quan hệ đạt 4NF khi không tồn tại phụ thuộc đa trị không tầm thường $X \twoheadrightarrow Y$ trừ trường hợp $X$ là siêu khóa.
+
+Phụ thuộc đa trị phát sinh khi một thuộc tính xác định một tập nhiều giá trị độc lập của thuộc tính khác. Trong hệ thống hiện tại:
+
+\begin{itemize}
+    \item Các mối kết hợp M:N đã được tách thành quan hệ trung gian (PACKAGE\_SPACE, RESERVATION\_RESOURCE,...), loại bỏ nguy cơ phụ thuộc đa trị.
+    \item Không xác định được phụ thuộc đa trị không tầm thường trong các quan hệ hiện tại.
+\end{itemize}
+
+\textbf{Kết luận 4NF:} Toàn bộ các quan hệ đạt dạng chuẩn 4NF.
+
+\textbf{Dạng chuẩn 5NF:}
+
+Một quan hệ đạt 5NF (hay PJ/NF -- Project-Join Normal Form) khi không thể phân rã thành các quan hệ nhỏ hơn mà không mất thông tin, tức là mọi phụ thuộc kết nối đều có thể suy ra từ các siêu khóa.
+
+Trong hệ thống hiện tại:
+
+\begin{itemize}
+    \item Các quan hệ trung gian như \texttt{PACKAGE\_SPACE} và \texttt{RESERVATION\_SPACE} không có thuộc tính không khóa, đã ở dạng tối giản.
+    \item Các quan hệ trung gian có thuộc tính \texttt{quantity} không thể phân rã thêm mà không mất thông tin về số lượng trong ngữ cảnh cụ thể.
+    \item Không xác định được phụ thuộc kết nối vi phạm 5NF trong hệ thống.
+\end{itemize}
+
+\textbf{Kết luận 5NF:} Toàn bộ các quan hệ đạt dạng chuẩn 5NF trong phạm vi thiết kế hiện tại.
+
+% ============================================================
 \section{Phân rã lược đồ}
+
+Dựa trên kết quả kiểm tra chuẩn hóa, phần này xác định các quan hệ cần phân rã, thực hiện phân rã và kiểm tra tính đúng đắn của quá trình phân rã.
+
 \subsection{Xác định quan hệ cần phân rã}
+
+Từ kết quả kiểm tra chuẩn hóa ở phần trên, hầu hết các quan hệ trong hệ thống đã đạt BCNF và không cần phân rã. Trường hợp duy nhất cần xem xét là quan hệ \texttt{SERVICE\_SESSION} do có thuộc tính dẫn xuất \texttt{actual\_usage\_duration}.
+
+\begin{table}[H]
+\centering
+\caption{Tổng hợp kết quả kiểm tra chuẩn hóa}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Quan hệ} & \textbf{1NF} & \textbf{2NF} & \textbf{3NF} & \textbf{BCNF} \\
+\hline
+15 quan hệ chính (trừ SERVICE\_SESSION) & \checkmark & \checkmark & \checkmark & \checkmark \\
+\hline
+\texttt{SERVICE\_SESSION} & \checkmark & \checkmark & Cần xem xét & Cần xem xét \\
+\hline
+6 quan hệ trung gian & \checkmark & \checkmark & \checkmark & \checkmark \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Kết luận:} Chỉ có quan hệ \texttt{SERVICE\_SESSION} cần xem xét xử lý thuộc tính dẫn xuất. Các quan hệ còn lại không cần phân rã.
+
 \subsection{Phân rã theo phụ thuộc hàm}
+
+\textbf{Xử lý quan hệ \texttt{SERVICE\_SESSION}:}
+
+Quan hệ gốc:
+
+$$\texttt{SERVICE\_SESSION}(\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status})$$
+
+Phụ thuộc hàm vi phạm BCNF:
+
+$$\{\texttt{check\_in}, \texttt{check\_out}\} \rightarrow \texttt{actual\_usage\_duration}$$
+
+\textbf{Phương án 1 — Loại bỏ thuộc tính dẫn xuất:}
+
+$$\texttt{SERVICE\_SESSION}(\underline{\texttt{session\_id}}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{status})$$
+
+\texttt{actual\_usage\_duration} được tính toán theo công thức:
+
+$$\texttt{actual\_usage\_duration} = \texttt{check\_out} - \texttt{check\_in}$$
+
+\textbf{Phương án 2 — Giữ nguyên có kiểm soát:}
+
+Giữ nguyên lược đồ ban đầu và đảm bảo tính nhất quán bằng ràng buộc ứng dụng hoặc trigger cơ sở dữ liệu. Phương án này ưu tiên hiệu năng truy vấn hơn tính chuẩn hóa tuyệt đối.
+
+\textbf{Quyết định thiết kế:} Hệ thống áp dụng Phương án 2 — giữ \texttt{actual\_usage\_duration} để phục vụ báo cáo và thống kê, đồng thời áp dụng trigger để tự động cập nhật giá trị khi \texttt{check\_in} hoặc \texttt{check\_out} thay đổi.
+
+\textbf{Các quan hệ còn lại không cần phân rã} vì đã đạt BCNF và mọi phụ thuộc hàm đều có vế trái là siêu khóa.
+
 \subsection{Kiểm tra bảo toàn phụ thuộc}
+
+Bảo toàn phụ thuộc đảm bảo rằng sau khi phân rã, toàn bộ tập phụ thuộc hàm ban đầu vẫn có thể được suy diễn từ các phụ thuộc hàm trong các quan hệ con.
+
+\textbf{Kiểm tra với quan hệ \texttt{SERVICE\_SESSION}:}
+
+Nếu áp dụng Phương án 1 (loại bỏ \texttt{actual\_usage\_duration}):
+
+\begin{itemize}
+    \item Phụ thuộc $\texttt{session\_id} \rightarrow \{\texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{status}\}$ vẫn được bảo toàn trong quan hệ mới.
+    \item Phụ thuộc $\{\texttt{check\_in}, \texttt{check\_out}\} \rightarrow \texttt{actual\_usage\_duration}$ không còn cần thiết vì \texttt{actual\_usage\_duration} được tính toán, không lưu trữ.
+\end{itemize}
+
+\textbf{Kết luận:} Tập phụ thuộc hàm được bảo toàn sau khi xử lý quan hệ \texttt{SERVICE\_SESSION}. Các quan hệ không phân rã giữ nguyên toàn bộ phụ thuộc hàm.
+
 \subsection{Kiểm tra bảo toàn kết nối}
+
+Bảo toàn kết nối (lossless join) đảm bảo rằng khi kết nối các quan hệ con lại, ta thu được đúng quan hệ ban đầu mà không phát sinh bộ giả.
+
+\textbf{Điều kiện bảo toàn kết nối:}
+
+Theo định lý, phân rã $R$ thành $R_1$ và $R_2$ có tính bảo toàn kết nối nếu:
+
+$$R_1 \cap R_2 \rightarrow R_1 \quad \text{hoặc} \quad R_1 \cap R_2 \rightarrow R_2$$
+
+tức là phần giao của hai quan hệ con phải là siêu khóa của ít nhất một trong hai quan hệ con.
+
+\textbf{Kiểm tra với \texttt{SERVICE\_SESSION}:}
+
+Nếu phân rã thành:
+\begin{align*}
+R_1 &= \texttt{SERVICE\_SESSION}(\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{status}) \\
+R_2 &= \texttt{SESSION\_TIME}(\texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration})
+\end{align*}
+
+Phần giao: $R_1 \cap R_2 = \{\texttt{check\_in}, \texttt{check\_out}\}$
+
+Trong $R_2$: $\{\texttt{check\_in}, \texttt{check\_out}\} \rightarrow \texttt{actual\_usage\_duration}$, tức là $\{\texttt{check\_in}, \texttt{check\_out}\}$ là siêu khóa của $R_2$.
+
+Do đó, phân rã này có tính bảo toàn kết nối.
+
+Tuy nhiên, như đã quyết định ở phần trước, hệ thống không thực hiện phân rã này mà giữ nguyên quan hệ \texttt{SERVICE\_SESSION} với \texttt{actual\_usage\_duration} là thuộc tính dẫn xuất có kiểm soát.
+
+\textbf{Kết luận chung:} Toàn bộ các quan hệ trong hệ thống không cần phân rã hoặc đã được xử lý phù hợp. Tính bảo toàn kết nối được đảm bảo trong mọi trường hợp.
 
 \section{Lược đồ logic cuối cùng}
 \subsection{Danh sách các quan hệ}
