@@ -65,54 +65,75 @@ Các thuộc tính của 15 quan hệ được xác định như sau:
 \centering
 \scriptsize
 \setlength{\tabcolsep}{2pt}
-\begin{tabular}{|p{.18\linewidth}|p{.72\linewidth}|}
+\begin{tabular}{|p{.20\linewidth}|p{.75\linewidth}|}
 \hline
 \textbf{Quan hệ} & \textbf{Các thuộc tính} \\
 \hline
 \texttt{USER} &
-\texttt{user\_id}, \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password}, \texttt{role}, \texttt{status}, \texttt{created\_at} \\
+\texttt{user\_id}, \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password},
+\texttt{role}, \texttt{status}, \texttt{created\_at} \\
 \hline
 \texttt{SERVICE\_PROVIDER} &
-\texttt{provider\_id}, \texttt{business\_name}, \texttt{description}, \texttt{address}, \texttt{status}, \texttt{created\_at} \\
+\texttt{provider\_id}, \texttt{business\_name}, \texttt{description}, \texttt{address},
+\texttt{status}, \texttt{created\_at} \\
 \hline
 \texttt{CREATIVE\_SPACE} &
-\texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} \\
+\texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type},
+\texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style},
+\texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics},
+\texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} \\
 \hline
 \texttt{RESOURCE} &
-\texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} \\
+\texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type},
+\texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price},
+\texttt{compatibility\_information}, \texttt{status} \\
 \hline
 \texttt{MAINTENANCE} &
-\texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} \\
+\texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type},
+\texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost},
+\texttt{status} \\
 \hline
 \texttt{SERVICE\_PACKAGE} &
-\texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at} \\
+\texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description},
+\texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at} \\
 \hline
 \texttt{PROMOTION} &
-\texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} \\
+\texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description},
+\texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at},
+\texttt{status} \\
 \hline
 \texttt{RESERVATION} &
-\texttt{reservation\_id}, \texttt{user\_id}, \texttt{package\_id}, \texttt{start\_time}, \texttt{end\_time}, \texttt{status}, \texttt{total\_amount}, \texttt{created\_at} \\
+\texttt{reservation\_id}, \texttt{user\_id}, \texttt{package\_id}, \texttt{start\_time},
+\texttt{end\_time}, \texttt{status}, \texttt{total\_amount}, \texttt{created\_at} \\
 \hline
 \texttt{PAYMENT} &
-\texttt{payment\_id}, \texttt{reservation\_id}, \texttt{amount}, \texttt{payment\_method}, \texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at} \\
+\texttt{payment\_id}, \texttt{reservation\_id}, \texttt{amount}, \texttt{payment\_method},
+\texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at} \\
 \hline
 \texttt{SERVICE\_SESSION} &
-\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status} \\
+\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out},
+\texttt{actual\_usage\_duration}, \texttt{status} \\
 \hline
 \texttt{REVIEW} &
-\texttt{review\_id}, \texttt{user\_id}, \texttt{reservation\_id}, \texttt{rating}, \texttt{comment}, \texttt{created\_at} \\
+\texttt{review\_id}, \texttt{user\_id}, \texttt{reservation\_id}, \texttt{rating},
+\texttt{comment}, \texttt{created\_at} \\
 \hline
 \texttt{COMMUNITY\_CONTENT} &
-\texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \\
+\texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content},
+\texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \\
 \hline
 \texttt{WORKSHOP} &
-\texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} \\
+\texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description},
+\texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity},
+\texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} \\
 \hline
 \texttt{PHOTO} &
-\texttt{photo\_id}, \texttt{user\_id}, \texttt{title}, \texttt{file\_url}, \texttt{description}, \texttt{created\_at}, \texttt{updated\_at} \\
+\texttt{photo\_id}, \texttt{user\_id}, \texttt{title}, \texttt{file\_url},
+\texttt{description}, \texttt{created\_at}, \texttt{updated\_at} \\
 \hline
 \texttt{COMPLAINT} &
-\texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \\
+\texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description},
+\texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \\
 \hline
 \end{tabular}
 \caption{Thuộc tính của các quan hệ chính}
@@ -364,10 +385,1134 @@ Do đó, trong phạm vi mô hình hiện tại:
 Vì vậy, chưa cần áp dụng các chiến lược chuyển đổi chuyên biệt cho tổng quát hóa hoặc chuyên biệt hóa. Nếu trong các bước phát triển sau này xuất hiện các lớp con có thuộc tính riêng, cần lựa chọn một trong các phương án như tạo một quan hệ cho lớp cha và các quan hệ cho lớp con, hoặc gộp các lớp con vào một quan hệ chung tùy theo yêu cầu nghiệp vụ.
 
 \section{Xác định phụ thuộc hàm}
+
+Sau khi mô hình quan niệm được chuyển sang mô hình quan hệ, bước tiếp theo là xác định các phụ thuộc hàm tồn tại trong các quan hệ. Phụ thuộc hàm là cơ sở để phân tích cấu trúc dữ liệu, xác định khóa, tìm phủ tối thiểu và kiểm tra các dạng chuẩn ở các phần tiếp theo.
+
+Theo nội dung bài giảng, với một lược đồ quan hệ $R(U)$, phụ thuộc hàm:
+
+$$X \rightarrow Y$$
+
+được xem là đúng nếu với mọi hai bộ $t_1$ và $t_2$ thuộc một thể hiện của quan hệ $r(R)$:
+
+$$t_1[X] = t_2[X] \Rightarrow t_1[Y] = t_2[Y]$$
+
+Nói cách khác, nếu hai bộ có cùng giá trị trên tập thuộc tính $X$ thì chúng bắt buộc phải có cùng giá trị trên tập thuộc tính $Y$.
+
+Trong hệ thống đang xét, các phụ thuộc hàm được xác định chủ yếu từ các quy tắc nghiệp vụ đã phân tích ở Chương 1 và các khóa định danh đã xác định ở Chương 2. Do đó, việc xác định phụ thuộc hàm không chỉ dựa trên quan sát một tập dữ liệu mẫu mà phải phản ánh đúng ý nghĩa nghiệp vụ của từng đối tượng.
+
 \subsection{Xác định các phụ thuộc hàm từ nghiệp vụ}
-\subsection{Kiểm tra phụ thuộc hàm}
-\subsection{Phụ thuộc đầy đủ}
-\subsection{Phụ thuộc bắc cầu}
+
+\paragraph{a. Nguyên tắc xác định}\mbox{}\par
+
+Các phụ thuộc hàm trong hệ thống được xác định dựa trên các nguyên tắc sau:
+
+\begin{itemize}
+\item Mỗi thực thể có một mã định danh riêng, do đó khóa chính của quan hệ xác định các thuộc tính còn lại của cùng một bộ.
+
+\item Đối với quan hệ có khóa chính ghép, các thuộc tính không khóa chỉ phụ thuộc vào sự kết hợp của toàn bộ khóa ghép nếu ý nghĩa nghiệp vụ yêu cầu phải biết đầy đủ các thành phần khóa.
+
+\item Các phụ thuộc hàm chỉ được xác định trong phạm vi thuộc tính của từng quan hệ khi phân tích chuẩn hóa.
+
+\item Một khóa ngoại không tự động xác định các thuộc tính của quan hệ được tham chiếu trong cùng một quan hệ. Ví dụ, trong quan hệ \texttt{CREATIVE\_SPACE}, việc có \texttt{provider\_id} không có nghĩa là:
+
+\[
+\texttt{provider\_id} \rightarrow \texttt{business\_name}
+\]
+
+vì \texttt{business\_name} không thuộc quan hệ \texttt{CREATIVE\_SPACE}.
+
+\item Các phụ thuộc hàm được xác định từ quy tắc nghiệp vụ, không chỉ dựa trên việc các giá trị tình cờ giống nhau trong dữ liệu mẫu.
+
+\end{itemize}
+
+\paragraph{b. Phụ thuộc hàm của các quan hệ chính}\mbox{}\par
+
+Các quan hệ chính của hệ thống đều sử dụng một thuộc tính định danh riêng làm khóa chính. Vì vậy, phụ thuộc hàm cơ bản của mỗi quan hệ được xác định từ khóa chính đến các thuộc tính không khóa.
+
+\paragraph{1. Quan hệ \texttt{USER}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{USER}(\texttt{user\_id}, \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password}, \texttt{role}, \texttt{status}, \texttt{created\_at}) $$
+
+Do \texttt{user\_id} định danh duy nhất một người dùng, ta có:
+
+$$ \texttt{user\_id} \rightarrow \{ \texttt{full\_name}, \texttt{email}, \texttt{phone}, \texttt{password}, \texttt{role}, \texttt{status}, \texttt{created\_at} \} $$
+
+Ý nghĩa nghiệp vụ: mỗi mã người dùng xác định duy nhất thông tin của một tài khoản trong hệ thống.
+
+\paragraph{2. Quan hệ \texttt{SERVICE\_PROVIDER}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{SERVICE\_PROVIDER}(\texttt{provider\_id}, \texttt{business\_name}, \texttt{description}, \texttt{address}, \texttt{status}, \texttt{created\_at}) $$
+
+Phụ thuộc hàm:
+
+$$
+\texttt{provider\_id}
+\rightarrow
+\{
+\texttt{business\_name},
+\texttt{description},
+\texttt{address},
+\texttt{status},
+\texttt{created\_at}
+\}
+$$
+
+Ý nghĩa nghiệp vụ: mỗi nhà cung cấp được nhận diện duy nhất bằng \texttt{provider\_id}.
+
+\paragraph{3. Quan hệ \texttt{CREATIVE\_SPACE}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{CREATIVE\_SPACE}( \texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} ) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{space\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} \} $$
+
+Mỗi \texttt{space\_id} đại diện cho đúng một không gian sáng tạo, vì vậy xác định duy nhất toàn bộ các thông tin mô tả không gian đó.
+
+\paragraph{4. Quan hệ \texttt{RESOURCE}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{RESOURCE}( \texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} ) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{resource\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} \} $$
+
+Ý nghĩa nghiệp vụ: mỗi mã tài nguyên xác định duy nhất thông tin về một tài nguyên được quản lý.
+
+\paragraph{5. Quan hệ \texttt{MAINTENANCE}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{MAINTENANCE}( \texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status}) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{maintenance\_id} \rightarrow \{ \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} \} $$
+
+Mỗi hoạt động bảo trì có một mã riêng và xác định duy nhất tài nguyên được bảo trì cùng các thông tin của hoạt động đó.
+
+\paragraph{6. Quan hệ \texttt{SERVICE\_PACKAGE}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{SERVICE\_PACKAGE}( \texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at}) $$
+
+Phụ thuộc hàm:
+
+$$
+\texttt{package\_id}
+\rightarrow
+\{
+\texttt{provider\_id},
+\texttt{name},
+\texttt{description},
+\texttt{price},
+\texttt{duration},
+\texttt{status},
+\texttt{created\_at}
+\}
+$$
+
+\paragraph{7. Quan hệ \texttt{PROMOTION}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{PROMOTION}( \texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status}) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{promotion\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} \} $$
+
+\paragraph{8. Quan hệ \texttt{RESERVATION}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{RESERVATION}(
+\texttt{reservation\_id}, \texttt{user\_id}, \texttt{package\_id},
+\texttt{start\_time}, \texttt{end\_time}, \texttt{status},
+\texttt{total\_amount}, \texttt{created\_at}
+)
+$$
+
+Phụ thuộc hàm:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\{
+\texttt{user\_id}, \texttt{package\_id}, \texttt{start\_time},
+\texttt{end\_time}, \texttt{status}, \texttt{total\_amount},
+\texttt{created\_at}
+\}
+$$
+
+Mỗi \texttt{reservation\_id} xác định duy nhất một lần đặt chỗ và toàn bộ thông tin của lần đặt đó.
+
+\paragraph{9. Quan hệ \texttt{PAYMENT}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{PAYMENT}(
+\texttt{payment\_id}, \texttt{reservation\_id}, \texttt{amount},
+\texttt{payment\_method}, \texttt{payment\_status},
+\texttt{transaction\_code}, \texttt{paid\_at}
+)
+$$
+
+Phụ thuộc hàm cơ bản:
+
+$$
+\texttt{payment\_id}
+\rightarrow
+\{
+\texttt{reservation\_id}, \texttt{amount}, \texttt{payment\_method},
+\texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at}
+\}
+$$
+
+Theo thiết kế quan hệ một--một tùy chọn giữa \texttt{RESERVATION} và \texttt{PAYMENT}, mỗi \texttt{reservation\_id} xuất hiện tối đa một lần trong \texttt{PAYMENT}. Nếu ràng buộc \texttt{UNIQUE(reservation\_id)} được áp dụng như đã xác định ở phần chuyển mối kết hợp $1:1$, ta còn có:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\{
+\texttt{payment\_id}, \texttt{amount}, \texttt{payment\_method},
+\texttt{payment\_status}, \texttt{transaction\_code}, \texttt{paid\_at}
+\}
+$$
+
+Tuy nhiên, phụ thuộc này dựa trên ràng buộc duy nhất của mô hình logic, không chỉ dựa vào việc \texttt{reservation\_id} là khóa ngoại.
+
+\paragraph{10. Quan hệ \texttt{SERVICE\_SESSION}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{SERVICE\_SESSION}(
+\texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in},
+\texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status}
+)
+$$
+
+Phụ thuộc hàm cơ bản:
+
+$$
+\texttt{session\_id}
+\rightarrow
+\{
+\texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out},
+\texttt{actual\_usage\_duration}, \texttt{status}
+\}
+$$
+
+Do mỗi Reservation có tối đa một Service Session, nếu \texttt{reservation\_id} được đặt ràng buộc \texttt{UNIQUE}, ta có thêm:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\{
+\texttt{session\_id}, \texttt{check\_in}, \texttt{check\_out},
+\texttt{actual\_usage\_duration}, \texttt{status}
+\}
+$$
+
+Ngoài ra, về mặt nghiệp vụ, nếu \texttt{actual\_usage\_duration} được tính trực tiếp từ thời điểm check-in và check-out thì có phụ thuộc:
+
+$$
+\{
+\texttt{check\_in}, \texttt{check\_out}
+\}
+\rightarrow
+\texttt{actual\_usage\_duration}
+$$
+
+Phụ thuộc này cho thấy \texttt{actual\_usage\_duration} là một thuộc tính có thể dẫn xuất từ dữ liệu thời gian. Vấn đề này sẽ được xem xét thêm khi phân tích phụ thuộc bắc cầu và chuẩn hóa.
+
+\paragraph{11. Quan hệ \texttt{REVIEW}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{REVIEW}(
+\texttt{review\_id}, \texttt{user\_id}, \texttt{reservation\_id},
+\texttt{rating}, \texttt{comment}, \texttt{created\_at}
+)
+$$
+
+Phụ thuộc hàm cơ bản:
+
+$$
+\texttt{review\_id}
+\rightarrow
+\{
+\texttt{user\_id}, \texttt{reservation\_id}, \texttt{rating},
+\texttt{comment}, \texttt{created\_at}
+\}
+$$
+
+Theo ràng buộc nghiệp vụ, mỗi Reservation có tối đa một Review. Khi \texttt{reservation\_id} được đặt \texttt{UNIQUE} trong quan hệ \texttt{REVIEW}, ta có:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\{
+\texttt{review\_id}, \texttt{user\_id}, \texttt{rating},
+\texttt{comment}, \texttt{created\_at}
+\}
+$$
+
+\paragraph{12. Quan hệ \texttt{COMMUNITY\_CONTENT}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{COMMUNITY\_CONTENT}( \texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at}) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{content\_id} \rightarrow \{ \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \} $$
+
+\paragraph{13. Quan hệ \texttt{WORKSHOP}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{WORKSHOP}( \texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at}) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{workshop\_id} \rightarrow \{ \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} \} $$
+
+\paragraph{14. Quan hệ \texttt{PHOTO}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{PHOTO}( \texttt{photo\_id}, \texttt{user\_id}, \texttt{title}, \texttt{file\_url}, \texttt{description}, \texttt{created\_at}, \texttt{updated\_at}) $$
+
+Phụ thuộc hàm:
+
+$$
+\texttt{photo\_id}
+\rightarrow
+\{
+\texttt{user\_id},
+\texttt{title},
+\texttt{file\_url},
+\texttt{description},
+\texttt{created\_at},
+\texttt{updated\_at}
+\}
+$$
+
+\paragraph{15. Quan hệ \texttt{COMPLAINT}}\mbox{}\par
+
+Lược đồ:
+
+$$ \texttt{COMPLAINT}( \texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution}) $$
+
+Phụ thuộc hàm:
+
+$$ \texttt{complaint\_id} \rightarrow \{ \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \} $$
+
+\paragraph{c. Phụ thuộc hàm của các quan hệ trung gian}\mbox{}\par
+
+Các quan hệ trung gian được tạo ra từ các mối kết hợp $M:N$. Phần lớn các quan hệ này sử dụng khóa chính ghép.
+
+\paragraph{1. Quan hệ \texttt{PACKAGE\_SPACE}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{PACKAGE\_SPACE}(
+\underline{\texttt{package\_id}},
+\underline{\texttt{space\_id}})
+$$
+
+Khóa chính là:
+
+$$
+\{
+\texttt{package\_id},
+\texttt{space\_id}
+\}
+$$
+
+Quan hệ này không có thuộc tính không khóa. Do đó, mục đích chính của quan hệ là biểu diễn việc một Service Package có thể bao gồm nhiều Creative Space và một Creative Space có thể thuộc nhiều Service Package.
+
+\paragraph{2. Quan hệ \texttt{PACKAGE\_RESOURCE}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{PACKAGE\_RESOURCE}(
+\underline{\texttt{package\_id}},
+\underline{\texttt{resource\_id}},
+\texttt{quantity})
+$$
+
+Theo nghiệp vụ, số lượng Resource được yêu cầu chỉ được xác định khi biết đồng thời Service Package và Resource. Do đó:
+
+$$
+\{
+\texttt{package\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Không có cơ sở nghiệp vụ để kết luận:
+
+$$
+\texttt{package\_id} \rightarrow \texttt{quantity}
+$$
+
+hoặc:
+
+$$
+\texttt{resource\_id} \rightarrow \texttt{quantity}
+$$
+
+vì một Package có thể chứa nhiều Resource với số lượng khác nhau, và cùng một Resource có thể được sử dụng với số lượng khác nhau trong các Package khác nhau.
+
+\paragraph{3. Quan hệ \texttt{RESERVATION\_SPACE}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{RESERVATION\_SPACE}(
+\underline{\texttt{reservation\_id}},
+\underline{\texttt{space\_id}})
+$$
+
+Quan hệ này không có thuộc tính không khóa. Khóa ghép dùng để xác định duy nhất một liên kết giữa Reservation và Creative Space.
+
+\paragraph{4. Quan hệ \texttt{RESERVATION\_RESOURCE}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{RESERVATION\_RESOURCE}(
+\underline{\texttt{reservation\_id}},
+\underline{\texttt{resource\_id}},
+\texttt{quantity})
+$$
+
+Phụ thuộc hàm:
+
+$$
+\{
+\texttt{reservation\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Số lượng Resource được phân bổ phụ thuộc vào đồng thời lần đặt và tài nguyên được phân bổ.
+
+\paragraph{5. Quan hệ \texttt{SESSION\_RESOURCE}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{SESSION\_RESOURCE}(
+\underline{\texttt{session\_id}},
+\underline{\texttt{resource\_id}},
+\texttt{quantity})
+$$
+
+Phụ thuộc hàm:
+
+$$
+\{
+\texttt{session\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Thuộc tính \texttt{quantity} biểu diễn số lượng Resource thực tế được sử dụng trong một Service Session cụ thể.
+
+\paragraph{6. Quan hệ \texttt{WORKSHOP\_REGISTRATION}}\mbox{}\par
+
+Lược đồ:
+
+$$
+\texttt{WORKSHOP\_REGISTRATION}(
+\underline{\texttt{user\_id}},
+\underline{\texttt{workshop\_id}})
+$$
+
+Quan hệ hiện tại không có thuộc tính không khóa. Khóa ghép được sử dụng để xác định duy nhất việc một User đăng ký tham gia một Workshop.
+
+\subsection{Kiểm tra phụ thuộc hàm}\mbox{}\par
+
+Theo nội dung bài giảng, việc kiểm tra một phụ thuộc hàm không nên chỉ dựa trên dữ liệu hiện có. Một phụ thuộc hàm có thể đúng trên một bảng dữ liệu mẫu nhưng vẫn không phản ánh quy tắc nghiệp vụ thực tế.
+
+Việc kiểm tra phụ thuộc hàm trong hệ thống được thực hiện theo hai mức:
+
+\begin{enumerate}
+\item Kiểm tra tính hợp lý dựa trên quy tắc nghiệp vụ.
+\item Kiểm tra khả năng vi phạm trên dữ liệu của quan hệ.
+\end{enumerate}
+
+\paragraph{a. Kiểm tra dựa trên quy tắc nghiệp vụ}\mbox{}\par
+
+Ví dụ, xét quan hệ:
+
+$$
+\texttt{RESOURCE}(
+\texttt{resource\_id},
+\texttt{provider\_id},
+\ldots)
+$$
+
+Theo thiết kế, mỗi \texttt{resource\_id} định danh duy nhất một Resource. Do đó:
+
+$$
+\texttt{resource\_id}
+\rightarrow
+\texttt{provider\_id}
+$$
+
+là phụ thuộc hàm phù hợp với nghiệp vụ.
+
+Ngược lại, không thể kết luận:
+
+$$
+\texttt{provider\_id}
+\rightarrow
+\texttt{resource\_id}
+$$
+
+vì một Service Provider có thể quản lý nhiều Resource.
+
+Tương tự, xét quan hệ:
+
+$$
+\texttt{RESERVATION\_RESOURCE}(
+\texttt{reservation\_id},
+\texttt{resource\_id},
+\texttt{quantity})
+$$
+
+Theo nghiệp vụ:
+
+$$
+\{
+\texttt{reservation\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+là hợp lý vì số lượng Resource chỉ có ý nghĩa trong phạm vi một Reservation cụ thể.
+
+Tuy nhiên:
+
+$$
+\texttt{reservation\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+vì một Reservation có thể sử dụng nhiều Resource với các số lượng khác nhau.
+
+Tương tự:
+
+$$
+\texttt{resource\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+vì cùng một Resource có thể được phân bổ với số lượng khác nhau trong các Reservation khác nhau.
+
+\paragraph{b. Kiểm tra vi phạm phụ thuộc hàm trên dữ liệu}\mbox{}\par
+
+Theo định nghĩa, phụ thuộc hàm:
+
+$$X \rightarrow Y$$
+
+bị vi phạm nếu tồn tại hai bộ $t_1$ và $t_2$ sao cho:
+
+$$t_1[X] = t_2[X]$$
+
+nhưng:
+
+$$t_1[Y] \neq t_2[Y]$$
+
+Ví dụ, giả sử kiểm tra phụ thuộc:
+
+$$\texttt{resource\_id} \rightarrow \texttt{rental\_price}$$
+
+Nếu tồn tại hai bản ghi cùng \texttt{resource\_id} nhưng có hai giá thuê khác nhau tại cùng một thời điểm dữ liệu, phụ thuộc hàm này bị vi phạm.
+
+Tuy nhiên, trong mô hình hiện tại, \texttt{resource\_id} là khóa chính của quan hệ \texttt{RESOURCE}. Vì vậy, không thể tồn tại hai bộ khác nhau có cùng \texttt{resource\_id}. Phụ thuộc hàm từ khóa chính đến các thuộc tính còn lại được bảo đảm bởi tính duy nhất của khóa.
+
+\paragraph{c. Kiểm tra các phụ thuộc hàm quan trọng}\mbox{}\par
+
+Các phụ thuộc hàm quan trọng trong hệ thống được kiểm tra theo ý nghĩa nghiệp vụ như sau:
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.30\linewidth} p{.28\linewidth} p{.25\linewidth}}
+\toprule
+Phụ thuộc hàm & Kết quả & Giải thích nghiệp vụ \\
+\midrule
+
+\texttt{user\_id} $\rightarrow$ thông tin User &
+Đúng &
+Mỗi User có một mã định danh duy nhất. \\
+
+\texttt{provider\_id} $\rightarrow$ thông tin Provider &
+Đúng &
+Mỗi Provider có một mã định danh riêng. \\
+
+\texttt{space\_id} $\rightarrow$ thông tin Space &
+Đúng &
+Mỗi Creative Space được xác định bởi một mã duy nhất. \\
+
+\texttt{resource\_id} $\rightarrow$ thông tin Resource &
+Đúng &
+Mỗi Resource được quản lý bằng một mã duy nhất. \\
+
+\texttt{reservation\_id} $\rightarrow$ thông tin Reservation &
+Đúng &
+Mỗi Reservation đại diện cho một lần đặt cụ thể. \\
+
+{\texttt{package\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Đúng &
+Số lượng phụ thuộc vào cặp Package--Resource. \\
+
+{\texttt{reservation\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Đúng &
+Số lượng phụ thuộc vào cặp Reservation--Resource. \\
+
+{\texttt{session\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Đúng &
+Số lượng phụ thuộc vào cặp Session--Resource. \\
+
+\texttt{provider\_id} $\rightarrow$ \texttt{resource\_id} &
+Không đúng &
+Một Provider có thể quản lý nhiều Resource. \\
+
+\texttt{user\_id} $\rightarrow$ \texttt{reservation\_id} &
+Không đúng &
+Một User có thể tạo nhiều Reservation. \\
+
+\texttt{package\_id} $\rightarrow$ \texttt{quantity} &
+Không đúng &
+Một Package có thể chứa nhiều Resource với số lượng khác nhau. \\
+
+\texttt{resource\_id} $\rightarrow$ \texttt{quantity} trong quan hệ trung gian &
+Không đúng &
+Cùng Resource có thể có số lượng khác nhau theo từng Package, Reservation hoặc Session. \\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{d. Kiểm tra bằng bao đóng}\mbox{}\par
+
+Theo nội dung bài giảng, một cách hình thức để kiểm tra một phụ thuộc hàm:
+
+$$F \models X \rightarrow Y$$
+
+là tính bao đóng $X^+$ theo tập phụ thuộc hàm $F$ và kiểm tra:
+
+$$Y \subseteq X^+$$
+
+Phương pháp tính bao đóng và kiểm tra suy diễn phụ thuộc hàm sẽ được trình bày chi tiết trong mục \textbf{Bao đóng và xác định khóa}.
+
+Trong phạm vi mục hiện tại, việc kiểm tra phụ thuộc hàm chủ yếu nhằm xác nhận rằng các FD được xác định phù hợp với quy tắc nghiệp vụ và cấu trúc khóa của các quan hệ đã thiết kế.
+
+\subsection{Phụ thuộc đầy đủ}\mbox{}\par
+
+Theo bài giảng, một phụ thuộc hàm:
+
+$$X \rightarrow Y$$
+
+được gọi là \textbf{phụ thuộc đầy đủ} nếu không thể loại bỏ bất kỳ thuộc tính nào khỏi $X$ mà vẫn xác định được $Y$.
+
+Nói cách khác, nếu $X$ là một tập thuộc tính gồm nhiều thuộc tính, thì $Y$ phụ thuộc đầy đủ vào $X$ khi:
+
+$$\forall X' \subset X: X' \not\rightarrow Y$$
+
+Phụ thuộc đầy đủ đặc biệt quan trọng đối với các quan hệ có khóa chính ghép. Nó được sử dụng để kiểm tra sự tồn tại của phụ thuộc bộ phận, là nguyên nhân dẫn đến vi phạm dạng chuẩn 2NF.
+
+\paragraph{a. Phụ thuộc đầy đủ trong các quan hệ khóa đơn}\mbox{}\par
+
+Đối với phần lớn các quan hệ chính của hệ thống, khóa chính chỉ gồm một thuộc tính. Ví dụ:
+
+$$
+\texttt{user\_id}
+\rightarrow
+\{
+\texttt{full\_name},
+\texttt{email},
+\ldots
+\}
+$$
+
+hoặc:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\{
+\texttt{user\_id},
+\texttt{package\_id},
+\ldots
+\}
+$$
+
+Do vế trái chỉ gồm một thuộc tính, không tồn tại tập con không rỗng nhỏ hơn dùng để kiểm tra việc loại bỏ một phần khóa. Vì vậy, các phụ thuộc từ khóa đơn đến thuộc tính không khóa không phát sinh vấn đề phụ thuộc bộ phận.
+
+Tuy nhiên, khái niệm phụ thuộc đầy đủ có ý nghĩa rõ nhất đối với các quan hệ có khóa ghép.
+
+\paragraph{b. Phụ thuộc đầy đủ trong \texttt{PACKAGE\_RESOURCE}}\mbox{}\par
+
+Xét quan hệ:
+
+$$
+\texttt{PACKAGE\_RESOURCE}(
+\texttt{package\_id},
+\texttt{resource\_id},
+\texttt{quantity})
+$$
+
+Khóa chính là:
+
+$$
+K =
+\{
+\texttt{package\_id},
+\texttt{resource\_id}
+\}
+$$
+
+Ta có phụ thuộc:
+
+$$
+\{
+\texttt{package\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Để kiểm tra đây có phải là phụ thuộc đầy đủ hay không, xét từng tập con của khóa:
+
+$$
+\texttt{package\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+và:
+
+$$
+\texttt{resource\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+Do không thể bỏ \texttt{package\_id} hoặc \texttt{resource\_id} khỏi vế trái mà vẫn xác định được \texttt{quantity}, nên:
+
+$$
+\{
+\texttt{package\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+là một \textbf{phụ thuộc đầy đủ}.
+
+Điều này phù hợp với nghiệp vụ vì số lượng Resource phải được xác định trong ngữ cảnh của một Service Package cụ thể.
+
+\paragraph{c. Phụ thuộc đầy đủ trong \texttt{RESERVATION\_RESOURCE}}\mbox{}\par
+
+Xét quan hệ:
+
+$$
+\texttt{RESERVATION\_RESOURCE}(
+\texttt{reservation\_id},
+\texttt{resource\_id},
+\texttt{quantity})
+$$
+
+Khóa chính:
+
+$$
+K =
+\{
+\texttt{reservation\_id},
+\texttt{resource\_id}
+\}
+$$
+
+Phụ thuộc hàm:
+
+$$
+\{
+\texttt{reservation\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Ta kiểm tra:
+
+$$
+\texttt{reservation\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+vì một Reservation có thể sử dụng nhiều Resource với số lượng khác nhau.
+
+Đồng thời:
+
+$$
+\texttt{resource\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+vì một Resource có thể được phân bổ với số lượng khác nhau trong các Reservation khác nhau.
+
+Do đó:
+
+$$
+\{
+\texttt{reservation\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+là phụ thuộc đầy đủ.
+
+\paragraph{d. Phụ thuộc đầy đủ trong \texttt{SESSION\_RESOURCE}}\mbox{}\par
+
+Xét quan hệ:
+
+$$
+\texttt{SESSION\_RESOURCE}(
+\texttt{session\_id},
+\texttt{resource\_id},
+\texttt{quantity})
+$$
+
+Khóa chính:
+
+$$
+K =
+\{
+\texttt{session\_id},
+\texttt{resource\_id}
+\}
+$$
+
+Phụ thuộc hàm:
+
+$$
+\{
+\texttt{session\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+Ta có:
+
+$$
+\texttt{session\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+và:
+
+$$
+\texttt{resource\_id}
+\not\rightarrow
+\texttt{quantity}
+$$
+
+Vì vậy, \texttt{quantity} phụ thuộc đầy đủ vào toàn bộ khóa ghép:
+
+$$
+\{
+\texttt{session\_id},
+\texttt{resource\_id}
+\}
+\rightarrow
+\texttt{quantity}
+$$
+
+\paragraph{e. Tổng hợp phụ thuộc đầy đủ}\mbox{}\par
+
+Các quan hệ có thuộc tính không khóa phụ thuộc đầy đủ vào khóa ghép trong mô hình hiện tại được tổng hợp như sau:
+
+\begin{center}
+\scriptsize
+\begin{tabular}{p{.28\linewidth} p{.32\linewidth} p{.25\linewidth}}
+\toprule
+Quan hệ & Phụ thuộc hàm & Kết luận \\
+\midrule
+
+\texttt{PACKAGE\_RESOURCE} &
+{\texttt{package\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Phụ thuộc đầy đủ \\
+
+\texttt{RESERVATION\_RESOURCE} &
+{\texttt{reservation\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Phụ thuộc đầy đủ \\
+
+\texttt{SESSION\_RESOURCE} &
+{\texttt{session\_id}, \texttt{resource\_id}} $\rightarrow$ \texttt{quantity} &
+Phụ thuộc đầy đủ \\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+Các quan hệ trung gian còn lại như \texttt{PACKAGE\_SPACE}, \texttt{RESERVATION\_SPACE} và \texttt{WORKSHOP\_REGISTRATION} chỉ bao gồm các thuộc tính tham gia vào khóa ghép và không có thuộc tính không khóa. Vì vậy, không phát sinh trường hợp phụ thuộc bộ phận của thuộc tính không khóa trong các quan hệ này.
+
+Kết quả phân tích cho thấy các thuộc tính \texttt{quantity} trong các quan hệ trung gian phụ thuộc vào toàn bộ khóa ghép tương ứng. Đây là một đặc điểm phù hợp với ý nghĩa nghiệp vụ của các quan hệ $M:N$ và là cơ sở thuận lợi cho việc kiểm tra dạng chuẩn 2NF ở phần tiếp theo.
+
+\subsection{Phụ thuộc bắc cầu}\mbox{}\par
+
+Theo nội dung bài giảng, một phụ thuộc được xem là có tính \textbf{bắc cầu} khi tồn tại một thuộc tính hoặc tập thuộc tính trung gian $Z$ sao cho:
+
+$$X \rightarrow Z$$
+
+và:
+
+$$Z \rightarrow Y$$
+
+suy ra:
+
+$$X \rightarrow Y$$
+
+Đối với chuẩn hóa, phụ thuộc bắc cầu thường được quan tâm trong trường hợp một thuộc tính không khóa phụ thuộc vào khóa thông qua một thuộc tính không khóa khác.
+
+Dạng tổng quát:
+
+$$K \rightarrow A$$
+
+và:
+
+$$A \rightarrow B$$
+
+suy ra:
+
+$$K \rightarrow B$$
+
+Trong đó:
+
+\begin{itemize}
+\item $K$ là khóa của quan hệ.
+\item $A$ là thuộc tính trung gian.
+\item $B$ là thuộc tính phụ thuộc bắc cầu.
+\end{itemize}
+
+Sự tồn tại của phụ thuộc bắc cầu giữa các thuộc tính không khóa là một dấu hiệu cần xem xét khi kiểm tra dạng chuẩn 3NF.
+
+\paragraph{a. Phân biệt phụ thuộc bắc cầu với quan hệ khóa ngoại}\mbox{}\par
+
+Trong hệ thống hiện tại, nhiều quan hệ có khóa ngoại. Ví dụ:
+
+$$
+\texttt{space\_id}
+\rightarrow
+\texttt{provider\_id}
+$$
+
+trong quan hệ \texttt{CREATIVE\_SPACE}.
+
+Đồng thời, trong quan hệ \texttt{SERVICE\_PROVIDER}, ta có:
+
+$$
+\texttt{provider\_id}
+\rightarrow
+\texttt{business\_name}
+$$
+
+Từ góc độ toàn bộ cơ sở dữ liệu, có thể nhận thấy một chuỗi liên hệ:
+
+$$
+\texttt{space\_id}
+\rightarrow
+\texttt{provider\_id}
+\rightarrow
+\texttt{business\_name}
+$$
+
+Tuy nhiên, đây \textbf{không được xem là phụ thuộc bắc cầu nội bộ của quan hệ \texttt{CREATIVE\_SPACE}} khi kiểm tra chuẩn hóa, bởi \texttt{business\_name} không phải thuộc tính của quan hệ \texttt{CREATIVE\_SPACE}.
+
+Tương tự, trong \texttt{RESERVATION} có:
+
+$$
+\texttt{reservation\_id}
+\rightarrow
+\texttt{user\_id}
+$$
+
+và trong \texttt{USER}:
+
+$$
+\texttt{user\_id}
+\rightarrow
+\texttt{full\_name}
+$$
+
+Nhưng không thể đưa \texttt{full\_name} vào phân tích phụ thuộc bắc cầu của riêng quan hệ \texttt{RESERVATION}, vì thuộc tính này thuộc quan hệ \texttt{USER}.
+
+Do đó, việc phân tích phụ thuộc bắc cầu phục vụ chuẩn hóa phải được thực hiện chủ yếu trên tập thuộc tính của từng quan hệ cụ thể.
+
+\paragraph{b. Trường hợp \texttt{SERVICE\_SESSION}}\mbox{}\par
+
+Trong mô hình hiện tại, quan hệ:
+
+$$ \texttt{SERVICE\_SESSION}( \texttt{session\_id}, \texttt{reservation\_id}, \texttt{check\_in}, \texttt{check\_out}, \texttt{actual\_usage\_duration}, \texttt{status}) $$
+
+có phụ thuộc:
+
+$$
+\texttt{session\_id}
+\rightarrow
+\{
+\texttt{check\_in},
+\texttt{check\_out}
+\}
+$$
+
+Nếu thời lượng sử dụng thực tế được tính từ hai thời điểm này thì:
+
+$$
+\{
+\texttt{check\_in},
+\texttt{check\_out}
+\}
+\rightarrow
+\texttt{actual\_usage\_duration}
+$$
+
+Do đó, có thể suy ra:
+
+$$
+\texttt{session\_id}
+\rightarrow
+\{
+\texttt{check\_in},
+\texttt{check\_out}
+\}
+\rightarrow
+\texttt{actual\_usage\_duration}
+$$
+
+Đây là trường hợp cần chú ý vì \texttt{actual\_usage\_duration} có thể là thuộc tính dẫn xuất.
+
+Về mặt thiết kế, có hai hướng xử lý:
+
+\begin{itemize}
+\item Không lưu trực tiếp \texttt{actual\_usage\_duration}, mà tính từ \texttt{check\_in} và \texttt{check\_out} khi cần.
+
+\item Nếu vẫn lưu để phục vụ truy vấn hoặc báo cáo, cần xác định rõ đây là dữ liệu dẫn xuất và bảo đảm tính nhất quán với hai thuộc tính thời gian.
+
+\end{itemize}
+
+Trường hợp này sẽ được xem xét khi phân tích chuẩn hóa nhằm hạn chế nguy cơ dư thừa dữ liệu và bất thường cập nhật.
+
+\paragraph{c. Đánh giá các quan hệ còn lại}\mbox{}\par
+
+Đối với các quan hệ chính khác, trong phạm vi các thuộc tính hiện có chưa xác định được phụ thuộc hàm giữa các thuộc tính không khóa một cách chắc chắn từ nghiệp vụ.
+
+Ví dụ, trong quan hệ \texttt{RESOURCE}:
+
+$$
+\texttt{resource\_id}
+\rightarrow
+\{
+\texttt{name},
+\texttt{resource\_type},
+\texttt{quantity},
+\texttt{condition},
+\ldots
+\}
+$$
+
+Không có cơ sở nghiệp vụ trong yêu cầu hiện tại để kết luận:
+
+$$
+\texttt{resource\_type}
+\rightarrow
+\texttt{rental\_price}
+$$
+
+vì các Resource cùng loại có thể có giá thuê khác nhau.
+
+Tương tự, trong quan hệ \texttt{CREATIVE\_SPACE}, không thể kết luận:
+
+$$
+\texttt{space\_type}
+\rightarrow
+\texttt{pricing}
+$$
+
+vì các Darkroom hoặc Studio cùng loại có thể có mức giá khác nhau tùy theo nhà cung cấp và đặc điểm cụ thể.
+
+Trong quan hệ \texttt{WORKSHOP}, cũng không thể kết luận:
+
+$$
+\texttt{topic}
+\rightarrow
+\texttt{price}
+$$
+
+vì các Workshop cùng chủ đề có thể có mức giá, thời gian và người tổ chức khác nhau.
+
+Do đó, không đưa các phụ thuộc hàm này vào tập FD của hệ thống khi chưa có quy tắc nghiệp vụ bảo đảm tính xác định duy nhất.
+
+\paragraph{d. Kết luận về phụ thuộc bắc cầu}\mbox{}\par
+
+Từ phân tích hiện tại có thể rút ra các nhận xét sau:
+
+\begin{itemize}
+\item Phần lớn các quan hệ chính được thiết kế với khóa định danh đơn và các thuộc tính mô tả phụ thuộc trực tiếp vào khóa chính.
+
+\item Các khóa ngoại chỉ biểu diễn liên kết giữa các quan hệ và không được tự động xem là phụ thuộc bắc cầu nội bộ trong một quan hệ.
+
+\item Các quan hệ trung gian sử dụng khóa ghép chủ yếu có thuộc tính \texttt{quantity} phụ thuộc trực tiếp và đầy đủ vào toàn bộ khóa ghép.
+
+\item Trường hợp \texttt{actual\_usage\_duration} trong \texttt{SERVICE\_SESSION} cần được chú ý vì có thể được dẫn xuất từ \texttt{check\_in} và \texttt{check\_out}.
+
+\item Những phụ thuộc bắc cầu thực sự giữa các thuộc tính không khóa sẽ là tiêu chí quan trọng khi kiểm tra và chuẩn hóa các quan hệ lên dạng chuẩn 3NF.
+
+\end{itemize}
+
+Như vậy, tập phụ thuộc hàm đã xác định trong phần này sẽ được sử dụng làm đầu vào cho các bước tiếp theo gồm tính bao đóng của tập thuộc tính, kiểm tra suy diễn phụ thuộc hàm, xác định siêu khóa, tìm khóa ứng viên, xác định phủ tối thiểu và chuẩn hóa lược đồ quan hệ.
+
 
 \section{Bao đóng và xác định khóa}
 \subsection{Bao đóng của tập thuộc tính}
