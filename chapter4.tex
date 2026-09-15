@@ -70,7 +70,6 @@ Dựa trên bộ dữ liệu mẫu gồm $5{,}680$ bản ghi, bảng dưới đ�
 
 \begin{table}[htbp]
 \centering
-\caption{Ước lượng và đo lường lưu trữ dữ liệu vật lý}
 \label{tab:storage_estimation}
 \renewcommand{\arraystretch}{1.2}
 \scriptsize
@@ -105,6 +104,7 @@ Dựa trên bộ dữ liệu mẫu gồm $5{,}680$ bản ghi, bảng dưới đ�
 \multicolumn{2}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{5,680} & -- & -- & \textbf{120} & \textbf{634} & \textbf{265} & \textbf{178} & \textbf{5,072} & \textbf{1,424} \\
 \hline
 \end{tabular}
+\caption{Ước lượng và đo lường lưu trữ dữ liệu vật lý}
 }%
 \end{table}
 
@@ -173,7 +173,6 @@ Việc lựa chọn tổ chức tập tin cho từng bảng dựa trên tần su
 
 \begin{table}[htbp]
 \centering
-\caption{So sánh các phương thức tổ chức tập tin và mức độ phù hợp với dự án}
 \label{tab:file_org_comparison}
 \renewcommand{\arraystretch}{1.3}
 \scriptsize
@@ -208,6 +207,7 @@ Cần thiết cho các bảng giao dịch thời gian (\texttt{RESERVATION}, \te
 Chỉ phù hợp về mặt lý thuyết với tra cứu khóa định danh đơn lẻ (\texttt{user\_id}, \texttt{provider\_id}). \\
 \hline
 \end{tabular}
+\caption{So sánh các phương thức tổ chức tập tin và mức độ phù hợp với dự án}
 \end{table}
 
 \subsubsection{Phân tích phương thức Heap trong dự án và cơ chế SQL Server}
@@ -483,7 +483,6 @@ Các chỉ mục kết hợp được triển khai gồm:
 
 \begin{table}[htbp]
 	\centering
-	\caption{Các chỉ mục kết hợp được triển khai}
 	\label{tab:composite_indexes}
 	\renewcommand{\arraystretch}{1.2}
 	\scriptsize
@@ -528,6 +527,7 @@ Các chỉ mục kết hợp được triển khai gồm:
 		\texttt{(user\_id, status)} \\
 		\hline
 	\end{tabular}
+	\caption{Các chỉ mục kết hợp được triển khai}
 \end{table}
 
 Các thuộc tính được khai báo trong mệnh đề \texttt{INCLUDE} không được
@@ -568,7 +568,6 @@ Các workload và chỉ mục tương ứng được tổng hợp như sau:
 
 \begin{table}[htbp]
 	\centering
-	\caption{Lựa chọn chỉ mục theo workload}
 	\label{tab:index_workload}
 	\renewcommand{\arraystretch}{1.2}
 	\scriptsize
@@ -644,6 +643,7 @@ Các workload và chỉ mục tương ứng được tổng hợp như sau:
 		Lọc Complaint theo User và trạng thái. \\
 		\hline
 	\end{tabular}
+	\caption{Lựa chọn chỉ mục theo workload}
 \end{table}
 
 Các chỉ mục trên được lựa chọn nhằm hỗ trợ các workload có tần suất truy
@@ -750,7 +750,6 @@ Khóa phân vùng (partition key) là thuộc tính hoặc tập thuộc tính �
 
 \begin{table}[htbp]
 \centering
-\caption{Lựa chọn khóa phân vùng}
 \begin{tabular}{|l|l|l|p{4cm}|}
 \hline
 \textbf{Quan hệ} & \textbf{Khóa phân vùng} & \textbf{Kiểu phân vùng} & \textbf{Lý do} \\
@@ -766,6 +765,7 @@ Khóa phân vùng (partition key) là thuộc tính hoặc tập thuộc tính �
 \texttt{CREATIVE\_SPACE} & \texttt{space\_type} & List & Tìm kiếm thường lọc theo loại không gian. \\
 \hline
 \end{tabular}
+\caption{Lựa chọn khóa phân vùng}
 \end{table}
 
 % ============================================================
@@ -779,7 +779,6 @@ Workload của hệ thống bao gồm các truy vấn được thực thi thư�
 
 \begin{table}[htbp]
 \centering
-\caption{Phân tích workload các truy vấn phổ biến}
 \begin{tabular}{|c|p{5cm}|p{3cm}|c|}
 \hline
 \textbf{STT} & \textbf{Truy vấn} & \textbf{Quan hệ liên quan} & \textbf{Tần suất} \\
@@ -801,6 +800,7 @@ Workload của hệ thống bao gồm các truy vấn được thực thi thư�
 8 & Lấy Review của một Reservation & \texttt{REVIEW} & Trung bình \\
 \hline
 \end{tabular}
+\caption{Phân tích workload các truy vấn phổ biến}
 \end{table}
 
 Các truy vấn có tần suất cao và ảnh hưởng trực tiếp đến trải nghiệm người dùng sẽ được ưu tiên tối ưu hóa.
@@ -889,7 +889,6 @@ Ví dụ, chỉ mục B+ trên \texttt{user\_id} của \texttt{RESERVATION} có 
 
 \begin{table}[htbp]
 \centering
-\caption{So sánh chi phí các kế hoạch thực thi}
 \begin{tabular}{|l|p{5cm}|c|}
 \hline
 \textbf{Kế hoạch} & \textbf{Mô tả} & \textbf{Chi phí (I/O)} \\
@@ -901,6 +900,7 @@ Chỉ mục B+ trên \texttt{user\_id} & Tìm qua chỉ mục, lấy các bộ p
 Chỉ mục Hash trên \texttt{user\_id} & Tính hash, truy cập trực tiếp bucket & $1 + k$ \\
 \hline
 \end{tabular}
+\caption{So sánh chi phí các kế hoạch thực thi}
 \end{table}
 
 Khi số bộ kết quả $k$ nhỏ so với tổng số bộ, chỉ mục rõ ràng hiệu quả hơn quét tuần tự.
@@ -922,7 +922,6 @@ Phép kết nối (join) thường là phép toán tốn kém nhất trong một
 
 \begin{table}[htbp]
 \centering
-\caption{Lựa chọn thuật toán kết nối theo từng truy vấn}
 \begin{tabular}{|p{3.5cm}|l|l|p{3.5cm}|}
 \hline
 \textbf{Truy vấn} & \textbf{Quan hệ kết nối} & \textbf{Thuật toán} & \textbf{Lý do} \\
@@ -936,6 +935,7 @@ Lấy Resource của Package & \texttt{PACKAGE\_RESOURCE} $\bowtie$ \texttt{RESO
 Thống kê doanh thu & \texttt{PAYMENT} $\bowtie$ \texttt{RESERVATION} & Sort-Merge Join & Kết quả cần sắp xếp theo thời gian. \\
 \hline
 \end{tabular}
+\caption{Lựa chọn thuật toán kết nối theo từng truy vấn}
 \end{table}
 
 \section{Lựa chọn cấu hình vật lý}

@@ -156,52 +156,47 @@ Các mục trên bám khá sát Chương 2: slide nhấn mạnh **thực thể, 
 
 # CHƯƠNG 4. THIẾT KẾ VẬT LÝ
 
-### 4.1. Lựa chọn hệ quản trị cơ sở dữ liệu
+### 4.1. Thiết kế lưu trữ vật lý
 
-* 4.1.1. DBMS được lựa chọn
-* 4.1.2. Căn cứ lựa chọn DBMS
+* 4.1.1. Khối và bản ghi
+* 4.1.2. Ước lượng số khối dữ liệu
+* 4.1.3. Lựa chọn tổ chức tập tin
+* 4.1.4. Heap, Sorted và Hash
 
-### 4.2. Thiết kế lưu trữ vật lý
+### 4.2. Thiết kế chỉ mục
 
-* 4.2.1. Khối và bản ghi
-* 4.2.2. Ước lượng số khối dữ liệu
-* 4.2.3. Lựa chọn tổ chức tập tin
-* 4.2.4. Heap, Sorted và Hash
+* 4.2.1. Xác định nhu cầu sử dụng chỉ mục
+* 4.2.2. Chỉ mục Clustered/Nonclustered
+* 4.2.3. Chỉ mục B+
+* 4.2.4. Chỉ mục Hash
+* 4.2.5. Chỉ mục kết hợp
+* 4.2.6. Lựa chọn chỉ mục theo workload
 
-### 4.3. Thiết kế chỉ mục
+### 4.3. Phân vùng dữ liệu
 
-* 4.3.1. Xác định nhu cầu sử dụng chỉ mục
-* 4.3.2. Chỉ mục Clustered/Nonclustered
-* 4.3.3. Chỉ mục B+
-* 4.3.4. Chỉ mục Hash
-* 4.3.5. Chỉ mục kết hợp
-* 4.3.6. Lựa chọn chỉ mục theo workload
+* 4.3.1. Phân vùng ngang
+* 4.3.2. Phân vùng dọc
+* 4.3.3. Lựa chọn khóa phân vùng
 
-### 4.4. Phân vùng dữ liệu
+### 4.4. Tối ưu truy vấn
 
-* 4.4.1. Phân vùng ngang
-* 4.4.2. Phân vùng dọc
-* 4.4.3. Lựa chọn khóa phân vùng
+* 4.4.1. Phân tích workload
+* 4.4.2. Cây truy vấn và tối ưu phép toán
+* 4.4.3. Ước lượng kích thước trung gian
+* 4.4.4. Ước lượng chi phí truy vấn
+* 4.4.5. Lựa chọn thuật toán kết nối
 
-### 4.5. Tối ưu truy vấn
+### 4.5. Lựa chọn cấu hình vật lý
 
-* 4.5.1. Phân tích workload
-* 4.5.2. Cây truy vấn và tối ưu phép toán
-* 4.5.3. Ước lượng kích thước trung gian
-* 4.5.4. Ước lượng chi phí truy vấn
-* 4.5.5. Lựa chọn thuật toán kết nối
+* 4.5.1. Bộ đệm (Buffer Pool)
+* 4.5.2. RAID và tổ chức lưu trữ
+* 4.5.3. Row-store và Column-store
+* 4.5.4. Đánh đổi giữa đọc, ghi và dung lượng
 
-### 4.6. Lựa chọn cấu hình vật lý
+### 4.6. Thiết kế vật lý cuối cùng
 
-* 4.6.1. Bộ đệm (Buffer Pool)
-* 4.6.2. RAID và tổ chức lưu trữ
-* 4.6.3. Row-store và Column-store
-* 4.6.4. Đánh đổi giữa đọc, ghi và dung lượng
-
-### 4.7. Thiết kế vật lý cuối cùng
-
-* 4.7.1. Kiểu dữ liệu
-* 4.7.2. Các ràng buộc vật lý
-* 4.7.3. Các chỉ mục
-* 4.7.4. Phân vùng/cấu hình lưu trữ
-* 4.7.5. Tổng hợp thiết kế vật lý
+* 4.6.1. Kiểu dữ liệu
+* 4.6.2. Các ràng buộc vật lý
+* 4.6.3. Các chỉ mục
+* 4.6.4. Phân vùng/cấu hình lưu trữ
+* 4.6.5. Tổng hợp thiết kế vật lý

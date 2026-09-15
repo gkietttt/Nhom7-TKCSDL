@@ -207,8 +207,10 @@
 % Format captions
 \captionsetup{labelsep=periodem}
 
-% Place table captions above table
-\captionsetup[table]{position=top}
+% Place captions below tables, figures, and code listings for consistent document styling
+\captionsetup[table]{position=bottom}
+\captionsetup[figure]{position=bottom}
+\captionsetup[lstlisting]{position=bottom}
 
 % Format subcaptions
 \captionsetup[sub]{labelformat=simple, labelsep=periodem, size=footnotesize}

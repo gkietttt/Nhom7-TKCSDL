@@ -912,7 +912,7 @@ Như vậy, việc xác định mức tham gia giúp mô hình quan niệm mô t
 Mô hình dữ liệu được xây dựng và biểu diễn thông qua hai sơ đồ:
 \textbf{ERD} và \textbf{EER}. Hai sơ đồ được xây dựng dựa trên các
 thực thể, thuộc tính, mối kết hợp, bản số, mức tham gia và các ràng buộc
-nghiệp vụ đã được xác định ở Chương 0 và Chương 1.
+nghiệp vụ đã được xác định ở Chương 1.
 
 \subsubsection{Sơ đồ ERD}
 
@@ -1096,6 +1096,7 @@ Do đó, các quan hệ như \textit{Resource--Maintenance} hoặc \textit{Reser
 Vì vậy, sơ đồ EER không sử dụng ký hiệu thực thể yếu hoặc mối quan hệ định danh.
 
 \subsection{Tổng quát hóa/chuyên biệt hóa EER}
+\label{sec:eer_generalization}
 
 Tổng quát hóa/chuyên biệt hóa được sử dụng khi một nhóm thực thể có các thuộc tính chung nhưng có những đặc điểm riêng theo từng loại.
 
@@ -1309,7 +1310,9 @@ Sau quá trình rà soát và kiểm chứng, mô hình Thực thể - Mối k�
     \label{fig:erd_hoanchinh}
 \end{figure}
 \subsubsection*{Mô hình Thực thể - Mối kết hợp mở rộng (EER)}
-Mô hình EER (Enhanced Entity-Relationship) nâng cấp ERD bằng cách bổ sung cơ chế Tổng quát hóa/Chuyên biệt hóa (Generalization/Specialization). Trong hệ thống, thực thể \textbf{User} được phân tích thành một siêu lớp (Superclass), chứa các định danh và thuộc tính dùng chung. Dựa vào vai trò trên hệ thống, \textbf{User} được chuyên biệt hóa thành các tập con (Subclass) bao gồm: \textbf{Photographer} (Người thuê dịch vụ), \textbf{Service Provider} (Chủ không gian/thiết bị), và \textbf{Photography Expert} (Người tổ chức Workshop). Các tập con này thừa kế toàn bộ đặc tính của \textbf{User} và phát triển các mối kết hợp đặc thù riêng.
+Mô hình EER (Enhanced Entity-Relationship) nâng cấp ERD bằng cách bổ sung các cơ chế biểu diễn nâng cao. Trong sơ đồ EER, thực thể \textbf{User} được biểu diễn với các vai trò nghiệp vụ khác nhau gồm \textbf{Photographer} (Người thuê dịch vụ), \textbf{Service Provider} (Chủ không gian/thiết bị) và \textbf{Photography Expert} (Người tổ chức Workshop) nhằm thể hiện rõ các mối kết hợp đặc thù theo từng vai trò.
+
+Cần lưu ý rằng việc biểu diễn vai trò trên sơ đồ EER chỉ mang tính minh họa trực quan. Như đã phân tích ở mục~\ref{sec:eer_generalization}, mô hình dữ liệu hiện tại \textbf{không áp dụng cơ chế tổng quát hóa/chuyên biệt hóa} để tạo các thực thể con riêng biệt. Thay vào đó, các vai trò được quản lý thông qua thuộc tính \texttt{role} của thực thể \textbf{User}. Do đó, khi chuyển sang mô hình logic ở Chương 3, \textbf{User} vẫn được biểu diễn bằng một quan hệ duy nhất.
 
 \begin{figure}[htbp]
     \centering
@@ -1328,29 +1331,180 @@ Sơ đồ Lớp UML cung cấp góc nhìn hướng đối tượng (Object-Orien
     \label{fig:uml_hoanchinh}
 \end{figure}
 \subsection{Từ điển dữ liệu}
-Từ điển dữ liệu dưới đây trích xuất định nghĩa cho một số thực thể cốt lõi nhất của hệ thống, làm tài liệu tham chiếu cho bước thiết kế logic.
+Từ điển dữ liệu dưới đây trích xuất định nghĩa cho tất cả 15 thực thể của hệ thống, làm tài liệu tham chiếu cho bước thiết kế logic. Mỗi thực thể được liệt kê cùng thuộc tính định danh (gạch chân) và các thuộc tính mô tả chính. Ở mức quan niệm, cột \textit{Miền giá trị} mô tả bản chất dữ liệu thay vì kiểu dữ liệu cụ thể của hệ quản trị; các kiểu dữ liệu triển khai sẽ được xác định ở Chương~3.
 
 \begin{table}[htbp]
     \centering
-    \caption{Từ điển dữ liệu các thực thể cốt lõi}
-    \label{tab:data_dictionary}
+    \label{tab:data_dictionary_1}
     \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{|l|l|l|p{6cm}|}
+    \scriptsize
+    \begin{tabular}{|l|l|l|p{5.5cm}|}
         \hline
-        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Kiểu DL} & \textbf{Ý nghĩa} \\ \hline
-        \multirow{3}{*}{\textbf{User}} 
-        & \underline{user\_id} & INT & Mã định danh người dùng \\ \cline{2-4} 
-        & email & VARCHAR & Địa chỉ email đăng nhập \\ \cline{2-4} 
-        & role & VARCHAR & Vai trò (Photographer, Provider, Expert) \\ \hline
-        \multirow{3}{*}{\textbf{Reservation}} 
-        & \underline{reservation\_id} & INT & Mã giao dịch đặt chỗ \\ \cline{2-4} 
-        & start\_time & DATETIME & Thời gian bắt đầu sử dụng dịch vụ \\ \cline{2-4} 
-        & status & VARCHAR & Trạng thái đặt chỗ \\ \hline
-        \multirow{3}{*}{\textbf{Resource}} 
-        & \underline{resource\_id} & INT & Mã thiết bị \\ \cline{2-4} 
-        & resource\_name & VARCHAR & Tên gọi của thiết bị \\ \cline{2-4} 
-        & quantity & INT & Số lượng trong kho \\ \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Miền giá trị} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{8}{*}{\textbf{User}}
+        & \underline{user\_id} & Số nguyên tự tăng & Mã định danh người dùng \\ \cline{2-4}
+        & full\_name & Chuỗi ký tự & Họ và tên đầy đủ \\ \cline{2-4}
+        & email & Chuỗi ký tự & Địa chỉ email đăng nhập \\ \cline{2-4}
+        & phone & Chuỗi ký tự & Số điện thoại liên hệ \\ \cline{2-4}
+        & password & Chuỗi ký tự & Mật khẩu đã được mã hóa \\ \cline{2-4}
+        & role & Chuỗi phân loại & Vai trò (Photographer, Service Provider, Expert, Administrator) \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái tài khoản \\ \cline{2-4}
+        & created\_at & Thời gian & Thời điểm tạo tài khoản \\ \hline
+        \multirow{6}{*}{\textbf{Service Provider}}
+        & \underline{provider\_id} & Số nguyên tự tăng & Mã định danh nhà cung cấp \\ \cline{2-4}
+        & business\_name & Chuỗi ký tự & Tên doanh nghiệp/cá nhân \\ \cline{2-4}
+        & description & Văn bản & Mô tả giới thiệu \\ \cline{2-4}
+        & address & Chuỗi ký tự & Địa chỉ \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái hoạt động \\ \cline{2-4}
+        & created\_at & Thời gian & Thời điểm đăng ký \\ \hline
     \end{tabular}
+    \caption{Từ điển dữ liệu -- Nhóm người dùng và nhà cung cấp}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \label{tab:data_dictionary_2}
+    \renewcommand{\arraystretch}{1.3}
+    \scriptsize
+    \begin{tabular}{|l|l|l|p{5.5cm}|}
+        \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Miền giá trị} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{10}{*}{\textbf{Creative Space}}
+        & \underline{space\_id} & Số nguyên tự tăng & Mã định danh không gian \\ \cline{2-4}
+        & provider\_id & Số nguyên & Tham chiếu nhà cung cấp sở hữu \\ \cline{2-4}
+        & name & Chuỗi ký tự & Tên không gian sáng tạo \\ \cline{2-4}
+        & space\_type & Chuỗi phân loại & Loại không gian (phòng tối, studio,...) \\ \cline{2-4}
+        & description & Văn bản & Mô tả chi tiết \\ \cline{2-4}
+        & area & Số thập phân & Diện tích (m$^2$) \\ \cline{2-4}
+        & capacity & Số nguyên & Sức chứa tối đa \\ \cline{2-4}
+        & pricing & Số thập phân & Mức giá thuê \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái hoạt động \\ \cline{2-4}
+        & \textit{+ 6 thuộc tính mô tả} & & artistic\_style, lighting\_condition, ventilation, acoustic\_characteristics, operating\_hours, usage\_policy \\ \hline
+        \multirow{7}{*}{\textbf{Resource}}
+        & \underline{resource\_id} & Số nguyên tự tăng & Mã định danh tài nguyên/thiết bị \\ \cline{2-4}
+        & provider\_id & Số nguyên & Tham chiếu nhà cung cấp quản lý \\ \cline{2-4}
+        & name & Chuỗi ký tự & Tên tài nguyên \\ \cline{2-4}
+        & resource\_type & Chuỗi phân loại & Loại tài nguyên \\ \cline{2-4}
+        & quantity & Số nguyên & Số lượng tồn kho \\ \cline{2-4}
+        & rental\_price & Số thập phân & Giá thuê mỗi đơn vị \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái sử dụng \\ \hline
+        \multirow{6}{*}{\textbf{Maintenance}}
+        & \underline{maintenance\_id} & Số nguyên tự tăng & Mã định danh hoạt động bảo trì \\ \cline{2-4}
+        & resource\_id & Số nguyên & Tham chiếu tài nguyên được bảo trì \\ \cline{2-4}
+        & maintenance\_type & Chuỗi phân loại & Loại bảo trì (định kỳ, đột xuất) \\ \cline{2-4}
+        & scheduled\_at & Thời gian & Thời điểm dự kiến bảo trì \\ \cline{2-4}
+        & cost & Số thập phân & Chi phí bảo trì \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái bảo trì \\ \hline
+    \end{tabular}
+    \caption{Từ điển dữ liệu -- Nhóm không gian và tài nguyên}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \label{tab:data_dictionary_3}
+    \renewcommand{\arraystretch}{1.3}
+    \scriptsize
+    \begin{tabular}{|l|l|l|p{5.5cm}|}
+        \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Miền giá trị} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{7}{*}{\textbf{Service Package}}
+        & \underline{package\_id} & Số nguyên tự tăng & Mã định danh gói dịch vụ \\ \cline{2-4}
+        & provider\_id & Số nguyên & Tham chiếu nhà cung cấp tạo gói \\ \cline{2-4}
+        & name & Chuỗi ký tự & Tên gói dịch vụ \\ \cline{2-4}
+        & description & Văn bản & Mô tả nội dung gói \\ \cline{2-4}
+        & price & Số thập phân & Giá gói dịch vụ \\ \cline{2-4}
+        & duration & Số nguyên & Thời lượng sử dụng (phút) \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái gói \\ \hline
+        \multirow{7}{*}{\textbf{Promotion}}
+        & \underline{promotion\_id} & Số nguyên tự tăng & Mã định danh khuyến mãi \\ \cline{2-4}
+        & provider\_id & Số nguyên & Tham chiếu nhà cung cấp tổ chức \\ \cline{2-4}
+        & name & Chuỗi ký tự & Tên chương trình khuyến mãi \\ \cline{2-4}
+        & discount\_type & Chuỗi phân loại & Loại giảm giá (phần trăm, cố định) \\ \cline{2-4}
+        & discount\_value & Số thập phân & Giá trị giảm giá \\ \cline{2-4}
+        & start\_at & Thời gian & Thời điểm bắt đầu \\ \cline{2-4}
+        & end\_at & Thời gian & Thời điểm kết thúc \\ \hline
+    \end{tabular}
+    \caption{Từ điển dữ liệu -- Nhóm gói dịch vụ và khuyến mãi}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \label{tab:data_dictionary_4}
+    \renewcommand{\arraystretch}{1.3}
+    \scriptsize
+    \begin{tabular}{|l|l|l|p{5.5cm}|}
+        \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Miền giá trị} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{7}{*}{\textbf{Reservation}}
+        & \underline{reservation\_id} & Số nguyên tự tăng & Mã giao dịch đặt chỗ \\ \cline{2-4}
+        & user\_id & Số nguyên & Tham chiếu người dùng tạo đặt chỗ \\ \cline{2-4}
+        & package\_id & Số nguyên & Tham chiếu gói dịch vụ (tùy chọn) \\ \cline{2-4}
+        & start\_time & Thời gian & Thời gian bắt đầu sử dụng \\ \cline{2-4}
+        & end\_time & Thời gian & Thời gian kết thúc sử dụng \\ \cline{2-4}
+        & total\_amount & Số thập phân & Tổng tiền đặt chỗ \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái đặt chỗ \\ \hline
+        \multirow{6}{*}{\textbf{Payment}}
+        & \underline{payment\_id} & Số nguyên tự tăng & Mã định danh thanh toán \\ \cline{2-4}
+        & reservation\_id & Số nguyên & Tham chiếu đặt chỗ được thanh toán \\ \cline{2-4}
+        & amount & Số thập phân & Số tiền thanh toán \\ \cline{2-4}
+        & payment\_method & Chuỗi phân loại & Phương thức thanh toán \\ \cline{2-4}
+        & payment\_status & Chuỗi phân loại & Trạng thái thanh toán \\ \cline{2-4}
+        & paid\_at & Thời gian & Thời điểm thanh toán \\ \hline
+        \multirow{5}{*}{\textbf{Service Session}}
+        & \underline{session\_id} & Số nguyên tự tăng & Mã định danh phiên sử dụng \\ \cline{2-4}
+        & reservation\_id & Số nguyên & Tham chiếu đặt chỗ tương ứng \\ \cline{2-4}
+        & check\_in & Thời gian & Thời điểm bắt đầu sử dụng \\ \cline{2-4}
+        & check\_out & Thời gian & Thời điểm kết thúc sử dụng \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái phiên \\ \hline
+    \end{tabular}
+    \caption{Từ điển dữ liệu -- Nhóm giao dịch}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \label{tab:data_dictionary_5}
+    \renewcommand{\arraystretch}{1.3}
+    \scriptsize
+    \begin{tabular}{|l|l|l|p{5.5cm}|}
+        \hline
+        \textbf{Thực thể} & \textbf{Thuộc tính} & \textbf{Miền giá trị} & \textbf{Ý nghĩa} \\ \hline
+        \multirow{5}{*}{\textbf{Review}}
+        & \underline{review\_id} & Số nguyên tự tăng & Mã định danh đánh giá \\ \cline{2-4}
+        & user\_id & Số nguyên & Tham chiếu người viết đánh giá \\ \cline{2-4}
+        & reservation\_id & Số nguyên & Tham chiếu đặt chỗ được đánh giá \\ \cline{2-4}
+        & rating & Số nguyên (1--5) & Điểm đánh giá \\ \cline{2-4}
+        & comment & Văn bản & Nội dung nhận xét \\ \hline
+        \multirow{6}{*}{\textbf{Community Content}}
+        & \underline{content\_id} & Số nguyên tự tăng & Mã định danh nội dung \\ \cline{2-4}
+        & user\_id & Số nguyên & Tham chiếu người tạo nội dung \\ \cline{2-4}
+        & title & Chuỗi ký tự & Tiêu đề bài viết \\ \cline{2-4}
+        & content & Văn bản & Nội dung chi tiết \\ \cline{2-4}
+        & content\_type & Chuỗi phân loại & Loại nội dung \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái nội dung \\ \hline
+        \multirow{8}{*}{\textbf{Workshop}}
+        & \underline{workshop\_id} & Số nguyên tự tăng & Mã định danh workshop \\ \cline{2-4}
+        & organizer\_id & Số nguyên & Tham chiếu người tổ chức \\ \cline{2-4}
+        & title & Chuỗi ký tự & Tiêu đề workshop \\ \cline{2-4}
+        & topic & Chuỗi ký tự & Chủ đề \\ \cline{2-4}
+        & start\_time & Thời gian & Thời gian bắt đầu \\ \cline{2-4}
+        & end\_time & Thời gian & Thời gian kết thúc \\ \cline{2-4}
+        & capacity & Số nguyên & Sức chứa tối đa \\ \cline{2-4}
+        & price & Số thập phân & Phí tham gia \\ \hline
+        \multirow{5}{*}{\textbf{Photo}}
+        & \underline{photo\_id} & Số nguyên tự tăng & Mã định danh ảnh \\ \cline{2-4}
+        & user\_id & Số nguyên & Tham chiếu người sở hữu ảnh \\ \cline{2-4}
+        & title & Chuỗi ký tự & Tiêu đề ảnh \\ \cline{2-4}
+        & file\_url & Chuỗi ký tự & Đường dẫn tập tin ảnh \\ \cline{2-4}
+        & description & Văn bản & Mô tả ảnh \\ \hline
+        \multirow{6}{*}{\textbf{Complaint}}
+        & \underline{complaint\_id} & Số nguyên tự tăng & Mã định danh khiếu nại \\ \cline{2-4}
+        & user\_id & Số nguyên & Tham chiếu người gửi khiếu nại \\ \cline{2-4}
+        & subject & Chuỗi ký tự & Tiêu đề khiếu nại \\ \cline{2-4}
+        & description & Văn bản & Nội dung khiếu nại \\ \cline{2-4}
+        & status & Chuỗi phân loại & Trạng thái xử lý \\ \cline{2-4}
+        & resolution & Văn bản & Nội dung giải quyết \\ \hline
+    \end{tabular}
+    \caption{Từ điển dữ liệu -- Nhóm cộng đồng và hỗ trợ}
 \end{table}
 
 \subsection{Danh sách các ràng buộc nghiệp vụ}
@@ -1358,7 +1512,6 @@ Tổng hợp các quy tắc vận hành bắt buộc phải tuân thủ khi thao
 
 \begin{table}[htbp]
     \centering
-    \caption{Danh sách Ràng buộc nghiệp vụ (Business Rules)}
     \label{tab:business_rules}
     \renewcommand{\arraystretch}{1.3}
     \begin{tabular}{|c|p{3.5cm}|p{8.5cm}|}
@@ -1369,4 +1522,5 @@ Tổng hợp các quy tắc vận hành bắt buộc phải tuân thủ khi thao
         \textbf{BR3} & Ràng buộc tham gia & Một khoản thanh toán (\textbf{Payment}) bắt buộc phải tham chiếu đến đúng một \textbf{Reservation}. \\ \hline
         \textbf{BR4} & Ràng buộc số lượng & Số lượng thiết bị khách hàng đặt (thuộc tính \texttt{quantity} của mối kết hợp) không được vượt quá số lượng tồn kho của \textbf{Resource}. \\ \hline
     \end{tabular}
+    \caption{Danh sách Ràng buộc nghiệp vụ (Business Rules)}
 \end{table}
