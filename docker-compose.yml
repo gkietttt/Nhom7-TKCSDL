@@ -2,10 +2,11 @@ services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: ${CONTAINER_NAME:-sqlserver_filmphoto}
+    user: root
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "${ACCEPT_EULA:-Y}"
-      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto@2026!DB}"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto2026!DB}"
       MSSQL_PID: "${MSSQL_PID:-Developer}"
     ports:
       - "${DB_PORT:-1433}:1433"
@@ -28,17 +29,21 @@ services:
         condition: service_healthy
     restart: "no"
     environment:
-      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto@2026!DB}"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto2026!DB}"
       DB_NAME: "${DB_NAME:-FilmPhotographyDB}"
     volumes:
       - ./SQL_src:/usr/src/app/sql
     entrypoint: >
       /bin/bash -c "
+      set -e;
       echo 'Waiting for SQL Server to be ready...';
       SQLCMD='/opt/mssql-tools18/bin/sqlcmd';
       if [ ! -f $$SQLCMD ]; then SQLCMD='/opt/mssql-tools/bin/sqlcmd'; fi;
       echo 'Executing database initialization scripts...';
-      $$SQLCMD -S sqlserver -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -i /usr/src/app/sql/init_db.sql;
+      for file in /usr/src/app/sql/0*.sql; do
+        echo \"Executing $$file...\";
+        $$SQLCMD -S sqlserver -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -b -i \"$$file\";
+      done;
       echo 'Database initialization completed successfully!';
       "
 

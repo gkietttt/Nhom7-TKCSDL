@@ -5,7 +5,7 @@
 param (
     [string]$Server = "localhost,1433",
     [string]$User = "sa",
-    [string]$Password = "FilmPhoto@2026!DB"
+    [string]$Password = "FilmPhoto2026!DB"
 )
 
 $PSScriptRoot = Split-Path -Parent -MyInvocation.MyCommand.Definition

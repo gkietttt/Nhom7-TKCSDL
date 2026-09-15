@@ -5,7 +5,7 @@ set -e
 # Shell Script nạp toàn bộ Database & Seed Data vào SQL Server trong Docker
 # ============================================================================
 
-SA_PASSWORD="${SA_PASSWORD:-FilmPhoto@2026!DB}"
+SA_PASSWORD="${SA_PASSWORD:-FilmPhoto2026!DB}"
 SERVER="${DB_HOST:-localhost}"
 PORT="${DB_PORT:-1433}"
 

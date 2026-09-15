@@ -49,9 +49,9 @@ Tệp `.env` lưu trữ các thông số bảo mật và cấu hình môi trư�
 | Tên biến | Giá trị mặc định | Ý nghĩa |
 | :--- | :--- | :--- |
 | `ACCEPT_EULA` | `Y` | Đồng ý điều khoản sử dụng của Microsoft SQL Server |
-| `SA_PASSWORD` | `FilmPhoto@2026!DB` | Mật khẩu tài khoản quản trị `sa` (đáp ứng tiêu chuẩn chữ hoa, thường, số, ký tự đặc biệt) |
+| `SA_PASSWORD` | `FilmPhoto2026!DB` | Mật khẩu tài khoản quản trị `sa` (đáp ứng tiêu chuẩn chữ hoa, thường, số, ký tự đặc biệt) |
 | `MSSQL_PID` | `Developer` | Phiên bản bản quyền miễn phí đầy đủ tính năng |
-| `DB_PORT` | `1433` | Cổng kết nối TCP/IP ánh xạ ra máy host |
+| `DB_PORT` | `14333` | Cổng kết nối TCP/IP ánh xạ ra máy host |
 | `DB_NAME` | `FilmPhotographyDB` | Tên cơ sở dữ liệu chính của dự án |
 | `CONTAINER_NAME` | `sqlserver_filmphoto` | Tên của Docker Container |
 
@@ -109,10 +109,10 @@ docker compose down -v
 
 ### 4.1. Thông tin kết nối tổng quát
 
-- **Server / Host:** `localhost` hoặc `127.0.0.1` (Cổng: `1433`)
+- **Server / Host:** `localhost` hoặc `127.0.0.1` (Cổng: `14333`)
 - **Authentication:** `SQL Server Authentication`
 - **Username:** `sa`
-- **Password:** `FilmPhoto@2026!DB` (hoặc giá trị trong tệp `.env`)
+- **Password:** `FilmPhoto2026!DB` (hoặc giá trị trong tệp `.env`)
 - **Database:** `FilmPhotographyDB`
 - **Trust Server Certificate:** `True` (bắt buộc khi kết nối với SQL Server 2022)
 
@@ -122,35 +122,36 @@ docker compose down -v
 
 #### A. SQL Server Management Studio (SSMS)
 1. **Server type:** `Database Engine`
-2. **Server name:** `localhost,1433`
+2. **Server name:** `localhost,14333`
 3. **Authentication:** `SQL Server Authentication`
 4. **Login:** `sa`
-5. **Password:** `FilmPhoto@2026!DB`
+5. **Password:** `FilmPhoto2026!DB`
 6. Nhấn vào **Options >>** -> Chọn tab **Connection Properties** -> Tích chọn **Trust server certificate**.
 7. Nhấn **Connect**.
 
 #### B. Visual Studio Code (Extension: `mssql` / `SQLTools`)
 1. Cài extension **SQL Server (mssql)** của Microsoft.
 2. Thêm Connection Profile mới:
-   - `Server name`: `localhost`
+  - `Server name`: `localhost`
+  - `Port`: `14333`
    - `Database name`: `FilmPhotographyDB`
    - `Authentication Type`: `SQL Login`
    - `User name`: `sa`
-   - `Password`: `FilmPhoto@2026!DB`
+  - `Password`: `FilmPhoto2026!DB`
    - `Trust server certificate`: `Yes`
 
 #### C. DBeaver / DataGrip / Azure Data Studio
 - Driver: **Microsoft Driver**
 - Host: `localhost` | Port: `1433`
 - Database: `FilmPhotographyDB`
-- User: `sa` | Password: `FilmPhoto@2026!DB`
+- User: `sa` | Password: `FilmPhoto2026!DB`
 - Driver properties: `trustServerCertificate = true`
 
 #### D. Truy cập trực tiếp qua dòng lệnh `sqlcmd` trong Docker Container
 
 ```bash
 # Mở phiên sqlcmd tương tác trực tiếp bên trong container
-docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "FilmPhoto@2026!DB" -C -d FilmPhotographyDB
+docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "FilmPhoto2026!DB" -C -d FilmPhotographyDB
 ```
 
 ---
@@ -159,11 +160,11 @@ docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd -S localhost -
 
 - **C# / .NET (Entity Framework / ADO.NET):**
   ```text
-  Server=localhost,1433;Database=FilmPhotographyDB;User Id=sa;Password=FilmPhoto@2026!DB;TrustServerCertificate=True;
+  Server=localhost,14333;Database=FilmPhotographyDB;User Id=sa;Password=FilmPhoto2026!DB;TrustServerCertificate=True;
   ```
 - **Node.js (tedious / mssql / Prisma):**
   ```text
-  sqlserver://localhost:1433;database=FilmPhotographyDB;user=sa;password=FilmPhoto@2026!DB;encrypt=true;trustServerCertificate=true;
+  sqlserver://localhost:14333;database=FilmPhotographyDB;user=sa;password=FilmPhoto2026!DB;encrypt=true;trustServerCertificate=true;
   ```
 - **Python (pyodbc / SQLAlchemy):**
   ```text
@@ -245,7 +246,7 @@ Chạy lệnh sau để xuất file sao lưu trực tiếp vào thư mục `SQL_
 
 ```bash
 docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P "FilmPhoto@2026!DB" -C \
+  -S localhost -U sa -P "FilmPhoto2026!DB" -C \
   -Q "BACKUP DATABASE [FilmPhotographyDB] TO DISK = N'/usr/src/app/sql/FilmPhotographyDB_Backup.bak' WITH FORMAT, MEDIANAME = N'FilmPhoto_SQLServer_Backup', NAME = N'Full Backup of FilmPhotographyDB';"
 ```
 
@@ -253,7 +254,7 @@ docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd \
 
 ```bash
 docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P "FilmPhoto@2026!DB" -C \
+  -S localhost -U sa -P "FilmPhoto2026!DB" -C \
   -Q "RESTORE DATABASE [FilmPhotographyDB] FROM DISK = N'/usr/src/app/sql/FilmPhotographyDB_Backup.bak' WITH REPLACE;"
 ```
 

@@ -10,7 +10,7 @@ Repo sử dụng Microsoft SQL Server 2022 Developer chạy bằng Docker Compos
 - Docker Desktop phiên bản có Docker Compose v2
 - Windows, macOS hoặc Linux
 - Tối thiểu khoảng 4 GB RAM cấp cho Docker
-- Cổng `1433` chưa bị ứng dụng khác sử dụng
+- Cổng `14333` chưa bị ứng dụng khác sử dụng
 
 ## 2. Tải đầy đủ source code
 
@@ -43,9 +43,9 @@ Tạo hoặc kiểm tra file `.env` ở thư mục gốc:
 
 ```dotenv
 ACCEPT_EULA=Y
-SA_PASSWORD=FilmPhoto@2026!DB
+SA_PASSWORD=FilmPhoto2026!DB
 MSSQL_PID=Developer
-DB_PORT=1433
+DB_PORT=14333
 DB_NAME=FilmPhotographyDB
 CONTAINER_NAME=sqlserver_filmphoto
 ```
@@ -101,7 +101,7 @@ Thông tin mặc định:
 
 | Thuộc tính | Giá trị |
 |---|---|
-| Server | `localhost,1433` |
+| Server | `localhost,14333` |
 | Database | `FilmPhotographyDB` |
 | Authentication | SQL Server Authentication |
 | User | `sa` |
@@ -111,20 +111,20 @@ Thông tin mặc định:
 Chuỗi kết nối mẫu:
 
 ```text
-Server=localhost,1433;Database=FilmPhotographyDB;User Id=sa;Password=FilmPhoto@2026!DB;TrustServerCertificate=True;
+Server=localhost,14333;Database=FilmPhotographyDB;User Id=sa;Password=FilmPhoto2026!DB;TrustServerCertificate=True;
 ```
 
 Kết nối trực tiếp bằng `sqlcmd` trong container:
 
 ```bash
 docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd \
-  -S localhost -U sa -P "FilmPhoto@2026!DB" -C -d FilmPhotographyDB
+  -S localhost,14333 -U sa -P "FilmPhoto2026!DB" -C -d FilmPhotographyDB
 ```
 
 Trong PowerShell, dùng một dòng tương đương:
 
 ```powershell
-docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "FilmPhoto@2026!DB" -C -d FilmPhotographyDB
+docker exec -it sqlserver_filmphoto /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "FilmPhoto2026!DB" -C -d FilmPhotographyDB
 ```
 
 ## 6. Kiểm tra database
@@ -152,7 +152,7 @@ ORDER BY t.name;
 GO
 ```
 
-Kết quả mong đợi là **21 bảng** và tổng cộng **5.710 bản ghi** theo `doc/plan_db.md`.
+Kết quả mong đợi là **21 bảng** và tổng cộng **5.680 bản ghi** theo `doc/plan_db.md`.
 
 ## 7. Dừng, khởi động lại và xóa dữ liệu
 
@@ -187,7 +187,7 @@ Cần cài `sqlcmd` và bảo đảm lệnh `sqlcmd` có trong `PATH`:
 
 ```powershell
 cd SQL_src
-.\init.ps1 -Server "localhost,1433" -User "sa" -Password "FilmPhoto@2026!DB"
+.\init.ps1 -Server "localhost,14333" -User "sa" -Password "FilmPhoto2026!DB"
 ```
 
 ### Bash trên Linux/macOS
