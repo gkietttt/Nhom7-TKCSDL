@@ -1,18 +1,669 @@
 \chapter{Thiết kế vật lý}
 
 \section{Thiết kế lưu trữ vật lý}
+
+Thiết kế lưu trữ vật lý là giai đoạn chuyển đổi mô hình quan hệ logic (gồm 21 quan hệ đã chuẩn hóa đạt BCNF ở Chương 3) thành cấu trúc lưu trữ cụ thể trên hệ quản trị cơ sở dữ liệu Microsoft SQL Server 2022. Nội dung phần này phân tích cách các bản ghi được lưu trữ vật lý dưới dạng các dòng (Rows) trong các trang dữ liệu (Data Pages $8\text{ KB}$), ước lượng không gian lưu trữ và hệ số chặn dựa trên quy mô dữ liệu mẫu thực tế của dự án (\textit{Platform Connecting the Film Photography Community with Darkroom and Studio Services}), đồng thời đánh giá và lựa chọn phương thức tổ chức tập tin phù hợp với đặc thù workload của từng nhóm nghiệp vụ.
+
 \subsection{Khối và bản ghi}
+
+\subsubsection{Cơ chế ánh xạ và đơn vị lưu trữ trong SQL Server}
+
+Trong môi trường Microsoft SQL Server, các khái niệm ở mức logic được hiện thực hóa thành các cấu trúc vật lý cụ thể:
+\begin{itemize}
+    \item Mỗi \textbf{quan hệ} (Relation) được tạo thành một \textbf{bảng} (Table) trong cơ sở dữ liệu \texttt{FilmPhotographyDB}.
+    \item Mỗi \textbf{bản ghi} (Record/Tuple) tương ứng với một \textbf{dòng dữ liệu} (Data Row).
+    \item \textbf{Khối dữ liệu (Data Page):} SQL Server sử dụng trang dữ liệu có kích thước cố định $B = 8\text{ KB}$ ($8{,}192\text{ bytes}$) làm đơn vị lưu trữ và cấp phát cơ bản. Trong đó:
+    \begin{itemize}
+        \item $96\text{ bytes}$ đầu trang dành cho phần tiêu đề (\textit{Page Header}), lưu trữ các thông tin điều khiển như mã định danh trang (\texttt{PageID}), loại trang, dung lượng trống và con trỏ liên kết hai chiều.
+        \item Cuối trang là mảng con trỏ dòng (\textit{Row Offset Array}), mỗi dòng chiếm $2\text{ bytes}$ để chỉ định vị trí bắt đầu của dòng tương ứng trong trang.
+        \item Không gian khả dụng tối đa cho dữ liệu dòng thực tế trên mỗi trang là $B_{\text{usable}} \approx 8{,}060\text{ bytes}$.
+    \end{itemize}
+    \item \textbf{Extent ($64\text{ KB}$):} Tám trang dữ liệu liên tiếp ($8 \times 8\text{ KB} = 64\text{ KB}$) tạo thành một Extent. SQL Server quản lý và cấp phát không gian theo Extent để tối ưu hóa hiệu năng đọc/ghi tuần tự trên ổ đĩa.
+    \item Khi thực thi bất kỳ truy vấn nào, hệ quản trị cơ sở dữ liệu luôn nạp nguyên trang dữ liệu $8\text{ KB}$ từ đĩa vào vùng nhớ đệm (\textit{Buffer Pool}) thay vì truy xuất từng dòng riêng lẻ.
+\end{itemize}
+
+\subsubsection{Phân nhóm các bảng của dự án theo đặc điểm kích thước bản ghi}
+
+Dựa trên cấu trúc 21 bảng trong lược đồ quan hệ đã xác định ở Chương 3, các bảng của dự án được phân thành 4 nhóm kích thước và hành vi lưu trữ:
+
+\begin{enumerate}
+    \item \textbf{Nhóm bảng có kích thước bản ghi nhỏ gọn (Compact Rows):}
+    Gồm \texttt{USER}, \texttt{PAYMENT}, \texttt{SERVICE\_SESSION}, \texttt{REVIEW}, và \texttt{WORKSHOP\_REGISTRATION}. Các bảng này chủ yếu chứa các thuộc tính số nguyên \texttt{INT} ($4\text{ bytes}$), dữ liệu thời gian \texttt{DATETIME2(0)} ($6\text{ bytes}$), số tiền \texttt{DECIMAL} ($9\text{ bytes}$) và các chuỗi ngắn mã hóa. Kích thước bản ghi trung bình dao động từ $65\text{ bytes}$ đến $190\text{ bytes}$, cho phép mỗi trang $8\text{ KB}$ chứa từ 40 đến hơn 120 dòng.
+
+    \item \textbf{Nhóm bảng có bản ghi lớn do chứa nhiều văn bản mô tả (Wide/Descriptive Rows):}
+    Gồm \texttt{CREATIVE\_SPACE}, \texttt{RESOURCE}, \texttt{COMMUNITY\_CONTENT}, \texttt{WORKSHOP}, và \texttt{COMPLAINT}. Do tính chất nền tảng nhiếp ảnh analog cần lưu trữ thông số kỹ thuật (điều kiện ánh sáng, hệ thống thông gió, đặc tính âm học, hóa chất tương thích, nội dung bài viết kỹ thuật), các cột dạng \texttt{NVARCHAR} và \texttt{NVARCHAR(MAX)} làm kích thước bản ghi trung bình tăng lên $300\text{ bytes} - 550\text{ bytes}$, khiến mỗi trang chỉ chứa được khoảng $14 - 25$ dòng.
+
+    \item \textbf{Nhóm bảng giao dịch phát sinh thường xuyên (High-Volume Transaction Rows):}
+    Gồm \texttt{RESERVATION}, \texttt{PAYMENT}, \texttt{SERVICE\_SESSION}, \texttt{REVIEW}, và \texttt{COMPLAINT}. Trong đó, \texttt{RESERVATION} là bảng trung tâm phát sinh bản ghi liên tục khi Photographer đặt phòng tối và dịch vụ. Dòng dữ liệu được thiết kế tối giản để giảm số lượng trang vật lý cần đọc khi quét theo khoảng thời gian.
+
+    \item \textbf{Nhóm bảng liên kết quan hệ nhiều--nhiều (Compact Association Rows):}
+    Gồm 6 bảng trung gian: \texttt{PACKAGE\_SPACE}, \texttt{PACKAGE\_RESOURCE}, \texttt{RESERVATION\_SPACE}, \texttt{RESERVATION\_RESOURCE}, \texttt{SESSION\_RESOURCE}, và \texttt{WORKSHOP\_REGISTRATION}. Mỗi bản ghi chỉ gồm các khóa ngoại \texttt{INT} và thuộc tính số lượng \texttt{quantity} (\texttt{INT}), có kích thước rất nhỏ ($18\text{ bytes} - 24\text{ bytes}$), đạt hệ số chặn từ $300 - 450\text{ dòng/trang}$, tối ưu cho các phép kết nối bảng (\textit{JOIN}).
+\end{enumerate}
+
 \subsection{Ước lượng số khối dữ liệu}
+
+\subsubsection{Mô hình ước lượng lý thuyết}
+
+Trong lý thuyết cơ sở dữ liệu, việc ước lượng số lượng khối/trang dữ liệu cần thiết để lưu trữ một quan hệ $i$ được tính qua các công thức:
+
+\begin{itemize}
+    \item \textbf{Hệ số chặn (Blocking Factor - $bfr_i$):} Số lượng bản ghi tối đa có thể lưu trữ trong một trang $8\text{ KB}$ ($B_{\text{usable}} = 8{,}060\text{ bytes}$):
+    \[
+    bfr_i = \left\lfloor \frac{B_{\text{usable}}}{R_i} \right\rfloor
+    \]
+    với $R_i$ là kích thước trung bình của một dòng trong quan hệ $i$ (bao gồm chi phí quản lý dòng \textit{Row Header} $4\text{ bytes}$, \textit{Null Bitmap} và \textit{Column Offset Array} $\approx 14 - 22\text{ bytes}$).
+
+    \item \textbf{Số lượng trang dữ liệu lý thuyết ($b_i$):} Với quan hệ có $r_i$ bản ghi:
+    \[
+    b_i = \left\lceil \frac{r_i}{bfr_i} \right\rceil
+    \]
+
+    \item \textbf{Tổng dung lượng lưu trữ ước lượng ($S_i$):}
+    \[
+    S_i = b_i \times 8\text{ KB}
+    \]
+\end{itemize}
+
+\subsubsection{Bảng ước lượng lưu trữ chi tiết cho 21 quan hệ của dự án}
+
+Dựa trên số lượng bản ghi thực tế của bộ dữ liệu mẫu đã được nạp trong cơ sở dữ liệu SQL Server của dự án ($5{,}710$ bản ghi), bảng thống kê ước lượng lưu trữ vật lý được trình bày dưới đây:
+
+\begin{table}[htbp]
+\centering
+\caption{Ước lượng lưu trữ dữ liệu vật lý cho 21 bảng trong SQL Server}
+\label{tab:storage_estimation}
+\renewcommand{\arraystretch}{1.2}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|c|l|c|r|r|r|r|r|}
+\hline
+\textbf{STT} & \textbf{Tên bảng / Quan hệ} & \textbf{Nhóm dữ liệu} & \textbf{Số bản ghi ($r$)} & \textbf{$R$ trung bình} & \textbf{$bfr$} & \textbf{Số page ($b$)} & \textbf{Dung lượng (KB)} \\
+\hline
+1 & \texttt{USER} & Người dùng & 100 & 190 bytes & 42 & 3 & 24 KB \\
+2 & \texttt{SERVICE\_PROVIDER} & Nhà cung cấp & 20 & 330 bytes & 24 & 1 & 8 KB \\
+3 & \texttt{CREATIVE\_SPACE} & Không gian sáng tạo & 60 & 550 bytes & 14 & 5 & 40 KB \\
+4 & \texttt{RESOURCE} & Thiết bị, vật tư & 150 & 320 bytes & 25 & 6 & 48 KB \\
+5 & \texttt{MAINTENANCE} & Lịch sử bảo trì & 100 & 200 bytes & 40 & 3 & 24 KB \\
+6 & \texttt{SERVICE\_PACKAGE} & Gói dịch vụ & 60 & 240 bytes & 33 & 2 & 16 KB \\
+7 & \texttt{PROMOTION} & Khuyến mãi & 40 & 230 bytes & 35 & 2 & 16 KB \\
+8 & \texttt{RESERVATION} & Giao dịch đặt chỗ & 500 & 80 bytes & 100 & 5 & 40 KB \\
+9 & \texttt{PAYMENT} & Giao dịch thanh toán & 450 & 110 bytes & 73 & 7 & 56 KB \\
+10 & \texttt{SERVICE\_SESSION} & Phiên sử dụng & 400 & 65 bytes & 124 & 4 & 32 KB \\
+11 & \texttt{REVIEW} & Đánh giá dịch vụ & 300 & 170 bytes & 47 & 7 & 56 KB \\
+12 & \texttt{COMMUNITY\_CONTENT} & Bài viết cộng đồng & 300 & 390 bytes & 20 & 15 & 120 KB \\
+13 & \texttt{WORKSHOP} & Buổi workshop & 50 & 380 bytes & 21 & 3 & 24 KB \\
+14 & \texttt{PHOTO} & Bộ sưu tập ảnh & 500 & 270 bytes & 29 & 18 & 144 KB \\
+15 & \texttt{COMPLAINT} & Khiếu nại dịch vụ & 50 & 380 bytes & 21 & 3 & 24 KB \\
+16 & \texttt{PACKAGE\_SPACE} & Gói -- Không gian (M:N) & 120 & 18 bytes & 447 & 1 & 8 KB \\
+17 & \texttt{PACKAGE\_RESOURCE} & Gói -- Tài nguyên (M:N) & 180 & 22 bytes & 366 & 1 & 8 KB \\
+18 & \texttt{RESERVATION\_SPACE} & Đặt chỗ -- Không gian (M:N) & 600 & 18 bytes & 447 & 2 & 16 KB \\
+19 & \texttt{RESERVATION\_RESOURCE} & Đặt chỗ -- Tài nguyên (M:N) & 800 & 22 bytes & 366 & 3 & 24 KB \\
+20 & \texttt{SESSION\_RESOURCE} & Phiên -- Tài nguyên (M:N) & 600 & 22 bytes & 366 & 2 & 16 KB \\
+21 & \texttt{WORKSHOP\_REGISTRATION} & Đăng ký Workshop (M:N) & 300 & 24 bytes & 335 & 1 & 8 KB \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{5,680} & -- & -- & \textbf{94 pages} & \textbf{752 KB} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Phân biệt ước lượng lý thuyết và lưu trữ thực tế trong SQL Server}
+
+Cần phân biệt rõ giữa mô hình tính toán lý thuyết và cơ chế lưu trữ thực tế của SQL Server Engine:
+\begin{itemize}
+    \item \textbf{Cơ chế cấp phát Extent ($64\text{ KB}$):} SQL Server cấp phát không gian theo từng Extent (8 trang liên tiếp). Do đó, dung lượng cấp phát vật lý thực tế trên đĩa (\textit{Reserved Space}) thường lớn hơn dung lượng dữ liệu hữu ích (\textit{Data Space}) do chứa các trang đệm chưa dùng hết.
+    \item \textbf{Cột có độ dài biến đổi (\texttt{NVARCHAR}, \texttt{NVARCHAR(MAX)}):} Khi kích thước văn bản vượt quá $8\text{ KB}$, SQL Server tự động đẩy phần vượt quá sang các trang riêng biệt (\textit{Row-Overflow Pages} hoặc \textit{LOB Data Pages}) và lưu con trỏ tham chiếu $24\text{ bytes}$ tại trang dữ liệu gốc.
+    \item \textbf{Không gian lưu trữ chỉ mục (Index Space):} Ngoài các trang dữ liệu thuần túy, hệ thống còn cấp phát các trang trung gian để xây dựng cấu trúc cây B-Tree cho các chỉ mục Clustered và Non-Clustered.
+\end{itemize}
+
+Để đo lường dung lượng và số trang thực tế của từng bảng trong SQL Server, câu lệnh T-SQL sau được thực thi:
+
+\begin{lstlisting}[language=SQL, caption={Truy vấn đo lường lưu trữ vật lý thực tế trong SQL Server}]
+USE FilmPhotographyDB;
+GO
+
+SELECT 
+    t.name AS [TableName],
+    p.rows AS [RowCount],
+    SUM(a.total_pages) AS [TotalPages],
+    SUM(a.used_pages) AS [UsedPages],
+    SUM(a.data_pages) AS [DataPages],
+    (SUM(a.total_pages) * 8) AS [ReservedSpaceKB],
+    (SUM(a.data_pages) * 8) AS [DataSpaceKB]
+FROM sys.tables t
+INNER JOIN sys.indexes i ON t.object_id = i.object_id
+INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
+INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+WHERE t.is_ms_shipped = 0
+GROUP BY t.name, p.rows
+ORDER BY [DataSpaceKB] DESC;
+GO
+\end{lstlisting}
+
 \subsection{Lựa chọn tổ chức tập tin}
+
+\subsubsection{Phân tích đặc điểm Workload của dự án}
+
+Việc lựa chọn tổ chức tập tin cho từng bảng dựa trên tần suất và đặc thù các luồng truy xuất dữ liệu trong nền tảng:
+
+\begin{enumerate}
+    \item \textbf{Tra cứu thông tin người dùng và nhà cung cấp (\texttt{USER}, \texttt{SERVICE\_PROVIDER}):}
+    Chủ yếu là các truy vấn tìm kiếm chính xác theo điều kiện bằng trên khóa chính (\texttt{user\_id}, \texttt{provider\_id}) hoặc khóa ứng viên (\texttt{email}, \texttt{phone}). Tần suất đọc chiếm ưu thế so với thao tác ghi.
+
+    \item \textbf{Tra cứu dịch vụ của nhà cung cấp (\texttt{SERVICE\_PROVIDER}, \texttt{CREATIVE\_SPACE}, \texttt{RESOURCE}, \texttt{SERVICE\_PACKAGE}, \texttt{PROMOTION}):}
+    Đặc trưng bởi thao tác lọc đa thuộc tính (\textit{Multi-attribute filtering}): tìm phòng tối theo loại (\texttt{space\_type}), sức chứa (\texttt{capacity}), khoảng giá (\texttt{pricing}) và trạng thái; lọc thiết bị theo nhà cung cấp và loại tài nguyên (\texttt{resource\_type}).
+
+    \item \textbf{Giao dịch đặt và sử dụng dịch vụ (\texttt{RESERVATION}, \texttt{PAYMENT}, \texttt{SERVICE\_SESSION}):}
+    Nhóm bảng có khối lượng thao tác ghi (Insert/Update) cao nhất. Đặc biệt, \texttt{RESERVATION} liên tục thực hiện truy vấn kiểm tra trùng lịch theo khoảng thời gian (\textit{Time-range queries}: $\texttt{start\_time} \le T \le \texttt{end\_time}$) để tránh xung đột tài nguyên. Bảng \texttt{PAYMENT} và \texttt{SERVICE\_SESSION} có quan hệ $1:1$ với \texttt{RESERVATION}, đòi hỏi truy xuất tức thời theo \texttt{reservation\_id}.
+
+    \item \textbf{Quản lý bảo trì (\texttt{MAINTENANCE}):}
+    Thường xuyên truy vấn theo thời gian dự kiến (\texttt{scheduled\_at}) để kiểm tra danh sách thiết bị đang bảo trì nhằm tạm khóa khả năng cho thuê của tài nguyên.
+
+    \item \textbf{Hoạt động cộng đồng và đánh giá (\texttt{COMMUNITY\_CONTENT}, \texttt{PHOTO}, \texttt{WORKSHOP}, \texttt{WORKSHOP\_REGISTRATION}, \texttt{REVIEW}, \texttt{COMPLAINT}):}
+    Đặc trưng bởi thao tác hiển thị danh sách bài viết/ảnh mới nhất sắp xếp theo thời gian (\texttt{created\_at} DESC), tra cứu workshop theo ngày diễn ra (\texttt{start\_time}) hoặc tra cứu các khiếu nại chưa xử lý (\texttt{status = 'Open'}).
+
+    \item \textbf{Các quan hệ nhiều--nhiều (Intermediate Relations):}
+    Truy xuất hoàn toàn dựa trên phép kết nối (\textit{Equi-Join}) thông qua các khóa ngoại ghép, ví dụ: kiểm tra danh sách tài nguyên trong gói dịch vụ (\texttt{PACKAGE\_RESOURCE}) hoặc danh sách không gian của một lần đặt chỗ (\texttt{RESERVATION\_SPACE}).
+\end{enumerate}
+
 \subsection{Heap, Sorted và Hash}
 
+\subsubsection{So sánh tổng quan ba phương thức tổ chức tập tin kinh điển}
+
+\begin{table}[htbp]
+\centering
+\caption{So sánh các phương thức tổ chức tập tin và mức độ phù hợp với dự án}
+\label{tab:file_org_comparison}
+\renewcommand{\arraystretch}{1.3}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{2.2cm}|p{3.1cm}|p{3.1cm}|p{3.1cm}|}
+\hline
+\textbf{Tiêu chí} & \textbf{Heap File} & \textbf{Sorted File} & \textbf{Hash File} \\
+\hline
+\textbf{Thứ tự lưu trữ} &
+Không duy trì thứ tự logic cố định; bản ghi mới được chèn vào vị trí trống bất kỳ hoặc cuối tập tin. &
+Các bản ghi được sắp xếp vật lý liên tục theo giá trị của một khóa sắp xếp (\textit{Sort Key}). &
+Vị trí khối được tính toán trực tiếp qua hàm băm $h(K) \rightarrow \text{Address}$. \\
+\hline
+\textbf{Tìm kiếm bằng khóa ($= K$)} &
+Kém hiệu quả; phải quét tuần tự toàn bộ tập tin ($O(b)$ I/O) nếu không có cấu trúc chỉ mục phụ trợ. &
+Rất hiệu quả; có thể áp dụng tìm kiếm nhị phân trên các khối dữ liệu ($O(\log_2 b)$ I/O). &
+Tối ưu tuyệt đối; thời gian truy xuất lý thuyết xấp xỉ $O(1)$ I/O nếu phân bố đều. \\
+\hline
+\textbf{Truy vấn theo khoảng ($K_1 \le X \le K_2$)} &
+Không hỗ trợ; bắt buộc phải quét toàn bộ bảng ($O(b)$). &
+Cực kỳ tối ưu; chỉ cần tìm điểm bắt đầu rồi đọc tuần tự các khối kế tiếp ($O(\log_2 b + \text{kết quả})$). &
+Không hỗ trợ; hàm băm phân tán giá trị ngẫu nhiên, không bảo toàn thứ tự. \\
+\hline
+\textbf{Chi phí thêm mới (Insert)} &
+Rất nhanh ($O(1)$ I/O); chỉ cần tìm trang có sẵn không gian trống (\textit{PFS Page}) và ghi vào. &
+Tốn kém; phải dịch chuyển các bản ghi phía sau để chèn đúng vị trí hoặc sử dụng vùng tràn (\textit{Overflow Area}). &
+Rất nhanh ($O(1)$ I/O) nếu không xảy ra xung đột địa chỉ băm (\textit{Collision}). \\
+\hline
+\textbf{Mức phù hợp với dự án} &
+Phù hợp cho bảng log ghi chép đơn thuần, bảng có kích thước nhỏ ít bản ghi. &
+Cần thiết cho các bảng giao dịch thời gian (\texttt{RESERVATION}, \texttt{WORKSHOP}, \texttt{MAINTENANCE}). &
+Chỉ phù hợp về mặt lý thuyết với tra cứu khóa định danh đơn lẻ (\texttt{user\_id}, \texttt{provider\_id}). \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Phân tích phương thức Heap trong dự án và cơ chế SQL Server}
+
+\paragraph{a. Đặc điểm lý thuyết:}
+Heap File cho phép thao tác ghi dữ liệu đạt tốc độ tối đa vì hệ quản trị không mất chi phí tính toán vị trí hay tái cấu trúc dữ liệu. Tuy nhiên, thao tác đọc dữ liệu có điều kiện bắt buộc phải quét qua toàn bộ các trang dữ liệu (\textit{Table Scan}), gây lãng phí bộ nhớ đệm và băng thông I/O.
+
+\paragraph{b. Hiện thực trong SQL Server:}
+Trong SQL Server, một bảng không có Clustered Index được gọi là một \textbf{Heap Table}. SQL Server quản lý Heap thông qua hai cấu trúc trang:
+\begin{itemize}
+    \item \textbf{Page Free Space (PFS):} Theo dõi tỷ lệ phần trăm không gian còn trống của từng trang để cấp phát nhanh cho các thao tác \texttt{INSERT}.
+    \item \textbf{Index Allocation Map (IAM):} Quản lý danh sách tất cả các Extent thuộc về bảng Heap để phục vụ việc quét tuần tự.
+\end{itemize}
+
+\paragraph{c. Đánh giá áp dụng cho dự án:}
+Mặc dù dữ liệu mẫu hiện tại của dự án có quy mô vừa phải ($5{,}710$ bản ghi, dung lượng ước lượng $\approx 704\text{ KB}$), việc để các bảng dưới dạng Heap thuần túy chỉ chấp nhận được ở các bảng có kích thước cực nhỏ như \texttt{SERVICE\_PROVIDER} ($20\text{ dòng} \approx 1\text{ page}$) hoặc \texttt{PACKAGE\_SPACE} ($120\text{ dòng} \approx 1\text{ page}$). Đối với các bảng nghiệp vụ chính, cấu trúc Heap dễ phát sinh hiện tượng chuyển tiếp bản ghi (\textit{Forwarded Records}) khi các cột \texttt{NVARCHAR} được cập nhật dài hơn, gây phân mảnh dữ liệu.
+
+\subsubsection{Phân tích phương thức Sorted và cơ chế Clustered Index trong SQL Server}
+
+\paragraph{a. Đặc điểm lý thuyết:}
+Sorted File mang lại hiệu quả vượt trội cho các truy vấn lọc theo khoảng giá trị hoặc khoảng thời gian. Trong nền tảng nhiếp ảnh phim, các truy vấn cốt lõi đều mang bản chất có thứ tự:
+\begin{itemize}
+    \item Kiểm tra lịch đặt phòng tối: \texttt{start\_time} và \texttt{end\_time} trong \texttt{RESERVATION}.
+    \item Lọc lịch bảo trì thiết bị: \texttt{scheduled\_at} trong \texttt{MAINTENANCE}.
+    \item Hiển thị danh sách workshop sắp diễn ra: \texttt{start\_time} trong \texttt{WORKSHOP}.
+    \item Dòng thời gian bài viết cộng đồng: \texttt{created\_at} trong \texttt{COMMUNITY\_CONTENT}.
+\end{itemize}
+
+\paragraph{b. Hiện thực trong SQL Server:}
+Cần nhấn mạnh rằng trong SQL Server disk-based tables, \textbf{không tồn tại một loại tệp riêng biệt gọi là "Sorted File" được cấu hình thủ công}. Thay vào đó, SQL Server hiện thực hóa mô hình dữ liệu có thứ tự thông qua \textbf{Clustered Index (Chỉ mục cụm dựa trên cây B+ Tree)}:
+\begin{itemize}
+    \item Các trang dữ liệu ở mức lá (\textit{Leaf Level}) của Clustered Index chính là các trang chứa dữ liệu thực tế của bảng.
+    \item Các trang lá được liên kết đôi (\textit{Doubly Linked List}) theo đúng thứ tự logic của khóa chỉ mục cụm (\textit{Clustering Key}).
+    \item Các mức chỉ mục trung gian (\textit{Root và Intermediate Levels}) tạo thành cây B+ Tree cho phép định vị nhanh trang chứa dữ liệu với chi phí $O(\log_B N)$ I/O.
+    \item Khi khai báo khóa chính \texttt{PRIMARY KEY} trong câu lệnh \texttt{CREATE TABLE}, SQL Server tự động tạo Clustered Index trên cột khóa chính này (mặc định), biến bảng thành cấu trúc Clustered Table.
+\end{itemize}
+
+\paragraph{c. Đánh giá áp dụng cho dự án:}
+Tất cả 21 bảng trong dự án đều được tổ chức dưới dạng Clustered Tables dựa trên khóa chính:
+\begin{itemize}
+    \item Đối với 15 bảng thực thể chính: Khóa chính dạng \texttt{IDENTITY(1,1)} tăng dần đơn điệu (\texttt{user\_id}, \texttt{reservation\_id},...) giúp loại bỏ hoàn toàn hiện tượng phân tách trang (\textit{Page Split}) khi chèn dữ liệu mới, đảm bảo các trang dữ liệu luôn được lấp đầy tối đa ($\approx 100\%$).
+    \item Đối với 6 bảng quan hệ nhiều--nhiều: Khóa chính ghép (ví dụ \texttt{(package\_id, space\_id)}) đóng vai trò khóa cụm, giúp gom cụm các dòng liên quan về mặt vật lý trên cùng một trang dữ liệu, tối ưu hóa triệt để thao tác kết nối bảng.
+\end{itemize}
+
+\subsubsection{Phân tích phương thức Hash và đối chiếu với SQL Server}
+
+\paragraph{a. Đặc điểm lý thuyết:}
+Hash File sử dụng hàm băm toán học để ánh xạ trực tiếp giá trị khóa thành địa chỉ khối vật lý. Phương thức này cực kỳ tối ưu cho các thao tác tìm kiếm chính xác theo giá trị bằng ($= K$), chẳng hạn như tìm kiếm người dùng theo \texttt{user\_id} hay tìm thiết bị theo \texttt{resource\_id}.
+
+Tuy nhiên, Hash File bộc lộ các nhược điểm chí mạng:
+\begin{itemize}
+    \item Hoàn toàn không thể hỗ trợ các truy vấn tìm kiếm theo khoảng (Range Queries) hoặc sắp xếp (Order By) --- vốn là yêu cầu sống còn của hệ thống đặt phòng và workshop.
+    \item Khi số lượng bản ghi tăng trưởng vượt quá sức chứa ban đầu, hiện tượng xung đột băm gia tăng khiến hệ thống phải duyệt qua các chuỗi khối tràn (\textit{Overflow Buckets}), làm suy giảm hiệu năng nghiêm trọng.
+\end{itemize}
+
+\paragraph{b. Hiện thực trong SQL Server:}
+Trong hệ quản trị SQL Server truyền thống (Disk-Based Database Engine):
+\begin{itemize}
+    \item \textbf{Không hỗ trợ tổ chức tập tin dạng Hash Table trên đĩa.} Mọi bảng lưu trữ trên đĩa chỉ có thể là Heap hoặc Clustered Index (B+ Tree).
+    \item Cơ chế \textbf{Hash Index} chỉ xuất hiện trong tính năng \textbf{In-Memory OLTP (Memory-Optimized Tables)} của SQL Server, nơi dữ liệu được lưu hoàn toàn trên RAM và sử dụng mảng con trỏ xô (\textit{Hash Bucket Array}) không sử dụng trang $8\text{ KB}$.
+\end{itemize}
+
+\paragraph{c. Đánh giá áp dụng cho dự án:}
+Do nền tảng sử dụng mô hình cơ sở dữ liệu quan hệ truyền thống trên đĩa (Disk-based SQL Server), cấu trúc Hash File ở mức tổ chức tập tin không được áp dụng trực tiếp. Thay vào đó, nhu cầu tìm kiếm nhanh theo khóa bằng sẽ được giải quyết triệt để thông qua Clustered Index và Non-Clustered B-Tree Indexes.
+
+\subsubsection{Kết luận lựa chọn thiết kế lưu trữ vật lý cho dự án}
+
+Từ các phân tích chuyên sâu ở trên, thiết kế lưu trữ vật lý cho nền tảng \textit{Platform Connecting the Film Photography Community with Darkroom and Studio Services} đi đến các quyết định kỹ thuật thống nhất:
+
+\begin{enumerate}
+    \item \textbf{Không áp dụng một phương thức duy nhất cho toàn bộ hệ thống:} Việc tổ chức lưu trữ được phân hóa rõ ràng theo bản chất workload của từng nhóm bảng.
+    \item \textbf{Cấu trúc bảng chuẩn hóa trên Clustered B-Tree Table:} Toàn bộ 21 quan hệ được tổ chức dưới dạng bảng có chỉ mục cụm (Clustered Tables) với khóa cụm là khóa chính tăng dần \texttt{IDENTITY} (cho bảng thực thể) hoặc khóa ngoại ghép (cho bảng trung gian), đảm bảo cân bằng tối ưu giữa tốc độ ghi mới và tốc độ truy xuất điểm.
+    \item \textbf{Bổ sung Non-Clustered Indexes cho các thuộc tính thời gian và khóa ngoại:} Để bù đắp cho việc khóa cụm đã được đặt trên khóa chính, các truy vấn tìm kiếm theo khoảng thời gian (\texttt{RESERVATION.start\_time}, \texttt{WORKSHOP.start\_time}) và các thao tác kết nối theo nhà cung cấp (\texttt{CREATIVE\_SPACE.provider\_id}, \texttt{RESOURCE.provider\_id}) sẽ được hỗ trợ toàn diện bằng các chỉ mục không cụm (Non-Clustered Indexes) được trình bày chi tiết ở phần tiếp theo.
+\end{enumerate}
+
+
 \section{Thiết kế chỉ mục}
+
+Thiết kế chỉ mục là một nội dung của thiết kế mức vật lý, được thực hiện
+dựa trên lược đồ logic đã được xác định ở các chương trước và hệ quản trị cơ
+sở dữ liệu được lựa chọn. Trong dự án, hệ thống được triển khai trên
+Microsoft SQL Server 2022.
+
+Mục tiêu của thiết kế chỉ mục là giảm chi phí truy xuất dữ liệu đối với các
+truy vấn thường xuyên, đặc biệt là các truy vấn tìm kiếm, lọc, kết nối giữa
+các quan hệ và truy xuất dữ liệu theo thời gian.
+
+Các chỉ mục được thiết kế dựa trên các quan hệ và thuộc tính đã tồn tại
+trong lược đồ logic. Không tạo thêm thực thể hoặc thuộc tính mới nhằm phục
+vụ việc xây dựng chỉ mục.
+
+Trong script triển khai vật lý, hệ thống sử dụng các Nonclustered Index,
+bao gồm chỉ mục trên một thuộc tính, chỉ mục kết hợp trên nhiều thuộc tính
+và các chỉ mục có sử dụng mệnh đề \texttt{INCLUDE} để hỗ trợ truy vấn.
+
 \subsection{Xác định nhu cầu sử dụng chỉ mục}
+
+Nhu cầu sử dụng chỉ mục được xác định từ các nghiệp vụ chính của hệ thống
+và các quan hệ đã được xác định ở thiết kế mức logic.
+
+Các nhóm truy xuất chính gồm:
+
+\begin{enumerate}
+	\item Truy xuất bản ghi theo khóa chính.
+	\item Truy xuất dữ liệu thông qua khóa ngoại.
+	\item Tìm kiếm và lọc Creative Space theo loại và trạng thái.
+	\item Tìm kiếm và lọc Resource theo loại và trạng thái.
+	\item Truy xuất Maintenance theo Resource và thời gian bảo trì.
+	\item Truy xuất Service Package theo Service Provider và trạng thái.
+	\item Truy xuất Promotion theo Service Provider và khoảng thời gian.
+	\item Truy xuất Reservation theo User, Service Package và thời gian.
+	\item Truy xuất Payment theo trạng thái và thời gian thanh toán.
+	\item Truy xuất Service Session theo thời gian check-in và trạng thái.
+	\item Truy xuất Review theo User hoặc rating.
+	\item Truy xuất Community Content theo User, loại, trạng thái và thời gian.
+	\item Truy xuất Workshop theo người tổ chức, thời gian và trạng thái.
+	\item Truy xuất Photo theo User và thời gian tạo.
+	\item Truy xuất Complaint theo User và trạng thái.
+	\item Truy xuất các quan hệ trung gian thông qua các khóa được liên kết.
+\end{enumerate}
+
+Các nhu cầu trên được sử dụng làm cơ sở để lựa chọn thuộc tính khóa của
+chỉ mục. Những thuộc tính thường xuyên xuất hiện trong điều kiện
+\texttt{WHERE}, \texttt{JOIN}, lọc theo khoảng hoặc kết hợp nhiều điều kiện
+được ưu tiên xem xét xây dựng chỉ mục.
+
 \subsection{Chỉ mục Clustered/Nonclustered}
+
+Trong SQL Server, Clustered Index tổ chức dữ liệu của bảng theo thứ tự của
+khóa chỉ mục, trong khi Nonclustered Index được tổ chức riêng với dữ liệu
+bảng và chứa các khóa dùng để tìm kiếm cùng thông tin tham chiếu đến dữ liệu.
+
+Trong phạm vi triển khai của hệ thống, script vật lý sử dụng Nonclustered
+Index để phục vụ các workload tìm kiếm, lọc và JOIN.
+
+Các chỉ mục Nonclustered được xây dựng trên các khóa ngoại thường xuyên được
+sử dụng trong JOIN, chẳng hạn:
+
+\begin{itemize}
+	\item \texttt{CREATIVE\_SPACE.provider\_id}.
+	\item \texttt{RESOURCE.provider\_id}.
+	\item \texttt{MAINTENANCE.resource\_id}.
+	\item \texttt{SERVICE\_PACKAGE.provider\_id}.
+	\item \texttt{PROMOTION.provider\_id}.
+	\item \texttt{RESERVATION.user\_id}.
+	\item \texttt{RESERVATION.package\_id}.
+	\item \texttt{REVIEW.user\_id}.
+	\item \texttt{COMMUNITY\_CONTENT.user\_id}.
+	\item \texttt{WORKSHOP.organizer\_id}.
+	\item \texttt{PHOTO.user\_id}.
+\end{itemize}
+
+Ngoài các chỉ mục trên khóa ngoại, hệ thống sử dụng Nonclustered Index cho
+các workload lọc và tìm kiếm. Một số chỉ mục tiêu biểu gồm:
+
+\begin{itemize}
+	\item \texttt{IX\_SERVICE\_PROVIDER\_Status}.
+	\item \texttt{IX\_SERVICE\_PACKAGE\_Status}.
+	\item \texttt{IX\_REVIEW\_Rating}.
+	\item \texttt{IX\_RESERVATION\_UserId}.
+	\item \texttt{IX\_RESERVATION\_PackageId}.
+\end{itemize}
+
+Các chỉ mục trên được tạo bằng lệnh \texttt{CREATE NONCLUSTERED INDEX}
+trong script triển khai vật lý.
+
+Hệ thống không tạo thêm Clustered Index riêng trong script
+\texttt{03\_create\_constraints\_and\_indexes.sql}. Vì vậy, phần triển khai
+hiện tại tập trung vào Nonclustered Index.
+
 \subsection{Chỉ mục B+}
+
+Các Rowstore Index trong SQL Server sử dụng cấu trúc cây B+ để tổ chức các
+mức của chỉ mục. Cấu trúc này gồm nút gốc, các nút trung gian và mức lá,
+giúp thực hiện tìm kiếm theo khóa hiệu quả.
+
+B+ tree phù hợp với các truy vấn tìm kiếm theo giá trị, truy vấn so sánh,
+truy vấn theo khoảng và truy vấn yêu cầu dữ liệu có thứ tự.
+
+Trong hệ thống, các chỉ mục liên quan đến thời gian là những trường hợp
+phù hợp với đặc điểm này.
+
+Đối với \texttt{RESERVATION}, hệ thống xây dựng:
+
+\begin{verbatim}
+	IX_RESERVATION_TimeRange
+	(start_time, end_time, status)
+\end{verbatim}
+
+Chỉ mục này hỗ trợ các truy vấn liên quan đến thời gian đặt chỗ và trạng
+thái Reservation.
+
+Đối với \texttt{MAINTENANCE}, hệ thống xây dựng:
+
+\begin{verbatim}
+	IX_MAINTENANCE_Scheduled_Status
+	(scheduled_at, status)
+\end{verbatim}
+
+Chỉ mục này hỗ trợ truy xuất lịch bảo trì theo thời gian và trạng thái.
+
+Đối với \texttt{PROMOTION}, hệ thống xây dựng:
+
+\begin{verbatim}
+	IX_PROMOTION_DateRange
+	(start_at, end_at, status)
+\end{verbatim}
+
+Chỉ mục này phục vụ các truy vấn lọc Promotion theo khoảng thời gian và
+trạng thái.
+
+Đối với \texttt{WORKSHOP}, hệ thống xây dựng:
+
+\begin{verbatim}
+	IX_WORKSHOP_Time_Status
+	(start_time, end_time, status)
+\end{verbatim}
+
+Chỉ mục hỗ trợ truy xuất Workshop theo thời gian và trạng thái.
+
+Ngoài ra, các chỉ mục như:
+
+\begin{verbatim}
+	IX_PHOTO_UserId
+	(user_id, created_at)
+\end{verbatim}
+
+cũng tận dụng khả năng tìm kiếm theo thứ tự của cấu trúc cây để hỗ trợ
+truy xuất Photo của một User theo thời gian tạo.
+
+Như vậy, B+ tree được sử dụng ở đây không phải là một loại chỉ mục riêng
+được tạo bằng một câu lệnh ``CREATE B+ INDEX'', mà là cấu trúc dữ liệu nền
+tảng của các Rowstore Index được triển khai trong SQL Server.
+
 \subsection{Chỉ mục Hash}
+
+Hash Index phù hợp với các truy vấn tìm kiếm chính xác theo giá trị bằng,
+trong khi không phù hợp với các truy vấn yêu cầu sắp xếp hoặc tìm kiếm theo
+khoảng.
+
+Trong thiết kế vật lý hiện tại, hệ thống không triển khai Hash Index.
+Các chỉ mục trong script \texttt{03\_create\_constraints\_and\_indexes.sql}
+đều được tạo dưới dạng Nonclustered Index.
+
+Lý do lựa chọn Nonclustered Index thay vì Hash Index là workload của hệ
+thống không chỉ bao gồm tìm kiếm bằng mà còn có các truy vấn lọc theo
+trạng thái, truy vấn theo thời gian, truy vấn theo khoảng và các truy vấn
+kết hợp nhiều thuộc tính.
+
+Ví dụ, các workload trên:
+
+\begin{itemize}
+	\item \texttt{RESERVATION.start\_time}.
+	\item \texttt{RESERVATION.end\_time}.
+	\item \texttt{MAINTENANCE.scheduled\_at}.
+	\item \texttt{PROMOTION.start\_at}.
+	\item \texttt{WORKSHOP.start\_time}.
+\end{itemize}
+
+có nhu cầu truy xuất theo thứ tự hoặc khoảng thời gian nên cấu trúc
+B+ tree của Rowstore Index phù hợp hơn.
+
+Do đó, Hash Index được giữ ở mức phân tích và so sánh, không phải là thành
+phần được triển khai trong cơ sở dữ liệu hiện tại.
+
 \subsection{Chỉ mục kết hợp}
+
+Chỉ mục kết hợp là chỉ mục có nhiều thuộc tính khóa. Trong hệ thống, các
+chỉ mục kết hợp được sử dụng khi nhiều thuộc tính thường xuyên xuất hiện
+cùng nhau trong điều kiện truy vấn.
+
+Các chỉ mục kết hợp được triển khai gồm:
+
+\begin{table}[H]
+	\centering
+	\caption{Các chỉ mục kết hợp được triển khai}
+	\label{tab:composite_indexes}
+	\renewcommand{\arraystretch}{1.2}
+	\scriptsize
+	\begin{tabular}{|p{4.0cm}|p{5.5cm}|}
+		\hline
+		\textbf{Chỉ mục} & \textbf{Các thuộc tính khóa} \\
+		\hline
+		\texttt{IX\_USER\_Role\_Status} &
+		\texttt{(role, status)} \\
+		\hline
+		\texttt{IX\_CREATIVE\_SPACE\_Type\_Status} &
+		\texttt{(space\_type, status)} \\
+		\hline
+		\texttt{IX\_RESOURCE\_Type\_Status} &
+		\texttt{(resource\_type, status)} \\
+		\hline
+		\texttt{IX\_MAINTENANCE\_Scheduled\_Status} &
+		\texttt{(scheduled\_at, status)} \\
+		\hline
+		\texttt{IX\_PROMOTION\_DateRange} &
+		\texttt{(start\_at, end\_at, status)} \\
+		\hline
+		\texttt{IX\_RESERVATION\_TimeRange} &
+		\texttt{(start\_time, end\_time, status)} \\
+		\hline
+		\texttt{IX\_PAYMENT\_Status} &
+		\texttt{(payment\_status, paid\_at)} \\
+		\hline
+		\texttt{IX\_SERVICE\_SESSION\_CheckIn} &
+		\texttt{(check\_in, status)} \\
+		\hline
+		\texttt{IX\_COMMUNITY\_CONTENT\_Type\_Status} &
+		\texttt{(content\_type, status, created\_at)} \\
+		\hline
+		\texttt{IX\_WORKSHOP\_Time\_Status} &
+		\texttt{(start\_time, end\_time, status)} \\
+		\hline
+		\texttt{IX\_PHOTO\_UserId} &
+		\texttt{(user\_id, created\_at)} \\
+		\hline
+		\texttt{IX\_COMPLAINT\_UserId\_Status} &
+		\texttt{(user\_id, status)} \\
+		\hline
+	\end{tabular}
+\end{table}
+
+Các thuộc tính được khai báo trong mệnh đề \texttt{INCLUDE} không được
+xem là thuộc tính khóa của chỉ mục kết hợp. Chúng được lưu bổ sung ở mức
+lá của Nonclustered Index nhằm hỗ trợ truy vấn và hạn chế việc phải truy
+xuất lại dữ liệu từ bảng.
+
+Ví dụ:
+
+\begin{verbatim}
+	IX_RESERVATION_TimeRange
+	(start_time, end_time, status)
+\end{verbatim}
+
+là chỉ mục kết hợp gồm ba thuộc tính khóa.
+
+Trong khi đó:
+
+\begin{verbatim}
+	IX_USER_Role_Status
+	(role, status)
+	INCLUDE (full_name, email)
+\end{verbatim}
+
+có hai thuộc tính khóa là \texttt{role} và \texttt{status}; 
+\texttt{full\_name} và \texttt{email} chỉ là các thuộc tính được INCLUDE.
+
+Thứ tự thuộc tính trong chỉ mục kết hợp được giữ theo thiết kế triển khai,
+vì thứ tự này ảnh hưởng đến khả năng tận dụng chỉ mục khi thực hiện truy
+vấn.
+
 \subsection{Lựa chọn chỉ mục theo workload}
+
+Việc lựa chọn chỉ mục được thực hiện dựa trên workload của hệ thống thay vì
+tạo chỉ mục trên tất cả các thuộc tính.
+
+Các workload và chỉ mục tương ứng được tổng hợp như sau:
+
+\begin{table}[H]
+	\centering
+	\caption{Lựa chọn chỉ mục theo workload}
+	\label{tab:index_workload}
+	\renewcommand{\arraystretch}{1.2}
+	\scriptsize
+	\begin{tabular}{|p{4.0cm}|p{4.2cm}|p{4.0cm}|}
+		\hline
+		\textbf{Workload} &
+		\textbf{Chỉ mục} &
+		\textbf{Mục đích} \\
+		\hline
+		
+		Tìm User theo role và status &
+		\texttt{IX\_USER\_Role\_Status} &
+		Lọc User theo role và status. \\
+		\hline
+		
+		Tìm Creative Space theo provider &
+		\texttt{IX\_CREATIVE\_SPACE\_ProviderId} &
+		Hỗ trợ truy xuất Space thuộc Provider. \\
+		\hline
+		
+		Tìm Creative Space theo loại và trạng thái &
+		\texttt{IX\_CREATIVE\_SPACE\_Type\_Status} &
+		Lọc Space theo loại và trạng thái. \\
+		\hline
+		
+		Tìm Resource theo Provider &
+		\texttt{IX\_RESOURCE\_ProviderId} &
+		Hỗ trợ truy xuất Resource thuộc Provider. \\
+		\hline
+		
+		Tìm Resource theo loại và trạng thái &
+		\texttt{IX\_RESOURCE\_Type\_Status} &
+		Lọc Resource theo loại và trạng thái. \\
+		\hline
+		
+		Truy xuất Reservation của User &
+		\texttt{IX\_RESERVATION\_UserId} &
+		Tìm Reservation theo User. \\
+		\hline
+		
+		Truy xuất Reservation theo Package &
+		\texttt{IX\_RESERVATION\_PackageId} &
+		Tìm Reservation theo Service Package. \\
+		\hline
+		
+		Truy xuất Reservation theo thời gian &
+		\texttt{IX\_RESERVATION\_TimeRange} &
+		Lọc theo thời gian và trạng thái. \\
+		\hline
+		
+		Truy xuất Payment theo trạng thái và thời gian &
+		\texttt{IX\_PAYMENT\_Status} &
+		Lọc Payment theo trạng thái và thời gian thanh toán. \\
+		\hline
+		
+		Truy xuất Workshop theo thời gian &
+		\texttt{IX\_WORKSHOP\_Time\_Status} &
+		Lọc Workshop theo thời gian và trạng thái. \\
+		\hline
+		
+		Truy xuất Community Content &
+		\texttt{IX\_COMMUNITY\_CONTENT\_Type\_Status} &
+		Lọc nội dung theo loại, trạng thái và thời gian. \\
+		\hline
+		
+		Truy xuất Photo của User &
+		\texttt{IX\_PHOTO\_UserId} &
+		Tìm Photo của User theo thời gian tạo. \\
+		\hline
+		
+		Truy xuất Complaint của User &
+		\texttt{IX\_COMPLAINT\_UserId\_Status} &
+		Lọc Complaint theo User và trạng thái. \\
+		\hline
+	\end{tabular}
+\end{table}
+
+Các chỉ mục trên được lựa chọn nhằm hỗ trợ các workload có tần suất truy
+xuất cao hoặc có điều kiện lọc nhiều thuộc tính. Các khóa ngoại được lập
+chỉ mục nhằm hỗ trợ các phép JOIN và truy xuất dữ liệu liên quan.
+
+Bên cạnh lợi ích về tốc độ truy xuất, chỉ mục cũng tạo ra chi phí lưu trữ
+và chi phí duy trì khi thực hiện \texttt{INSERT}, \texttt{UPDATE} và
+\texttt{DELETE}. Vì vậy, hệ thống không tạo chỉ mục trên tất cả các thuộc
+tính.
+
+Đặc biệt, các chỉ mục kết hợp được lựa chọn khi các thuộc tính thường xuyên
+xuất hiện cùng nhau trong workload. Các thuộc tính thời gian được ưu tiên
+sử dụng trong các chỉ mục phục vụ truy vấn theo khoảng hoặc thứ tự.
+
+Kết quả thiết kế chỉ mục được hiện thực trong script
+\texttt{03\_create\_constraints\_and\_indexes.sql}. Script đã tạo thành công
+các Nonclustered Index cùng với các ràng buộc CHECK của hệ thống trong quá
+trình khởi tạo cơ sở dữ liệu.
+
+
+
 
 \section{Phân vùng dữ liệu}
 
@@ -74,7 +725,7 @@ Quan hệ \texttt{CREATIVE\_SPACE} có nhiều thuộc tính mô tả chi tiết
 
 \textbf{Phân vùng dọc quan hệ \texttt{COMMUNITY\_CONTENT}:}
 
-Tương tự, quan hệ \texttt{COMMUNITY\_CONTENT} có thể tách thành:
+Quan hệ \texttt{COMMUNITY\_CONTENT} có thể tách thành:
 
 \begin{itemize}
     \item \texttt{CONTENT\_META}(\underline{\texttt{content\_id}}, \texttt{user\_id}, \texttt{title}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at}): metadata thường dùng trong danh sách.
@@ -156,7 +807,7 @@ Các truy vấn có tần suất cao và ảnh hưởng trực tiếp đến tr�
 
 Cây truy vấn (query tree) biểu diễn truy vấn dưới dạng cây đại số quan hệ, với các lá là các quan hệ và các nút trong là các phép toán.
 
-\textbf{Ví dụ — Truy vấn kiểm tra khả dụng Creative Space:}
+\textbf{Ví dụ -- Truy vấn kiểm tra khả dụng Creative Space:}
 
 \begin{verbatim}
 SELECT cs.space_id, cs.name, cs.pricing
@@ -179,7 +830,7 @@ WHERE cs.space_type = 'darkroom'
     \item \textbf{Đẩy phép chọn xuống sớm nhất có thể (Push Selection Down):} Áp dụng điều kiện \texttt{space\_type = 'darkroom'} và \texttt{status = 'active'} ngay khi quét \texttt{CREATIVE\_SPACE}, giảm số bộ cần xử lý ở các bước tiếp theo.
     \item \textbf{Đẩy phép chiếu xuống (Push Projection Down):} Chỉ giữ lại các thuộc tính cần thiết (\texttt{space\_id}, \texttt{name}, \texttt{pricing}) sau phép chọn.
     \item \textbf{Kết hợp các phép chọn liên tiếp:} Gộp nhiều điều kiện \texttt{WHERE} vào một phép chọn duy nhất.
-    \item \textbf{Thay thế tích Đề-các bằng kết nối:} Biểu diễn kết nối giữa \texttt{RESERVATION\_SPACE} và \texttt{RESERVATION} dưới dạng phép kết nối (join) thay vì tích Đề-các kèm phép chọn.
+    \item \textbf{Thay thế tích Đề-các bằng kết nối:} Biểu diễn kết nối giữa \texttt{RESERVATION\_SPACE} và \texttt{RESERVATION} dưới dạng phép kết nối thay vì tích Đề-các kèm phép chọn.
 \end{itemize}
 
 \subsection{Ước lượng kích thước trung gian}
@@ -232,7 +883,7 @@ $$\text{Chi phí} = h + 1$$
 
 Ví dụ, chỉ mục B+ trên \texttt{user\_id} của \texttt{RESERVATION} có $h = 3$, chi phí tìm một bộ là $3 + 1 = 4$ lần I/O, trong khi quét tuần tự cần $B(\texttt{RESERVATION})$ lần I/O.
 
-\textbf{So sánh chi phí các kế hoạch thực thi cho truy vấn lấy Reservation của một User:}
+\textbf{So sánh chi phí các kế hoạch thực thi:}
 
 \begin{table}[H]
 \centering
@@ -243,7 +894,7 @@ Ví dụ, chỉ mục B+ trên \texttt{user\_id} của \texttt{RESERVATION} có 
 \hline
 Quét tuần tự & Quét toàn bộ \texttt{RESERVATION}, lọc theo \texttt{user\_id} & $B(\texttt{RESERVATION})$ \\
 \hline
-Chỉ mục B+ trên \texttt{user\_id} & Tìm qua chỉ mục, lấy các bộ phù hợp & $h + k$ (k: số bộ kết quả) \\
+Chỉ mục B+ trên \texttt{user\_id} & Tìm qua chỉ mục, lấy các bộ phù hợp & $h + k$ \\
 \hline
 Chỉ mục Hash trên \texttt{user\_id} & Tính hash, truy cập trực tiếp bucket & $1 + k$ \\
 \hline
@@ -260,11 +911,8 @@ Phép kết nối (join) thường là phép toán tốn kém nhất trong một
 
 \begin{itemize}
     \item \textbf{Nested Loop Join:} Với mỗi bộ của quan hệ ngoài $R$, duyệt toàn bộ quan hệ trong $S$ để tìm bộ khớp. Chi phí: $B(R) + |R| \times B(S)$. Phù hợp khi $R$ nhỏ hoặc $S$ có chỉ mục.
-
     \item \textbf{Block Nested Loop Join:} Tải từng khối của $R$, kết nối với từng khối của $S$. Chi phí: $B(R) + \lceil B(R)/M \rceil \times B(S)$ với $M$ khối bộ đệm. Hiệu quả hơn Nested Loop thông thường.
-
-    \item \textbf{Sort-Merge Join:} Sắp xếp cả hai quan hệ theo thuộc tính kết nối, sau đó duyệt song song. Chi phí: $O(B(R) \log B(R) + B(S) \log B(S))$. Phù hợp khi dữ liệu đã được sắp xếp hoặc cần kết quả có thứ tự.
-
+    \item \textbf{Sort-Merge Join:} Sắp xếp cả hai quan hệ theo thuộc tính kết nối, sau đó duyệt song song. Phù hợp khi dữ liệu đã được sắp xếp hoặc cần kết quả có thứ tự.
     \item \textbf{Hash Join:} Băm cả hai quan hệ theo thuộc tính kết nối, kết nối trong cùng bucket. Chi phí: $3(B(R) + B(S))$. Hiệu quả với các quan hệ lớn và kết nối bằng.
 \end{itemize}
 
@@ -273,7 +921,7 @@ Phép kết nối (join) thường là phép toán tốn kém nhất trong một
 \begin{table}[H]
 \centering
 \caption{Lựa chọn thuật toán kết nối theo từng truy vấn}
-\begin{tabular}{|p{4cm}|l|l|p{3.5cm}|}
+\begin{tabular}{|p{3.5cm}|l|l|p{3.5cm}|}
 \hline
 \textbf{Truy vấn} & \textbf{Quan hệ kết nối} & \textbf{Thuật toán} & \textbf{Lý do} \\
 \hline
@@ -289,14 +937,65 @@ Thống kê doanh thu & \texttt{PAYMENT} $\bowtie$ \texttt{RESERVATION} & Sort-M
 \end{table}
 
 \section{Lựa chọn cấu hình vật lý}
+Để đảm bảo hiệu năng, độ tin cậy và khả năng mở rộng cho nền tảng cộng đồng nhiếp ảnh, các cấu hình vật lý ở cấp độ máy chủ và hệ quản trị cơ sở dữ liệu được định hướng như sau:
+
 \subsection{Bộ đệm (Buffer Pool)}
+Bộ đệm (Buffer Pool) là vùng nhớ trên RAM được SQL Server sử dụng để lưu trữ các trang dữ liệu (Data Pages) và bộ nhớ thực thi (Plan Cache) nhằm hạn chế tối đa việc phải truy xuất ổ đĩa vật lý chậm chạp.
+\begin{itemize}
+    \item \textbf{Tình trạng ban đầu:} Với quy mô dữ liệu mẫu hiện tại ($\approx 752\text{ KB}$), toàn bộ cơ sở dữ liệu hoàn toàn có thể nằm gọn trong RAM.
+    \item \textbf{Chiến lược cấu hình:} Khi hệ thống đi vào vận hành thực tế, dữ liệu bảng \texttt{PHOTO} và \texttt{COMMUNITY\_CONTENT} sẽ tăng rất nhanh. Quản trị viên cần cấu hình tham số \texttt{max server memory} cho SQL Server ở mức khoảng 75\% - 80\% tổng dung lượng RAM của máy chủ (chừa lại tài nguyên cho Hệ điều hành). Các bảng có tần suất truy xuất cấu hình cao như \texttt{CREATIVE\_SPACE}, \texttt{SERVICE\_PACKAGE} sẽ thường xuyên được lưu trú trong Buffer Pool nhờ thuật toán LRU-K (Least Recently Used).
+\end{itemize}
+
 \subsection{RAID và tổ chức lưu trữ}
+Để tối ưu hóa luồng I/O (Input/Output) và đảm bảo an toàn dữ liệu nghiêm ngặt cho các giao dịch thanh toán và đặt chỗ:
+\begin{itemize}
+    \item \textbf{Tách biệt File vật lý:} Tệp dữ liệu chính (\texttt{.mdf}) và tệp nhật ký giao dịch (\texttt{.ldf}) phải được lưu trữ trên hai ổ đĩa cứng vật lý (hoặc các LUN) độc lập. Điều này giúp hệ thống tránh tranh chấp I/O giữa thao tác ghi tuần tự liên tục (ghi Log) và thao tác đọc/ghi ngẫu nhiên (truy xuất Data).
+    \item \textbf{Lựa chọn RAID:} Khuyến nghị triển khai \textbf{RAID 10} (hoặc sử dụng SSD NVMe cấp doanh nghiệp). RAID 10 là sự kết hợp giữa Striping và Mirroring, cung cấp tốc độ đọc/ghi xuất sắc đồng thời có khả năng chịu lỗi phần cứng, cực kỳ quan trọng để bảo vệ dữ liệu \texttt{RESERVATION} và \texttt{PAYMENT}.
+\end{itemize}
+
 \subsection{Row-store và Column-store}
+\begin{itemize}
+    \item \textbf{Đặc tả hệ thống:} Nền tảng nhiếp ảnh phim mang đặc trưng cốt lõi của một hệ thống OLTP (Online Transaction Processing). Khối lượng công việc chủ yếu là các thao tác \texttt{INSERT}, \texttt{UPDATE} liên tục trên các bản ghi đơn lẻ (tạo tài khoản, đặt phòng tối, thêm lượt đánh giá).
+    \item \textbf{Lựa chọn:} \textbf{Row-store (Lưu trữ theo dòng)} là lựa chọn duy nhất và tối ưu nhất cho dự án này. Việc lưu các thuộc tính của một bản ghi liền kề nhau trên cùng một trang giúp truy xuất toàn vẹn một thực thể cực kỳ nhanh chóng. Công nghệ Column-store (lưu trữ theo cột) chỉ phù hợp cho hệ thống kho dữ liệu (OLAP/Data Warehouse) và không được sử dụng ở đây.
+\end{itemize}
+
 \subsection{Đánh đổi giữa đọc, ghi và dung lượng}
+Thiết kế cấu trúc vật lý luôn là bài toán cân bằng (Trade-off) giữa các nguồn tài nguyên:
+\begin{itemize}
+    \item \textbf{Tăng tốc độ Đọc $\leftrightarrow$ Giảm tốc độ Ghi, Tốn Dung lượng:} Việc tạo thêm nhiều chỉ mục không cụm (Non-Clustered Indexes) trên các cột thường xuyên được tìm kiếm (như \texttt{space\_type}, \texttt{status}) giúp các câu lệnh \texttt{SELECT} chạy rất nhanh. Đổi lại, mỗi khi có câu lệnh \texttt{INSERT} hay \texttt{UPDATE} xảy ra (điển hình tại bảng \texttt{RESERVATION}), SQL Server phải tốn chi phí cập nhật không chỉ bảng gốc mà còn tất cả các cây chỉ mục liên quan, làm chậm thao tác ghi và tiêu tốn thêm khoảng 20\% - 30\% dung lượng lưu trữ trên đĩa.
+    \item \textbf{Chiến lược cân bằng:} Chỉ áp dụng chỉ mục phụ trên các cột khóa ngoại và tối đa 2-3 cột thường xuyên dùng làm điều kiện lọc (\texttt{WHERE}) thiết yếu nhất.
+\end{itemize}
 
 \section{Thiết kế vật lý cuối cùng}
+Tổng hợp lại toàn bộ quá trình phân tích, dưới đây là đặc tả thiết kế vật lý cuối cùng sẽ được dùng để sinh mã DDL (Data Definition Language) cài đặt cơ sở dữ liệu trên Microsoft SQL Server.
+
 \subsection{Kiểu dữ liệu}
-\subsection{Các ràng buộc vật lý}
-\subsection{Các chỉ mục}
+\begin{itemize}
+    \item \textbf{Định danh (ID):} Khóa chính và khóa ngoại sử dụng kiểu \texttt{INT} ($4\text{ bytes}$) kết hợp thuộc tính \texttt{IDENTITY(1,1)} tự tăng để tối ưu không gian và giúp cây chỉ mục cân bằng.
+    \item \textbf{Chuỗi văn bản:} Ưu tiên dùng \texttt{NVARCHAR} để hỗ trợ lưu trữ Tiếng Việt có dấu. Phân bổ: \texttt{NVARCHAR(100)} cho tên gọi, tiêu đề; \texttt{NVARCHAR(MAX)} cho nội dung bài viết, mô tả không gian. Các trường không chứa dấu như \texttt{email}, \texttt{phone} sử dụng \texttt{VARCHAR} để tiết kiệm một nửa dung lượng so với NVARCHAR.
+    \item \textbf{Thời gian:} Sử dụng \texttt{DATETIME2(0)} ($6\text{ bytes}$) thay cho \texttt{DATETIME} cũ ($8\text{ bytes}$) do nghiệp vụ đặt phòng/workshop chỉ cần độ chính xác đến phần nguyên của giây.
+    \item \textbf{Tiền tệ:} Sử dụng \texttt{DECIMAL(12, 2)} ($9\text{ bytes}$) cho các trường \texttt{price}, \texttt{total\_amount} nhằm bảo toàn độ chính xác tuyệt đối trong giao dịch kế toán, tránh sai số làm tròn của kiểu \texttt{FLOAT}.
+\end{itemize}
+
+\subsection{Các ràng buộc vật lý (Constraints)}
+\begin{itemize}
+    \item \textbf{PRIMARY KEY \& FOREIGN KEY:} Khai báo toàn vẹn trên 21 quan hệ. Các khóa ngoại áp dụng quy tắc mặc định \texttt{ON DELETE NO ACTION} để bảo vệ dữ liệu (ví dụ: không thể xóa một Nhà cung cấp nếu họ đang có giao dịch chưa hoàn tất).
+    \item \textbf{UNIQUE:} Khởi tạo chỉ mục duy nhất (Unique Index) để chống trùng lặp dữ liệu quan trọng (\texttt{email}, \texttt{phone}).
+    \item \textbf{CHECK:} Đảm bảo tính hợp lệ dữ liệu ngay từ tầng vật lý. Ví dụ: \texttt{CHECK (rating BETWEEN 1 AND 5)} trong bảng \texttt{REVIEW}; \texttt{CHECK (end\_time > start\_time)} trong bảng \texttt{RESERVATION}.
+    \item \textbf{DEFAULT:} Hỗ trợ tự động điền dữ liệu, ví dụ: \texttt{status = 'Active'}, hoặc \texttt{created\_at = GETDATE()}.
+\end{itemize}
+
+\subsection{Các chỉ mục (Indexes)}
+\begin{itemize}
+    \item \textbf{Clustered Index (Chỉ mục cụm):} Tự động được cấu hình trên 21 cột/tổ hợp cột \texttt{PRIMARY KEY} để tổ chức lưu trữ dữ liệu vật lý có thứ tự.
+    \item \textbf{Non-Clustered Index (Chỉ mục không cụm):} Thiết lập bắt buộc trên tất cả các cột khóa ngoại nhằm tăng tốc độ cho phép kết nối (\texttt{JOIN}). Bổ sung thêm chỉ mục không cụm phụ trợ trên các cặp cột \texttt{(start\_time, end\_time)} để phục vụ các truy vấn kiểm tra trùng lịch đặt phòng.
+\end{itemize}
+
 \subsection{Phân vùng/cấu hình lưu trữ}
+\begin{itemize}
+    \item Mọi bảng dữ liệu và chỉ mục ở phiên bản đầu tiên của dự án sẽ được cấp phát mặc định trên một Filegroup duy nhất (\texttt{PRIMARY}).
+    \item Đánh giá không sử dụng Table Partitioning (Phân vùng ngang theo bảng) trong giai đoạn này vì đặc thù số lượng bản ghi chưa vượt quá ngưỡng hàng chục triệu dòng. Kỹ thuật này sẽ được đề xuất trong tương lai khi cần lưu trữ lịch sử \texttt{RESERVATION} theo từng năm riêng biệt.
+\end{itemize}
+
 \subsection{Tổng hợp thiết kế vật lý}
+Kết quả của giai đoạn thiết kế vật lý ở Chương 4 là một hệ thống các quy tắc và cấu hình trọn vẹn, sẵn sàng để chuyển đổi thành tập lệnh SQL (DDL). Thiết kế này không chỉ chuyển tải được đầy đủ ràng buộc logic từ Chương 3 mà còn khai thác tối đa sức mạnh của phần cứng máy chủ cũng như cơ chế cấp phát, bộ đệm và chỉ mục của SQL Server, đảm bảo nền tảng cộng đồng nhiếp ảnh phim vận hành ổn định, nhất quán và hiệu năng cao.
