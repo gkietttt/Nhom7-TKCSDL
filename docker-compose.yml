@@ -1,0 +1,47 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ${CONTAINER_NAME:-sqlserver_filmphoto}
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "${ACCEPT_EULA:-Y}"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto@2026!DB}"
+      MSSQL_PID: "${MSSQL_PID:-Developer}"
+    ports:
+      - "${DB_PORT:-1433}:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql/data
+      - ./SQL_src:/usr/src/app/sql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\" || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  # Service tự động nạp toàn bộ cấu trúc CSDL và dữ liệu mẫu khi khởi động lần đầu
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_filmphoto_init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-FilmPhoto@2026!DB}"
+      DB_NAME: "${DB_NAME:-FilmPhotographyDB}"
+    volumes:
+      - ./SQL_src:/usr/src/app/sql
+    entrypoint: >
+      /bin/bash -c "
+      echo 'Waiting for SQL Server to be ready...';
+      SQLCMD='/opt/mssql-tools18/bin/sqlcmd';
+      if [ ! -f $$SQLCMD ]; then SQLCMD='/opt/mssql-tools/bin/sqlcmd'; fi;
+      echo 'Executing database initialization scripts...';
+      $$SQLCMD -S sqlserver -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -i /usr/src/app/sql/init_db.sql;
+      echo 'Database initialization completed successfully!';
+      "
+
+volumes:
+  mssql_data:
+    driver: local
