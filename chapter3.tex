@@ -2,7 +2,7 @@
 
 Chương này trình bày quá trình chuyển mô hình quan niệm của hệ thống nền tảng kết nối cộng đồng nhiếp ảnh phim với các nhà cung cấp không gian sáng tạo, thiết bị và dịch vụ hỗ trợ sang mô hình quan hệ. Nội dung được xây dựng dựa trên các thực thể, thuộc tính và mối kết hợp đã xác định ở Chương 2.
 
-Mục tiêu của thiết kế logic là xây dựng tập các quan hệ có cấu trúc rõ ràng, xác định khóa chính và khóa ngoại, đồng thời chuẩn bị cơ sở cho việc xác định phụ thuộc hàm, tìm khóa ứng viên, chuẩn hóa và phân rã lược đồ ở các phần tiếp theo.
+Mục tiêu của thiết kế logic là xây dựng tập các quan hệ có cấu trúc rõ ràng, xác định khóa chính và khóa ngoại, đồng thời chuẩn bị cơ sở cho việc xác định phụ thuộc hàm, tìm khóa ứng viên, chuẩn hóa và phân rã lược đồ ở các phần tiếp theo. Tập quan hệ này phản ánh đúng các luồng nghiệp vụ cốt lõi của đề tài: quản lý không gian sáng tạo, tài nguyên, đặt chỗ và phiên sử dụng, gói dịch vụ, cộng đồng học tập, đánh giá và hỗ trợ AI; đồng thời giữ nguyên nguyên tắc rằng AI là mô-đun hỗ trợ chứ không phải thực thể dữ liệu độc lập.
 
 \section{Chuyển mô hình quan niệm sang mô hình quan hệ}
 
@@ -1774,7 +1774,7 @@ Dựa trên các phụ thuộc hàm đã xác định ở Chương 2, các thu�
 của các quan hệ chính đều có bao đóng bằng toàn bộ tập thuộc tính của
 quan hệ tương ứng.
 
-\begin{table}[H]
+\begin{table}[htbp]
 	\centering
 	\caption{Kết quả xác định siêu khóa}
 	\begin{tabular}{|c|c|c|}
@@ -1867,7 +1867,7 @@ Do đó các thuộc tính này là khóa ứng viên.
 Đối với các quan hệ kết hợp, khóa ứng viên là khóa ghép gồm hai thuộc tính
 theo thiết kế logic ở Chương 2.
 
-\begin{table}[H]
+\begin{table}[htbp]
 	\centering
 	\caption{Khóa ứng viên của các quan hệ}
 	\begin{tabular}{|c|c|}
@@ -2728,7 +2728,7 @@ Dưới đây là danh sách các lược đồ quan hệ cuối cùng với kh�
 \end{itemize}
 
 \subsection{Khóa chính và khóa ngoại}
-\begin{table}[H]
+\begin{table}[htbp]
     \centering
     \caption{Tổng hợp Khóa chính và Khóa ngoại}
     \renewcommand{\arraystretch}{1.2}
@@ -2773,7 +2773,7 @@ Dưới đây là danh sách các lược đồ quan hệ cuối cùng với kh�
 \subsection{Lược đồ quan hệ sau chuẩn hóa}
 Hình bên dưới minh họa trực quan Lược đồ logic quan hệ (Relational Schema) sau khi đã triệt tiêu các mối kết hợp nhiều-nhiều (M:N) thành các bảng chi tiết, đồng thời biểu diễn rõ các đường nối khóa ngoại (Foreign Key).
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     
     \includegraphics[width=\textwidth]{diagram/TKCSDL_Logical.png} 
