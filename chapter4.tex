@@ -1,4 +1,4 @@
-\chapter{Thiết kế vật lý}
+﻿\chapter{Thiết kế vật lý}
 
 \section{Thiết kế lưu trữ vật lý}
 
@@ -64,46 +64,48 @@ Trong lý thuyết cơ sở dữ liệu, việc ước lượng số lượng kh
     \]
 \end{itemize}
 
-\subsubsection{Bảng ước lượng lưu trữ chi tiết cho 21 quan hệ của dự án}
+\subsubsection{Bảng ước lượng và đo lường lưu trữ cho 21 quan hệ}
 
-Dựa trên số lượng bản ghi thực tế của bộ dữ liệu mẫu đã được nạp trong cơ sở dữ liệu SQL Server của dự án ($5{,}710$ bản ghi), bảng thống kê ước lượng lưu trữ vật lý được trình bày dưới đây:
+Dựa trên bộ dữ liệu mẫu gồm $5{,}680$ bản ghi, bảng dưới đây kết hợp hai nhóm số liệu. Các cột $R$ trung bình, $bfr$ và số page lý thuyết $b_i$ được tính theo mô hình trang dữ liệu; các cột còn lại là số liệu đo thực tế từ SQL Server. Vì vậy, $b_i$ có thể khác `DataPages` do SQL Server còn phải lưu page quản lý, page chỉ mục và dữ liệu LOB.
 
 \begin{table}[htbp]
 \centering
-\caption{Ước lượng lưu trữ dữ liệu vật lý cho 21 bảng trong SQL Server}
+\caption{Ước lượng và đo lường lưu trữ dữ liệu vật lý}
 \label{tab:storage_estimation}
 \renewcommand{\arraystretch}{1.2}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{|c|l|c|r|r|r|r|r|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|l|r|r|r|r|r|r|r|r|r|}
 \hline
-\textbf{STT} & \textbf{Tên bảng / Quan hệ} & \textbf{Nhóm dữ liệu} & \textbf{Số bản ghi ($r$)} & \textbf{$R$ trung bình} & \textbf{$bfr$} & \textbf{Số page ($b$)} & \textbf{Dung lượng (KB)} \\
+\textbf{STT} & \textbf{Tên bảng} & \textbf{$r$} & \textbf{$R$ (bytes)} & \textbf{$bfr$} & \textbf{$b_i$ lý thuyết} & \textbf{TotalPages} & \textbf{UsedPages} & \textbf{DataPages} & \textbf{Reserved (KB)} & \textbf{Data (KB)} \\
 \hline
-1 & \texttt{USER} & Người dùng & 100 & 190 bytes & 42 & 3 & 24 KB \\
-2 & \texttt{SERVICE\_PROVIDER} & Nhà cung cấp & 20 & 330 bytes & 24 & 1 & 8 KB \\
-3 & \texttt{CREATIVE\_SPACE} & Không gian sáng tạo & 60 & 550 bytes & 14 & 5 & 40 KB \\
-4 & \texttt{RESOURCE} & Thiết bị, vật tư & 150 & 320 bytes & 25 & 6 & 48 KB \\
-5 & \texttt{MAINTENANCE} & Lịch sử bảo trì & 100 & 200 bytes & 40 & 3 & 24 KB \\
-6 & \texttt{SERVICE\_PACKAGE} & Gói dịch vụ & 60 & 240 bytes & 33 & 2 & 16 KB \\
-7 & \texttt{PROMOTION} & Khuyến mãi & 40 & 230 bytes & 35 & 2 & 16 KB \\
-8 & \texttt{RESERVATION} & Giao dịch đặt chỗ & 500 & 80 bytes & 100 & 5 & 40 KB \\
-9 & \texttt{PAYMENT} & Giao dịch thanh toán & 450 & 110 bytes & 73 & 7 & 56 KB \\
-10 & \texttt{SERVICE\_SESSION} & Phiên sử dụng & 400 & 65 bytes & 124 & 4 & 32 KB \\
-11 & \texttt{REVIEW} & Đánh giá dịch vụ & 300 & 170 bytes & 47 & 7 & 56 KB \\
-12 & \texttt{COMMUNITY\_CONTENT} & Bài viết cộng đồng & 300 & 390 bytes & 20 & 15 & 120 KB \\
-13 & \texttt{WORKSHOP} & Buổi workshop & 50 & 380 bytes & 21 & 3 & 24 KB \\
-14 & \texttt{PHOTO} & Bộ sưu tập ảnh & 500 & 270 bytes & 29 & 18 & 144 KB \\
-15 & \texttt{COMPLAINT} & Khiếu nại dịch vụ & 50 & 380 bytes & 21 & 3 & 24 KB \\
-16 & \texttt{PACKAGE\_SPACE} & Gói -- Không gian (M:N) & 120 & 18 bytes & 447 & 1 & 8 KB \\
-17 & \texttt{PACKAGE\_RESOURCE} & Gói -- Tài nguyên (M:N) & 180 & 22 bytes & 366 & 1 & 8 KB \\
-18 & \texttt{RESERVATION\_SPACE} & Đặt chỗ -- Không gian (M:N) & 600 & 18 bytes & 447 & 2 & 16 KB \\
-19 & \texttt{RESERVATION\_RESOURCE} & Đặt chỗ -- Tài nguyên (M:N) & 800 & 22 bytes & 366 & 3 & 24 KB \\
-20 & \texttt{SESSION\_RESOURCE} & Phiên -- Tài nguyên (M:N) & 600 & 22 bytes & 366 & 2 & 16 KB \\
-21 & \texttt{WORKSHOP\_REGISTRATION} & Đăng ký Workshop (M:N) & 300 & 24 bytes & 335 & 1 & 8 KB \\
+1 & \texttt{PHOTO} & 500 & 446.58 & 18 & 28 & 58 & 34 & 30 & 464 & 240 \\
+2 & \texttt{COMMUNITY\_CONTENT} & 300 & 545.48 & 14 & 22 & 59 & 31 & 26 & 472 & 208 \\
+3 & \texttt{RESOURCE} & 150 & 438.09 & 18 & 9 & 35 & 19 & 14 & 280 & 112 \\
+4 & \texttt{PAYMENT} & 450 & 97.04 & 83 & 6 & 52 & 21 & 14 & 416 & 112 \\
+5 & \texttt{REVIEW} & 300 & 198.60 & 40 & 8 & 52 & 16 & 11 & 416 & 88 \\
+6 & \texttt{RESERVATION} & 500 & 67.76 & 118 & 5 & 36 & 16 & 10 & 288 & 80 \\
+7 & \texttt{CREATIVE\_SPACE} & 60 & 885.80 & 9 & 7 & 27 & 13 & 9 & 216 & 72 \\
+8 & \texttt{USER} & 100 & 277.94 & 28 & 4 & 36 & 15 & 9 & 288 & 72 \\
+9 & \texttt{WORKSHOP} & 50 & 587.60 & 13 & 4 & 27 & 10 & 6 & 216 & 48 \\
+10 & \texttt{MAINTENANCE} & 100 & 291.40 & 27 & 4 & 27 & 10 & 6 & 216 & 48 \\
+11 & \texttt{SERVICE\_SESSION} & 400 & 52.75 & 152 & 3 & 27 & 11 & 6 & 216 & 48 \\
+12 & \texttt{COMPLAINT} & 50 & 535.52 & 15 & 4 & 18 & 8 & 5 & 144 & 40 \\
+13 & \texttt{SERVICE\_PACKAGE} & 60 & 374.77 & 21 & 3 & 27 & 9 & 5 & 216 & 40 \\
+14 & \texttt{SESSION\_RESOURCE} & 600 & 19.00 & 424 & 2 & 18 & 9 & 5 & 144 & 40 \\
+15 & \texttt{RESERVATION\_RESOURCE} & 800 & 19.00 & 424 & 2 & 18 & 9 & 5 & 144 & 40 \\
+16 & \texttt{PROMOTION} & 40 & 310.75 & 25 & 2 & 27 & 8 & 4 & 216 & 32 \\
+17 & \texttt{RESERVATION\_SPACE} & 600 & 15.00 & 537 & 2 & 18 & 8 & 4 & 144 & 32 \\
+18 & \texttt{SERVICE\_PROVIDER} & 20 & 414.70 & 19 & 2 & 18 & 6 & 3 & 144 & 24 \\
+19 & \texttt{PACKAGE\_RESOURCE} & 180 & 19.00 & 424 & 1 & 18 & 4 & 2 & 144 & 16 \\
+20 & \texttt{PACKAGE\_SPACE} & 120 & 15.00 & 537 & 1 & 18 & 4 & 2 & 144 & 16 \\
+21 & \texttt{WORKSHOP\_REGISTRATION} & 300 & 21.00 & 383 & 1 & 18 & 4 & 2 & 144 & 16 \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{5,680} & -- & -- & \textbf{94 pages} & \textbf{752 KB} \\
+\multicolumn{2}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{5,680} & -- & -- & \textbf{120} & \textbf{634} & \textbf{265} & \textbf{178} & \textbf{5,072} & \textbf{1,424} \\
 \hline
 \end{tabular}
+}%
 \end{table}
 
 \subsubsection{Phân biệt ước lượng lý thuyết và lưu trữ thực tế trong SQL Server}
@@ -221,7 +223,7 @@ Trong SQL Server, một bảng không có Clustered Index được gọi là m�
 \end{itemize}
 
 \paragraph{c. Đánh giá áp dụng cho dự án:}
-Mặc dù dữ liệu mẫu hiện tại của dự án có quy mô vừa phải ($5{,}710$ bản ghi, dung lượng ước lượng $\approx 704\text{ KB}$), việc để các bảng dưới dạng Heap thuần túy chỉ chấp nhận được ở các bảng có kích thước cực nhỏ như \texttt{SERVICE\_PROVIDER} ($20\text{ dòng} \approx 1\text{ page}$) hoặc \texttt{PACKAGE\_SPACE} ($120\text{ dòng} \approx 1\text{ page}$). Đối với các bảng nghiệp vụ chính, cấu trúc Heap dễ phát sinh hiện tượng chuyển tiếp bản ghi (\textit{Forwarded Records}) khi các cột \texttt{NVARCHAR} được cập nhật dài hơn, gây phân mảnh dữ liệu.
+Mặc dù dữ liệu mẫu hiện tại của dự án có quy mô vừa phải ($5{,}680$ bản ghi, dữ liệu chiếm khoảng $1{,}424\text{ KB}$), việc để các bảng dưới dạng Heap thuần túy chỉ chấp nhận được ở các bảng có kích thước cực nhỏ như \texttt{SERVICE\_PROVIDER} hoặc \texttt{PACKAGE\_SPACE}. Đối với các bảng nghiệp vụ chính, cấu trúc Heap dễ phát sinh hiện tượng chuyển tiếp bản ghi (\textit{Forwarded Records}) khi các cột \texttt{NVARCHAR} được cập nhật dài hơn, gây phân mảnh dữ liệu.
 
 \subsubsection{Phân tích phương thức Sorted và cơ chế Clustered Index trong SQL Server}
 
@@ -479,7 +481,7 @@ cùng nhau trong điều kiện truy vấn.
 
 Các chỉ mục kết hợp được triển khai gồm:
 
-\begin{table}[H]
+\begin{table}[htbp]
 	\centering
 	\caption{Các chỉ mục kết hợp được triển khai}
 	\label{tab:composite_indexes}
@@ -564,7 +566,7 @@ tạo chỉ mục trên tất cả các thuộc tính.
 
 Các workload và chỉ mục tương ứng được tổng hợp như sau:
 
-\begin{table}[H]
+\begin{table}[htbp]
 	\centering
 	\caption{Lựa chọn chỉ mục theo workload}
 	\label{tab:index_workload}
@@ -746,7 +748,7 @@ Khóa phân vùng (partition key) là thuộc tính hoặc tập thuộc tính �
 
 \textbf{Lựa chọn khóa phân vùng cho các quan hệ chính:}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Lựa chọn khóa phân vùng}
 \begin{tabular}{|l|l|l|p{4cm}|}
@@ -775,7 +777,7 @@ Tối ưu truy vấn là quá trình tìm kế hoạch thực thi hiệu quả n
 
 Workload của hệ thống bao gồm các truy vấn được thực thi thường xuyên. Dựa trên các nghiệp vụ đã xác định, các truy vấn phổ biến trong hệ thống được phân tích như sau:
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Phân tích workload các truy vấn phổ biến}
 \begin{tabular}{|c|p{5cm}|p{3cm}|c|}
@@ -885,7 +887,7 @@ Ví dụ, chỉ mục B+ trên \texttt{user\_id} của \texttt{RESERVATION} có 
 
 \textbf{So sánh chi phí các kế hoạch thực thi:}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{So sánh chi phí các kế hoạch thực thi}
 \begin{tabular}{|l|p{5cm}|c|}
@@ -918,7 +920,7 @@ Phép kết nối (join) thường là phép toán tốn kém nhất trong một
 
 \textbf{Lựa chọn thuật toán kết nối cho hệ thống:}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Lựa chọn thuật toán kết nối theo từng truy vấn}
 \begin{tabular}{|p{3.5cm}|l|l|p{3.5cm}|}
@@ -942,7 +944,7 @@ Thống kê doanh thu & \texttt{PAYMENT} $\bowtie$ \texttt{RESERVATION} & Sort-M
 \subsection{Bộ đệm (Buffer Pool)}
 Bộ đệm (Buffer Pool) là vùng nhớ trên RAM được SQL Server sử dụng để lưu trữ các trang dữ liệu (Data Pages) và bộ nhớ thực thi (Plan Cache) nhằm hạn chế tối đa việc phải truy xuất ổ đĩa vật lý chậm chạp.
 \begin{itemize}
-    \item \textbf{Tình trạng ban đầu:} Với quy mô dữ liệu mẫu hiện tại ($\approx 752\text{ KB}$), toàn bộ cơ sở dữ liệu hoàn toàn có thể nằm gọn trong RAM.
+	\item \textbf{Tình trạng ban đầu:} Với dữ liệu mẫu hiện tại, phần dữ liệu chiếm khoảng $1{,}424\text{ KB}$ và không gian cấp phát là $5{,}072\text{ KB}$, nên toàn bộ cơ sở dữ liệu hoàn toàn có thể nằm gọn trong RAM.
     \item \textbf{Chiến lược cấu hình:} Khi hệ thống đi vào vận hành thực tế, dữ liệu bảng \texttt{PHOTO} và \texttt{COMMUNITY\_CONTENT} sẽ tăng rất nhanh. Quản trị viên cần cấu hình tham số \texttt{max server memory} cho SQL Server ở mức khoảng 75\% - 80\% tổng dung lượng RAM của máy chủ (chừa lại tài nguyên cho Hệ điều hành). Các bảng có tần suất truy xuất cấu hình cao như \texttt{CREATIVE\_SPACE}, \texttt{SERVICE\_PACKAGE} sẽ thường xuyên được lưu trú trong Buffer Pool nhờ thuật toán LRU-K (Least Recently Used).
 \end{itemize}
 
@@ -999,3 +1001,4 @@ Tổng hợp lại toàn bộ quá trình phân tích, dưới đây là đặc 
 
 \subsection{Tổng hợp thiết kế vật lý}
 Kết quả của giai đoạn thiết kế vật lý ở Chương 4 là một hệ thống các quy tắc và cấu hình trọn vẹn, sẵn sàng để chuyển đổi thành tập lệnh SQL (DDL). Thiết kế này không chỉ chuyển tải được đầy đủ ràng buộc logic từ Chương 3 mà còn khai thác tối đa sức mạnh của phần cứng máy chủ cũng như cơ chế cấp phát, bộ đệm và chỉ mục của SQL Server, đảm bảo nền tảng cộng đồng nhiếp ảnh phim vận hành ổn định, nhất quán và hiệu năng cao.
+
