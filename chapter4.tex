@@ -281,13 +281,495 @@ Từ các phân tích chuyên sâu ở trên, thiết kế lưu trữ vật lý 
     \item \textbf{Bổ sung Non-Clustered Indexes cho các thuộc tính thời gian và khóa ngoại:} Để bù đắp cho việc khóa cụm đã được đặt trên khóa chính, các truy vấn tìm kiếm theo khoảng thời gian (\texttt{RESERVATION.start\_time}, \texttt{WORKSHOP.start\_time}) và các thao tác kết nối theo nhà cung cấp (\texttt{CREATIVE\_SPACE.provider\_id}, \texttt{RESOURCE.provider\_id}) sẽ được hỗ trợ toàn diện bằng các chỉ mục không cụm (Non-Clustered Indexes) được trình bày chi tiết ở phần tiếp theo.
 \end{enumerate}
 
+```latex
 \section{Thiết kế chỉ mục}
+
+Thiết kế chỉ mục là một nội dung của thiết kế mức vật lý, được thực hiện
+dựa trên lược đồ quan hệ đã được xác định ở thiết kế mức logic. Mục tiêu của
+việc thiết kế chỉ mục là giảm chi phí truy xuất dữ liệu đối với các truy vấn
+thường xuyên, đặc biệt là các truy vấn tìm kiếm, lọc, sắp xếp và kết nối giữa
+các quan hệ.
+
+Trong phạm vi hệ thống, chỉ mục được lựa chọn dựa trên 21 quan hệ đã được
+xác định trong lược đồ logic cuối cùng, bao gồm 15 quan hệ chính và 6 quan hệ
+trung gian. Các chỉ mục không tạo thêm thực thể hoặc thuộc tính mới mà chỉ
+được xây dựng trên các thuộc tính đã tồn tại trong lược đồ logic.
+
+Việc lựa chọn chỉ mục được xem xét dựa trên ba yếu tố chính: cấu trúc khóa
+của quan hệ, các thuộc tính thường xuyên được sử dụng trong truy vấn và
+workload của hệ thống.
+
 \subsection{Xác định nhu cầu sử dụng chỉ mục}
+
+Nhu cầu sử dụng chỉ mục được xác định từ các nghiệp vụ chính của hệ thống
+được mô tả ở Chương 0 và các quan hệ đã chuyển đổi ở Chương 2.
+
+Các nhóm truy xuất chính gồm:
+
+\begin{enumerate}
+	\item Truy xuất bản ghi theo khóa chính.
+	\item Truy xuất dữ liệu thông qua khóa ngoại.
+	\item Tìm kiếm và lọc Creative Space.
+	\item Tìm kiếm và lọc Resource.
+	\item Tìm kiếm và lọc Service Package.
+	\item Truy xuất Reservation theo User và thời gian.
+	\item Truy xuất Payment theo Reservation hoặc mã giao dịch.
+	\item Truy xuất Service Session theo Reservation.
+	\item Truy xuất Community Content theo loại và thời gian.
+	\item Truy xuất Workshop theo thời gian.
+	\item Truy xuất các bản ghi trong các quan hệ trung gian để thực hiện
+	các phép JOIN.
+\end{enumerate}
+
+\subsubsection*{a) Truy xuất theo khóa chính}
+
+Mỗi quan hệ chính trong lược đồ logic đều có khóa chính dùng để định danh
+duy nhất một bản ghi. Các khóa chính gồm:
+
+\begin{itemize}
+	\item \texttt{USER.user\_id}.
+	\item \texttt{SERVICE\_PROVIDER.provider\_id}.
+	\item \texttt{CREATIVE\_SPACE.space\_id}.
+	\item \texttt{RESOURCE.resource\_id}.
+	\item \texttt{MAINTENANCE.maintenance\_id}.
+	\item \texttt{SERVICE\_PACKAGE.package\_id}.
+	\item \texttt{PROMOTION.promotion\_id}.
+	\item \texttt{RESERVATION.reservation\_id}.
+	\item \texttt{PAYMENT.payment\_id}.
+	\item \texttt{SERVICE\_SESSION.session\_id}.
+	\item \texttt{REVIEW.review\_id}.
+	\item \texttt{COMMUNITY\_CONTENT.content\_id}.
+	\item \texttt{WORKSHOP.workshop\_id}.
+	\item \texttt{PHOTO.photo\_id}.
+	\item \texttt{COMPLAINT.complaint\_id}.
+\end{itemize}
+
+Đối với các quan hệ trung gian có khóa chính ghép, chỉ mục trên khóa chính
+ghép được sử dụng để hỗ trợ việc xác định nhanh một tổ hợp liên kết:
+
+\begin{itemize}
+	\item \texttt{PACKAGE\_SPACE(package\_id, space\_id)}.
+	\item \texttt{PACKAGE\_RESOURCE(package\_id, resource\_id)}.
+	\item \texttt{RESERVATION\_SPACE(reservation\_id, space\_id)}.
+	\item \texttt{RESERVATION\_RESOURCE(reservation\_id, resource\_id)}.
+	\item \texttt{SESSION\_RESOURCE(session\_id, resource\_id)}.
+	\item \texttt{WORKSHOP\_REGISTRATION(user\_id, workshop\_id)}.
+\end{itemize}
+
+\subsubsection*{b) Truy xuất theo khóa ngoại}
+
+Các khóa ngoại thường được sử dụng trong phép JOIN và trong các truy vấn
+tìm các bản ghi liên quan đến một đối tượng cụ thể. Do đó, các thuộc tính
+khóa ngoại là các ứng viên quan trọng để xây dựng chỉ mục.
+
+Các thuộc tính khóa ngoại chính gồm:
+
+\begin{itemize}
+	\item \texttt{CREATIVE\_SPACE.provider\_id}.
+	\item \texttt{RESOURCE.provider\_id}.
+	\item \texttt{MAINTENANCE.resource\_id}.
+	\item \texttt{SERVICE\_PACKAGE.provider\_id}.
+	\item \texttt{PROMOTION.provider\_id}.
+	\item \texttt{RESERVATION.user\_id}.
+	\item \texttt{RESERVATION.package\_id}.
+	\item \texttt{PAYMENT.reservation\_id}.
+	\item \texttt{SERVICE\_SESSION.reservation\_id}.
+	\item \texttt{REVIEW.user\_id}.
+	\item \texttt{REVIEW.reservation\_id}.
+	\item \texttt{COMMUNITY\_CONTENT.user\_id}.
+	\item \texttt{WORKSHOP.organizer\_id}.
+	\item \texttt{PHOTO.user\_id}.
+	\item \texttt{COMPLAINT.user\_id}.
+\end{itemize}
+
+Ngoài ra, các quan hệ trung gian sử dụng các khóa ngoại ghép để liên kết
+với các quan hệ chính. Các khóa ngoại này được sử dụng trong các truy vấn
+JOIN và truy xuất các đối tượng liên quan.
+
+\subsubsection*{c) Truy xuất theo thuộc tính nghiệp vụ}
+
+Một số thuộc tính không phải khóa được sử dụng trong các thao tác tìm kiếm
+và lọc. Các thuộc tính có nhu cầu xem xét chỉ mục gồm:
+
+\begin{itemize}
+	\item \texttt{CREATIVE\_SPACE.space\_type}, \texttt{capacity},
+	\texttt{status}.
+	\item \texttt{RESOURCE.resource\_type}, \texttt{condition},
+	\texttt{status}.
+	\item \texttt{SERVICE\_PACKAGE.price}, \texttt{status}.
+	\item \texttt{RESERVATION.start\_time}, \texttt{end\_time},
+	\texttt{status}.
+	\item \texttt{PAYMENT.transaction\_code}, \texttt{payment\_status}.
+	\item \texttt{COMMUNITY\_CONTENT.content\_type}, \texttt{created\_at}.
+	\item \texttt{WORKSHOP.start\_time}, \texttt{status}.
+	\item \texttt{COMPLAINT.status}, \texttt{created\_at}.
+\end{itemize}
+
+Các thuộc tính trên chỉ là các ứng viên chỉ mục. Việc tạo chỉ mục thực tế
+phải dựa trên tần suất truy vấn và kích thước dữ liệu.
+
 \subsection{Chỉ mục Clustered/Nonclustered}
+
+Chỉ mục Clustered và Nonclustered được xem xét dựa trên cách hệ quản trị cơ
+sở dữ liệu tổ chức và truy xuất dữ liệu.
+
+Đối với các quan hệ chính, khóa chính có mức độ truy xuất cao và thường được
+sử dụng để định danh bản ghi. Vì vậy, khóa chính là ứng viên ưu tiên cho cấu
+trúc chỉ mục chính của quan hệ.
+
+Các quan hệ có khóa chính đơn gồm:
+
+\begin{itemize}
+	\item \texttt{USER}.
+	\item \texttt{SERVICE\_PROVIDER}.
+	\item \texttt{CREATIVE\_SPACE}.
+	\item \texttt{RESOURCE}.
+	\item \texttt{MAINTENANCE}.
+	\item \texttt{SERVICE\_PACKAGE}.
+	\item \texttt{PROMOTION}.
+	\item \texttt{RESERVATION}.
+	\item \texttt{PAYMENT}.
+	\item \texttt{SERVICE\_SESSION}.
+	\item \texttt{REVIEW}.
+	\item \texttt{COMMUNITY\_CONTENT}.
+	\item \texttt{WORKSHOP}.
+	\item \texttt{PHOTO}.
+	\item \texttt{COMPLAINT}.
+\end{itemize}
+
+Đối với sáu quan hệ trung gian, khóa chính ghép được sử dụng để hỗ trợ
+truy xuất theo tổ hợp khóa:
+
+\begin{itemize}
+	\item \texttt{PACKAGE\_SPACE}.
+	\item \texttt{PACKAGE\_RESOURCE}.
+	\item \texttt{RESERVATION\_SPACE}.
+	\item \texttt{RESERVATION\_RESOURCE}.
+	\item \texttt{SESSION\_RESOURCE}.
+	\item \texttt{WORKSHOP\_REGISTRATION}.
+\end{itemize}
+
+Chỉ mục Nonclustered phù hợp với các thuộc tính không phải khóa chính nhưng
+được sử dụng thường xuyên trong điều kiện tìm kiếm, lọc hoặc JOIN. Các
+khóa ngoại như \texttt{provider\_id}, \texttt{user\_id}, \texttt{resource\_id},
+\texttt{package\_id} và \texttt{reservation\_id} là những ứng viên quan trọng.
+
+Việc lựa chọn Clustered hay Nonclustered cụ thể phụ thuộc vào hệ quản trị cơ
+sở dữ liệu được lựa chọn khi triển khai. Do Task của dự án cho phép sử dụng
+PostgreSQL hoặc MySQL, thiết kế chỉ mục ở mức này không cố định cách cài đặt
+phụ thuộc vào một DBMS cụ thể.
+
 \subsection{Chỉ mục B+}
+
+B+ tree phù hợp với các truy vấn tìm kiếm theo thứ tự hoặc theo khoảng giá
+trị. Trong hệ thống, các thuộc tính thời gian và giá trị số là những ứng
+viên phù hợp cho loại chỉ mục này.
+
+\subsubsection*{a) Reservation theo thời gian}
+
+Reservation là quan hệ trung tâm trong nghiệp vụ đặt chỗ. Các thuộc tính
+\texttt{start\_time} và \texttt{end\_time} được sử dụng để xác định khoảng
+thời gian đặt dịch vụ.
+
+Các truy vấn có thể yêu cầu tìm Reservation trong một khoảng thời gian:
+
+\[
+T_1 \leq \texttt{start\_time} < T_2
+\]
+
+Do đó, B+ tree trên \texttt{RESERVATION.start\_time} là một ứng viên phù
+hợp khi workload có nhiều truy vấn theo khoảng thời gian.
+
+\subsubsection*{b) Service Package theo giá}
+
+Thuộc tính \texttt{SERVICE\_PACKAGE.price} có thể được sử dụng trong các
+truy vấn lọc theo khoảng giá:
+
+\[
+P_1 \leq \texttt{price} \leq P_2
+\]
+
+B+ tree hỗ trợ hiệu quả dạng truy vấn này và có thể được xem xét khi chức
+năng tìm kiếm Service Package thường xuyên sử dụng bộ lọc theo giá.
+
+\subsubsection*{c) Workshop theo thời gian}
+
+Thuộc tính \texttt{WORKSHOP.start\_time} có thể được sử dụng để tìm các
+Workshop diễn ra trong một khoảng thời gian nhất định hoặc sắp xếp các
+Workshop theo thời gian.
+
+Do đó, B+ tree là ứng viên phù hợp cho:
+
+\[
+\texttt{WORKSHOP.start\_time}
+\]
+
+\subsubsection*{d) Community Content theo thời gian}
+
+Đối với \texttt{COMMUNITY\_CONTENT}, thuộc tính \texttt{created\_at} có thể
+được sử dụng để lấy nội dung mới hoặc lọc nội dung theo khoảng thời gian.
+
+Vì vậy, B+ tree trên:
+
+\[
+\texttt{COMMUNITY\_CONTENT.created\_at}
+\]
+
+có thể được sử dụng khi workload thường xuyên truy xuất nội dung theo thời
+gian.
+
+\subsubsection*{e) Đánh giá}
+
+B+ tree được ưu tiên khi workload có:
+
+\begin{itemize}
+	\item Truy vấn tìm kiếm theo khoảng.
+	\item Truy vấn so sánh lớn hơn hoặc nhỏ hơn.
+	\item Truy vấn sắp xếp theo thứ tự.
+	\item Truy vấn lấy giá trị nhỏ nhất hoặc lớn nhất.
+\end{itemize}
+
+Do đó, B+ tree phù hợp hơn Hash index đối với các thuộc tính
+\texttt{start\_time}, \texttt{end\_time}, \texttt{price} và
+\texttt{created\_at} khi workload sử dụng các phép so sánh hoặc khoảng giá
+trị.
+
 \subsection{Chỉ mục Hash}
+
+Hash index phù hợp với các truy vấn tìm kiếm chính xác theo giá trị, đặc biệt
+là các truy vấn có điều kiện:
+
+\[
+A = value
+\]
+
+Hash index không phù hợp với các truy vấn cần sắp xếp hoặc tìm kiếm theo
+khoảng.
+
+Trong hệ thống, một số thuộc tính có thể xem xét Hash index khi workload
+chủ yếu là truy xuất chính xác:
+
+\begin{itemize}
+	\item \texttt{USER.user\_id}.
+	\item \texttt{SERVICE\_PROVIDER.provider\_id}.
+	\item \texttt{RESOURCE.resource\_id}.
+	\item \texttt{RESERVATION.reservation\_id}.
+	\item \texttt{PAYMENT.transaction\_code}.
+\end{itemize}
+
+Tuy nhiên, đối với các khóa chính, hệ quản trị cơ sở dữ liệu đã có cơ chế
+chỉ mục thông qua ràng buộc khóa chính. Vì vậy, không cần tạo thêm Hash index
+trên cùng thuộc tính nếu không có yêu cầu đặc biệt từ workload.
+
+Đối với \texttt{PAYMENT.transaction\_code}, Hash index có thể được xem xét
+nếu nghiệp vụ thường xuyên tra cứu một giao dịch bằng mã giao dịch chính xác.
+
+Việc lựa chọn Hash index cần phụ thuộc vào khả năng hỗ trợ của DBMS được
+lựa chọn. Nếu workload yêu cầu tìm kiếm theo khoảng hoặc sắp xếp thì B+ tree
+phù hợp hơn.
+
 \subsection{Chỉ mục kết hợp}
+
+Chỉ mục kết hợp được xây dựng trên nhiều thuộc tính và được sử dụng khi các
+thuộc tính thường xuyên xuất hiện cùng nhau trong điều kiện truy vấn.
+
+Trong hệ thống, các chỉ mục kết hợp được xem xét từ những workload chính.
+
+\subsubsection*{a) Reservation theo User và thời gian}
+
+Một trong những workload quan trọng là truy xuất các Reservation của một
+User theo thời gian.
+
+Do đó, có thể xem xét chỉ mục:
+
+\[
+(\texttt{RESERVATION.user\_id},
+\texttt{RESERVATION.start\_time})
+\]
+
+Chỉ mục này phù hợp với các truy vấn bắt đầu bằng điều kiện trên
+\texttt{user\_id} và tiếp tục lọc hoặc sắp xếp theo \texttt{start\_time}.
+
+\subsubsection*{b) Creative Space theo trạng thái và loại}
+
+Nếu workload thường xuyên tìm các Creative Space theo trạng thái và loại
+không gian, có thể xem xét:
+
+\[
+(\texttt{CREATIVE\_SPACE.status},
+\texttt{CREATIVE\_SPACE.space\_type})
+\]
+
+Chỉ mục này hỗ trợ các truy vấn lọc Creative Space theo hai thuộc tính.
+
+\subsubsection*{c) Resource theo loại và trạng thái}
+
+Đối với Resource, workload tìm kiếm tài nguyên theo loại và trạng thái có
+thể được hỗ trợ bởi:
+
+\[
+(\texttt{RESOURCE.resource\_type},
+\texttt{RESOURCE.status})
+\]
+
+Chỉ mục này phù hợp với các truy vấn tìm Resource theo loại tài nguyên và
+trạng thái sử dụng.
+
+\subsubsection*{d) Community Content theo loại và thời gian}
+
+Đối với Community Content, nếu workload thường xuyên tìm nội dung theo loại
+và thời gian tạo, có thể xem xét:
+
+\[
+(\texttt{COMMUNITY\_CONTENT.content\_type},
+\texttt{COMMUNITY\_CONTENT.created\_at})
+\]
+
+Chỉ mục hỗ trợ việc lọc theo loại nội dung và tiếp tục sắp xếp hoặc lọc theo
+thời gian tạo.
+
+\subsubsection*{e) Nguyên tắc lựa chọn thứ tự thuộc tính}
+
+Thứ tự thuộc tính trong chỉ mục kết hợp phải dựa trên workload. Thuộc tính
+được sử dụng trong điều kiện lọc chính thường được đặt ở vị trí đầu tiên.
+
+Ví dụ:
+
+\[
+(\texttt{user\_id},\texttt{start\_time})
+\]
+
+phù hợp với truy vấn có điều kiện:
+
+\[
+\texttt{user\_id}=U
+\]
+
+sau đó lọc theo \texttt{start\_time}.
+
+Không nên tạo nhiều chỉ mục kết hợp chỉ dựa trên khả năng có thể xuất hiện
+trong truy vấn. Mỗi chỉ mục phải có workload tương ứng để tránh tăng chi phí
+lưu trữ và chi phí cập nhật dữ liệu.
+
 \subsection{Lựa chọn chỉ mục theo workload}
+
+Dựa trên các nghiệp vụ đã xác định ở Chương 0, cấu trúc quan hệ ở Chương 2
+và lược đồ logic cuối cùng ở Chương 3, các workload chính của hệ thống được
+tổng hợp như sau:
+
+\begin{enumerate}
+	\item Truy xuất trực tiếp theo khóa chính.
+	\item JOIN giữa các quan hệ thông qua khóa ngoại.
+	\item Tìm kiếm và lọc Creative Space.
+	\item Tìm kiếm và lọc Resource.
+	\item Tìm kiếm Service Package theo giá và trạng thái.
+	\item Truy xuất Reservation của User theo thời gian.
+	\item Kiểm tra và truy xuất Reservation theo khoảng thời gian.
+	\item Tra cứu Payment theo Reservation hoặc
+	\texttt{transaction\_code}.
+	\item Truy xuất Service Session theo Reservation.
+	\item Truy xuất Community Content theo loại và thời gian.
+	\item Truy xuất Workshop theo thời gian.
+	\item Truy xuất dữ liệu từ các quan hệ trung gian để phục vụ các phép JOIN.
+\end{enumerate}
+
+Bảng sau tổng hợp lựa chọn chỉ mục theo workload:
+
+\begin{table}[H]
+	\centering
+	\caption{Lựa chọn chỉ mục theo workload}
+	\label{tab:index_workload}
+	\renewcommand{\arraystretch}{1.2}
+	\scriptsize
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{|p{3.4cm}|p{3.2cm}|p{5.2cm}|}
+		\hline
+		\textbf{Workload} &
+		\textbf{Chỉ mục đề xuất} &
+		\textbf{Mục đích} \\
+		\hline
+		
+		Truy xuất theo khóa chính &
+		Chỉ mục trên PK &
+		Tìm kiếm trực tiếp một bản ghi theo định danh. \\
+		\hline
+		
+		JOIN theo khóa ngoại &
+		Nonclustered index trên FK &
+		Giảm chi phí truy xuất các bản ghi liên quan khi thực hiện JOIN. \\
+		\hline
+		
+		Reservation theo User và thời gian &
+		\texttt{(user\_id,start\_time)} &
+		Truy xuất lịch sử Reservation của một User theo thời gian. \\
+		\hline
+		
+		Reservation theo khoảng thời gian &
+		B+ tree trên \texttt{start\_time} &
+		Hỗ trợ tìm kiếm và lọc Reservation theo thời gian. \\
+		\hline
+		
+		Creative Space theo trạng thái và loại &
+		\texttt{(status,space\_type)} &
+		Hỗ trợ lọc Creative Space theo trạng thái và loại. \\
+		\hline
+		
+		Resource theo loại và trạng thái &
+		\texttt{(resource\_type,status)} &
+		Hỗ trợ tìm Resource phù hợp với điều kiện truy vấn. \\
+		\hline
+		
+		Service Package theo giá &
+		B+ tree trên \texttt{price} &
+		Hỗ trợ tìm kiếm theo khoảng giá. \\
+		\hline
+		
+		Workshop theo thời gian &
+		B+ tree trên \texttt{start\_time} &
+		Hỗ trợ tìm kiếm và sắp xếp Workshop theo thời gian. \\
+		\hline
+		
+		Community Content theo thời gian &
+		B+ tree trên \texttt{created\_at} &
+		Hỗ trợ truy xuất nội dung mới hoặc theo khoảng thời gian. \\
+		\hline
+		
+		Payment theo mã giao dịch &
+		Hash hoặc B+ tree &
+		Hash phù hợp với tìm kiếm chính xác; B+ tree phù hợp nếu cần sắp xếp hoặc
+		tìm kiếm theo khoảng. \\
+		\hline
+		
+	\end{tabular}
+\end{table}
+
+Việc lựa chọn chỉ mục cuối cùng phải cân bằng giữa hiệu năng đọc và chi phí
+ghi. Mỗi chỉ mục bổ sung đều làm tăng dung lượng lưu trữ và có thể làm tăng
+chi phí của các thao tác \texttt{INSERT}, \texttt{UPDATE} và
+\texttt{DELETE}.
+
+Do đó, các chỉ mục ưu tiên cao của hệ thống là:
+
+\begin{itemize}
+	\item Chỉ mục trên khóa chính của các quan hệ.
+	\item Chỉ mục trên các khóa ngoại thường xuyên được sử dụng trong JOIN.
+	\item Chỉ mục hỗ trợ Reservation theo User và thời gian.
+	\item Chỉ mục hỗ trợ truy xuất Reservation theo thời gian.
+	\item Chỉ mục phục vụ các truy vấn tìm kiếm Creative Space và Resource
+	khi workload đủ lớn.
+\end{itemize}
+
+Các chỉ mục trên thuộc tính như \texttt{status}, \texttt{space\_type},
+\texttt{resource\_type}, \texttt{content\_type} và các chỉ mục kết hợp chỉ
+nên được triển khai khi workload thực tế chứng minh rằng lợi ích truy xuất
+lớn hơn chi phí duy trì chỉ mục.
+
+Như vậy, thiết kế chỉ mục được xây dựng hoàn toàn dựa trên lược đồ logic đã
+được xác định trước đó. Các quyết định về Clustered/Nonclustered, B+ tree,
+Hash và chỉ mục kết hợp là các quyết định ở mức vật lý nhằm tối ưu workload,
+không làm thay đổi các quan hệ, thuộc tính, PK hoặc FK của thiết kế logic.
+```
+
 
 \section{Phân vùng dữ liệu}
 \subsection{Phân vùng ngang}
