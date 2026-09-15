@@ -784,14 +784,65 @@ không làm thay đổi các quan hệ, thuộc tính, PK hoặc FK của thiế
 \subsection{Lựa chọn thuật toán kết nối}
 
 \section{Lựa chọn cấu hình vật lý}
+Để đảm bảo hiệu năng, độ tin cậy và khả năng mở rộng cho nền tảng cộng đồng nhiếp ảnh, các cấu hình vật lý ở cấp độ máy chủ và hệ quản trị cơ sở dữ liệu được định hướng như sau:
+
 \subsection{Bộ đệm (Buffer Pool)}
+Bộ đệm (Buffer Pool) là vùng nhớ trên RAM được SQL Server sử dụng để lưu trữ các trang dữ liệu (Data Pages) và bộ nhớ thực thi (Plan Cache) nhằm hạn chế tối đa việc phải truy xuất ổ đĩa vật lý chậm chạp.
+\begin{itemize}
+    \item \textbf{Tình trạng ban đầu:} Với quy mô dữ liệu mẫu hiện tại ($\approx 752\text{ KB}$), toàn bộ cơ sở dữ liệu hoàn toàn có thể nằm gọn trong RAM.
+    \item \textbf{Chiến lược cấu hình:} Khi hệ thống đi vào vận hành thực tế, dữ liệu bảng \texttt{PHOTO} và \texttt{COMMUNITY\_CONTENT} sẽ tăng rất nhanh. Quản trị viên cần cấu hình tham số \texttt{max server memory} cho SQL Server ở mức khoảng 75\% - 80\% tổng dung lượng RAM của máy chủ (chừa lại tài nguyên cho Hệ điều hành). Các bảng có tần suất truy xuất cấu hình cao như \texttt{CREATIVE\_SPACE}, \texttt{SERVICE\_PACKAGE} sẽ thường xuyên được lưu trú trong Buffer Pool nhờ thuật toán LRU-K (Least Recently Used).
+\end{itemize}
+
 \subsection{RAID và tổ chức lưu trữ}
+Để tối ưu hóa luồng I/O (Input/Output) và đảm bảo an toàn dữ liệu nghiêm ngặt cho các giao dịch thanh toán và đặt chỗ:
+\begin{itemize}
+    \item \textbf{Tách biệt File vật lý:} Tệp dữ liệu chính (\texttt{.mdf}) và tệp nhật ký giao dịch (\texttt{.ldf}) phải được lưu trữ trên hai ổ đĩa cứng vật lý (hoặc các LUN) độc lập. Điều này giúp hệ thống tránh tranh chấp I/O giữa thao tác ghi tuần tự liên tục (ghi Log) và thao tác đọc/ghi ngẫu nhiên (truy xuất Data).
+    \item \textbf{Lựa chọn RAID:} Khuyến nghị triển khai \textbf{RAID 10} (hoặc sử dụng SSD NVMe cấp doanh nghiệp). RAID 10 là sự kết hợp giữa Striping và Mirroring, cung cấp tốc độ đọc/ghi xuất sắc đồng thời có khả năng chịu lỗi phần cứng, cực kỳ quan trọng để bảo vệ dữ liệu \texttt{RESERVATION} và \texttt{PAYMENT}.
+\end{itemize}
+
 \subsection{Row-store và Column-store}
+\begin{itemize}
+    \item \textbf{Đặc tả hệ thống:} Nền tảng nhiếp ảnh phim mang đặc trưng cốt lõi của một hệ thống OLTP (Online Transaction Processing). Khối lượng công việc chủ yếu là các thao tác \texttt{INSERT}, \texttt{UPDATE} liên tục trên các bản ghi đơn lẻ (tạo tài khoản, đặt phòng tối, thêm lượt đánh giá).
+    \item \textbf{Lựa chọn:} \textbf{Row-store (Lưu trữ theo dòng)} là lựa chọn duy nhất và tối ưu nhất cho dự án này. Việc lưu các thuộc tính của một bản ghi liền kề nhau trên cùng một trang giúp truy xuất toàn vẹn một thực thể cực kỳ nhanh chóng. Công nghệ Column-store (lưu trữ theo cột) chỉ phù hợp cho hệ thống kho dữ liệu (OLAP/Data Warehouse) và không được sử dụng ở đây.
+\end{itemize}
+
 \subsection{Đánh đổi giữa đọc, ghi và dung lượng}
+Thiết kế cấu trúc vật lý luôn là bài toán cân bằng (Trade-off) giữa các nguồn tài nguyên:
+\begin{itemize}
+    \item \textbf{Tăng tốc độ Đọc $\leftrightarrow$ Giảm tốc độ Ghi, Tốn Dung lượng:} Việc tạo thêm nhiều chỉ mục không cụm (Non-Clustered Indexes) trên các cột thường xuyên được tìm kiếm (như \texttt{space\_type}, \texttt{status}) giúp các câu lệnh \texttt{SELECT} chạy rất nhanh. Đổi lại, mỗi khi có câu lệnh \texttt{INSERT} hay \texttt{UPDATE} xảy ra (điển hình tại bảng \texttt{RESERVATION}), SQL Server phải tốn chi phí cập nhật không chỉ bảng gốc mà còn tất cả các cây chỉ mục liên quan, làm chậm thao tác ghi và tiêu tốn thêm khoảng 20\% - 30\% dung lượng lưu trữ trên đĩa.
+    \item \textbf{Chiến lược cân bằng:} Chỉ áp dụng chỉ mục phụ trên các cột khóa ngoại và tối đa 2-3 cột thường xuyên dùng làm điều kiện lọc (\texttt{WHERE}) thiết yếu nhất.
+\end{itemize}
 
 \section{Thiết kế vật lý cuối cùng}
+Tổng hợp lại toàn bộ quá trình phân tích, dưới đây là đặc tả thiết kế vật lý cuối cùng sẽ được dùng để sinh mã DDL (Data Definition Language) cài đặt cơ sở dữ liệu trên Microsoft SQL Server.
+
 \subsection{Kiểu dữ liệu}
-\subsection{Các ràng buộc vật lý}
-\subsection{Các chỉ mục}
+\begin{itemize}
+    \item \textbf{Định danh (ID):} Khóa chính và khóa ngoại sử dụng kiểu \texttt{INT} ($4\text{ bytes}$) kết hợp thuộc tính \texttt{IDENTITY(1,1)} tự tăng để tối ưu không gian và giúp cây chỉ mục cân bằng.
+    \item \textbf{Chuỗi văn bản:} Ưu tiên dùng \texttt{NVARCHAR} để hỗ trợ lưu trữ Tiếng Việt có dấu. Phân bổ: \texttt{NVARCHAR(100)} cho tên gọi, tiêu đề; \texttt{NVARCHAR(MAX)} cho nội dung bài viết, mô tả không gian. Các trường không chứa dấu như \texttt{email}, \texttt{phone} sử dụng \texttt{VARCHAR} để tiết kiệm một nửa dung lượng so với NVARCHAR.
+    \item \textbf{Thời gian:} Sử dụng \texttt{DATETIME2(0)} ($6\text{ bytes}$) thay cho \texttt{DATETIME} cũ ($8\text{ bytes}$) do nghiệp vụ đặt phòng/workshop chỉ cần độ chính xác đến phần nguyên của giây.
+    \item \textbf{Tiền tệ:} Sử dụng \texttt{DECIMAL(12, 2)} ($9\text{ bytes}$) cho các trường \texttt{price}, \texttt{total\_amount} nhằm bảo toàn độ chính xác tuyệt đối trong giao dịch kế toán, tránh sai số làm tròn của kiểu \texttt{FLOAT}.
+\end{itemize}
+
+\subsection{Các ràng buộc vật lý (Constraints)}
+\begin{itemize}
+    \item \textbf{PRIMARY KEY \& FOREIGN KEY:} Khai báo toàn vẹn trên 21 quan hệ. Các khóa ngoại áp dụng quy tắc mặc định \texttt{ON DELETE NO ACTION} để bảo vệ dữ liệu (ví dụ: không thể xóa một Nhà cung cấp nếu họ đang có giao dịch chưa hoàn tất).
+    \item \textbf{UNIQUE:} Khởi tạo chỉ mục duy nhất (Unique Index) để chống trùng lặp dữ liệu quan trọng (\texttt{email}, \texttt{phone}).
+    \item \textbf{CHECK:} Đảm bảo tính hợp lệ dữ liệu ngay từ tầng vật lý. Ví dụ: \texttt{CHECK (rating BETWEEN 1 AND 5)} trong bảng \texttt{REVIEW}; \texttt{CHECK (end\_time > start\_time)} trong bảng \texttt{RESERVATION}.
+    \item \textbf{DEFAULT:} Hỗ trợ tự động điền dữ liệu, ví dụ: \texttt{status = 'Active'}, hoặc \texttt{created\_at = GETDATE()}.
+\end{itemize}
+
+\subsection{Các chỉ mục (Indexes)}
+\begin{itemize}
+    \item \textbf{Clustered Index (Chỉ mục cụm):} Tự động được cấu hình trên 21 cột/tổ hợp cột \texttt{PRIMARY KEY} để tổ chức lưu trữ dữ liệu vật lý có thứ tự.
+    \item \textbf{Non-Clustered Index (Chỉ mục không cụm):} Thiết lập bắt buộc trên tất cả các cột khóa ngoại nhằm tăng tốc độ cho phép kết nối (\texttt{JOIN}). Bổ sung thêm chỉ mục không cụm phụ trợ trên các cặp cột \texttt{(start\_time, end\_time)} để phục vụ các truy vấn kiểm tra trùng lịch đặt phòng.
+\end{itemize}
+
 \subsection{Phân vùng/cấu hình lưu trữ}
+\begin{itemize}
+    \item Mọi bảng dữ liệu và chỉ mục ở phiên bản đầu tiên của dự án sẽ được cấp phát mặc định trên một Filegroup duy nhất (\texttt{PRIMARY}).
+    \item Đánh giá không sử dụng Table Partitioning (Phân vùng ngang theo bảng) trong giai đoạn này vì đặc thù số lượng bản ghi chưa vượt quá ngưỡng hàng chục triệu dòng. Kỹ thuật này sẽ được đề xuất trong tương lai khi cần lưu trữ lịch sử \texttt{RESERVATION} theo từng năm riêng biệt.
+\end{itemize}
+
 \subsection{Tổng hợp thiết kế vật lý}
+Kết quả của giai đoạn thiết kế vật lý ở Chương 4 là một hệ thống các quy tắc và cấu hình trọn vẹn, sẵn sàng để chuyển đổi thành tập lệnh SQL (DDL). Thiết kế này không chỉ chuyển tải được đầy đủ ràng buộc logic từ Chương 3 mà còn khai thác tối đa sức mạnh của phần cứng máy chủ cũng như cơ chế cấp phát, bộ đệm và chỉ mục của SQL Server, đảm bảo nền tảng cộng đồng nhiếp ảnh phim vận hành ổn định, nhất quán và hiệu năng cao.
