@@ -34,6 +34,7 @@ BEGIN
             ELSE s.actual_usage_duration
         END
         FROM dbo.SERVICE_SESSION s
+
         INNER JOIN inserted i ON s.session_id = i.session_id;
     END
 END;
@@ -72,6 +73,144 @@ BEGIN
     SET p.updated_at = SYSDATETIME()
     FROM dbo.PHOTO p
     INNER JOIN inserted i ON p.photo_id = i.photo_id;
+END;
+GO
+
+-- Trigger 4: Giữ các quan hệ package/resource/space trong cùng provider
+IF OBJECT_ID('dbo.trg_PACKAGE_SPACE_Provider', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_PACKAGE_SPACE_Provider;
+GO
+
+CREATE TRIGGER dbo.trg_PACKAGE_SPACE_Provider
+ON dbo.PACKAGE_SPACE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.SERVICE_PACKAGE p ON p.package_id = i.package_id
+        INNER JOIN dbo.CREATIVE_SPACE s ON s.space_id = i.space_id
+        WHERE p.provider_id <> s.provider_id
+    )
+        THROW 51003, N'Package and creative space must belong to the same provider.', 1;
+END;
+GO
+
+IF OBJECT_ID('dbo.trg_PACKAGE_RESOURCE_Provider', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_PACKAGE_RESOURCE_Provider;
+GO
+
+CREATE TRIGGER dbo.trg_PACKAGE_RESOURCE_Provider
+ON dbo.PACKAGE_RESOURCE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.SERVICE_PACKAGE p ON p.package_id = i.package_id
+        INNER JOIN dbo.RESOURCE r ON r.resource_id = i.resource_id
+        WHERE p.provider_id <> r.provider_id
+    )
+        THROW 51004, N'Package and resource must belong to the same provider.', 1;
+END;
+GO
+
+-- Reservation không có package có thể chọn trực tiếp; nếu có package thì phải cùng provider.
+IF OBJECT_ID('dbo.trg_RESERVATION_SPACE_Provider', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_RESERVATION_SPACE_Provider;
+GO
+
+CREATE TRIGGER dbo.trg_RESERVATION_SPACE_Provider
+ON dbo.RESERVATION_SPACE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.RESERVATION r ON r.reservation_id = i.reservation_id
+        INNER JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+        INNER JOIN dbo.CREATIVE_SPACE s ON s.space_id = i.space_id
+        WHERE p.provider_id <> s.provider_id
+    )
+        THROW 51005, N'Reservation space must belong to the package provider.', 1;
+END;
+GO
+
+IF OBJECT_ID('dbo.trg_RESERVATION_RESOURCE_Provider', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_RESERVATION_RESOURCE_Provider;
+GO
+
+CREATE TRIGGER dbo.trg_RESERVATION_RESOURCE_Provider
+ON dbo.RESERVATION_RESOURCE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.RESERVATION r ON r.reservation_id = i.reservation_id
+        INNER JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+        INNER JOIN dbo.RESOURCE res ON res.resource_id = i.resource_id
+        WHERE p.provider_id <> res.provider_id
+    )
+        THROW 51006, N'Reservation resource must belong to the package provider.', 1;
+END;
+GO
+
+IF OBJECT_ID('dbo.trg_SESSION_RESOURCE_Provider', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_SESSION_RESOURCE_Provider;
+GO
+
+CREATE TRIGGER dbo.trg_SESSION_RESOURCE_Provider
+ON dbo.SESSION_RESOURCE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.SERVICE_SESSION s ON s.session_id = i.session_id
+        INNER JOIN dbo.RESERVATION r ON r.reservation_id = s.reservation_id
+        INNER JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+        INNER JOIN dbo.RESOURCE res ON res.resource_id = i.resource_id
+        WHERE p.provider_id <> res.provider_id
+    )
+        THROW 51007, N'Session resource must belong to the package provider.', 1;
+END;
+GO
+
+-- Review chỉ được tạo bởi user đã thực hiện reservation tương ứng.
+IF OBJECT_ID('dbo.trg_REVIEW_UserReservation', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_REVIEW_UserReservation;
+GO
+
+CREATE TRIGGER dbo.trg_REVIEW_UserReservation
+ON dbo.REVIEW
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.RESERVATION r ON r.reservation_id = i.reservation_id
+        WHERE i.user_id <> r.user_id
+    )
+        THROW 51008, N'Review user must match the reservation user.', 1;
 END;
 GO
 

@@ -40,35 +40,32 @@ DELETE FROM dbo.[USER];
 GO
 
 -- Reset IDENTITY
-DBCC CHECKIDENT ('dbo.USER', RESEED, 0);
-DBCC CHECKIDENT ('dbo.SERVICE_PROVIDER', RESEED, 0);
-DBCC CHECKIDENT ('dbo.CREATIVE_SPACE', RESEED, 0);
-DBCC CHECKIDENT ('dbo.RESOURCE', RESEED, 0);
-DBCC CHECKIDENT ('dbo.MAINTENANCE', RESEED, 0);
-DBCC CHECKIDENT ('dbo.SERVICE_PACKAGE', RESEED, 0);
-DBCC CHECKIDENT ('dbo.PROMOTION', RESEED, 0);
-DBCC CHECKIDENT ('dbo.RESERVATION', RESEED, 0);
-DBCC CHECKIDENT ('dbo.PAYMENT', RESEED, 0);
-DBCC CHECKIDENT ('dbo.SERVICE_SESSION', RESEED, 0);
-DBCC CHECKIDENT ('dbo.REVIEW', RESEED, 0);
-DBCC CHECKIDENT ('dbo.COMMUNITY_CONTENT', RESEED, 0);
-DBCC CHECKIDENT ('dbo.WORKSHOP', RESEED, 0);
-DBCC CHECKIDENT ('dbo.PHOTO', RESEED, 0);
-DBCC CHECKIDENT ('dbo.COMPLAINT', RESEED, 0);
+DBCC CHECKIDENT ('dbo.USER', RESEED, 1);
+DBCC CHECKIDENT ('dbo.SERVICE_PROVIDER', RESEED, 1);
+DBCC CHECKIDENT ('dbo.CREATIVE_SPACE', RESEED, 1);
+DBCC CHECKIDENT ('dbo.RESOURCE', RESEED, 1);
+DBCC CHECKIDENT ('dbo.MAINTENANCE', RESEED, 1);
+DBCC CHECKIDENT ('dbo.SERVICE_PACKAGE', RESEED, 1);
+DBCC CHECKIDENT ('dbo.PROMOTION', RESEED, 1);
+DBCC CHECKIDENT ('dbo.RESERVATION', RESEED, 1);
+DBCC CHECKIDENT ('dbo.PAYMENT', RESEED, 1);
+DBCC CHECKIDENT ('dbo.SERVICE_SESSION', RESEED, 1);
+DBCC CHECKIDENT ('dbo.REVIEW', RESEED, 1);
+DBCC CHECKIDENT ('dbo.COMMUNITY_CONTENT', RESEED, 1);
+DBCC CHECKIDENT ('dbo.WORKSHOP', RESEED, 1);
+DBCC CHECKIDENT ('dbo.PHOTO', RESEED, 1);
+DBCC CHECKIDENT ('dbo.COMPLAINT', RESEED, 1);
 GO
 
 -- ============================================================================
--- 1. SEED BẢNG USER (Mục tiêu: 100 bản ghi)
--- Gồm: Photographer (70), Service Provider (15), Expert (10), Administrator (5)
+-- 1. SEED BẢNG USER (Mục tiêu: 10,000 bản ghi)
+-- Gồm: Photographer (7,000), Service Provider (1,500), Expert (1,000), Administrator (500)
 -- ============================================================================
-PRINT N'>> Seeding [USER] (100 records)...';
+PRINT N'>> Seeding [USER] (10,000 records)...';
 
-;WITH N10(n) AS (
-    SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL 
-    SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
-),
-Numbers(n) AS (
-    SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) FROM N10 a CROSS JOIN N10 b
+;WITH Numbers(n) AS (
+    SELECT TOP (10000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 ),
 Names(id, last_name, first_name) AS (
     SELECT n,
@@ -91,9 +88,9 @@ SELECT
     N'090' + RIGHT(N'0000000' + CAST(id AS NVARCHAR(10)), 7),
     N'$2a$12$e9.jK63aGqH19QYk4v2.7O/xN7f.V9r4P58E/2.Bw2a1w2.9d6F2O', -- bcrpyt hash giả lập
     CASE 
-        WHEN id <= 5 THEN N'Administrator'
-        WHEN id <= 15 THEN N'Expert'
-        WHEN id <= 30 THEN N'Service Provider'
+        WHEN id <= 500 THEN N'Administrator'
+        WHEN id <= 1500 THEN N'Expert'
+        WHEN id <= 3000 THEN N'Service Provider'
         ELSE N'Photographer'
     END,
     CASE WHEN id % 25 = 0 THEN N'Inactive' ELSE N'Active' END,
@@ -102,13 +99,13 @@ FROM Names;
 GO
 
 -- ============================================================================
--- 2. SEED BẢNG SERVICE_PROVIDER (Mục tiêu: 20 bản ghi)
+-- 2. SEED BẢNG SERVICE_PROVIDER (Mục tiêu: 1,000 bản ghi)
 -- ============================================================================
-PRINT N'>> Seeding SERVICE_PROVIDER (20 records)...';
+PRINT N'>> Seeding SERVICE_PROVIDER (1,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (20) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (1000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.SERVICE_PROVIDER (business_name, description, address, status, created_at)
 SELECT 
@@ -126,20 +123,20 @@ SELECT
         WHEN 2 THEN CAST(n * 8 AS NVARCHAR(10)) + N' Bạch Đằng, Hải Châu, Đà Nẵng'
         ELSE CAST(n * 21 AS NVARCHAR(10)) + N' Phan Đăng Lưu, Phú Nhuận, TP. Hồ Chí Minh'
     END,
-    CASE WHEN n = 20 THEN N'Pending_Approval' ELSE N'Active' END,
+    CASE WHEN n % 20 = 0 THEN N'Pending_Approval' ELSE N'Active' END,
     DATEADD(DAY, -(50 - n), '2026-08-05 09:00:00')
 FROM Numbers;
 GO
 
 -- ============================================================================
--- 3. SEED BẢNG CREATIVE_SPACE (Mục tiêu: 60 bản ghi)
+-- 3. SEED BẢNG CREATIVE_SPACE (Mục tiêu: 3,000 bản ghi)
 -- Trung bình 3 không gian / provider
 -- ============================================================================
-PRINT N'>> Seeding CREATIVE_SPACE (60 records)...';
+PRINT N'>> Seeding CREATIVE_SPACE (3,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (60) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (3000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.CREATIVE_SPACE (
     provider_id, name, space_type, description, area, capacity,
@@ -147,7 +144,7 @@ INSERT INTO dbo.CREATIVE_SPACE (
     operating_hours, usage_policy, pricing, status
 )
 SELECT 
-    ((n - 1) % 20) + 1, -- Phân bổ đều cho 20 provider (mỗi provider 3 không gian)
+    ((n - 1) % 1000) + 1, -- Phân bổ đều cho 1,000 provider (mỗi provider 3 không gian)
     CASE (n % 4)
         WHEN 0 THEN N'Darkroom Classic Room ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Studio Ánh Sáng Tự Nhiên ' + CAST(n AS NVARCHAR(10))
@@ -183,21 +180,21 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 4. SEED BẢNG RESOURCE (Mục tiêu: 150 bản ghi)
--- Thiết bị, vật tư, dụng cụ phân bổ cho 20 provider
+-- 4. SEED BẢNG RESOURCE (Mục tiêu: 15,000 bản ghi)
+-- Thiết bị, vật tư, dụng cụ phân bổ cho 1,000 provider
 -- ============================================================================
-PRINT N'>> Seeding RESOURCE (150 records)...';
+PRINT N'>> Seeding RESOURCE (15,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (150) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (15000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.RESOURCE (
     provider_id, name, resource_type, description, quantity,
     condition, rental_price, compatibility_information, status
 )
 SELECT 
-    ((n - 1) % 20) + 1,
+    ((n - 1) % 1000) + 1,
     CASE (n % 9)
         WHEN 0 THEN N'Máy ảnh Leica M3 Single Stroke ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Ống kính Carl Zeiss Planar 50mm f/1.4 ' + CAST(n AS NVARCHAR(10))
@@ -241,21 +238,21 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 5. SEED BẢNG MAINTENANCE (Mục tiêu: 100 bản ghi)
+-- 5. SEED BẢNG MAINTENANCE (Mục tiêu: 18,000 bản ghi)
 -- Lịch sử bảo trì tài nguyên
 -- ============================================================================
-PRINT N'>> Seeding MAINTENANCE (100 records)...';
+PRINT N'>> Seeding MAINTENANCE (18,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (100) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (18000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.MAINTENANCE (
     resource_id, maintenance_type, description, scheduled_at,
     completed_at, cost, status
 )
 SELECT 
-    ((n - 1) % 150) + 1,
+    ((n - 1) % 15000) + 1,
     CASE (n % 5)
         WHEN 0 THEN N'Routine'
         WHEN 1 THEN N'Repair'
@@ -264,35 +261,35 @@ SELECT
         ELSE N'Inspection'
     END,
     N'Bảo trì định kỳ: lau thấu kính, bôi trơn bánh răng, kiểm tra tốc độ màn trập và độ chính xác ánh sáng đèn.',
-    DATEADD(DAY, -(120 - n), '2026-08-10 10:00:00'),
+    DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00'),
     CASE 
-        WHEN n <= 80 THEN DATEADD(HOUR, 4 + (n % 8), DATEADD(DAY, -(120 - n), '2026-08-10 10:00:00'))
+        WHEN n <= 14400 THEN DATEADD(HOUR, 4 + (n % 8), DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00'))
         ELSE NULL 
     END,
     150000.00 + (n % 10) * 50000.00,
     CASE 
-        WHEN n <= 80 THEN N'Completed'
-        WHEN n <= 95 THEN N'In_Progress'
+        WHEN n <= 14400 THEN N'Completed'
+        WHEN n <= 17100 THEN N'In_Progress'
         ELSE N'Scheduled'
     END
 FROM Numbers;
 GO
 
 -- ============================================================================
--- 6. SEED BẢNG SERVICE_PACKAGE (Mục tiêu: 60 bản ghi)
+-- 6. SEED BẢNG SERVICE_PACKAGE (Mục tiêu: 3,000 bản ghi)
 -- Khoảng 3 package / provider
 -- ============================================================================
-PRINT N'>> Seeding SERVICE_PACKAGE (60 records)...';
+PRINT N'>> Seeding SERVICE_PACKAGE (3,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (60) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (3000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.SERVICE_PACKAGE (
     provider_id, name, description, price, duration, status, created_at
 )
 SELECT 
-    ((n - 1) % 20) + 1,
+    ((n - 1) % 1000) + 1,
     CASE (n % 4)
         WHEN 0 THEN N'Gói Tráng Rọi Phòng Tối Tiêu Chuẩn ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Gói Studio Chụp Chân Dung Analog ' + CAST(n AS NVARCHAR(10))
@@ -302,27 +299,27 @@ SELECT
     N'Bao gồm quyền sử dụng không gian sáng tạo, thiết bị rọi ảnh chuyên dụng, hóa chất tráng tiêu chuẩn và kỹ thuật viên hỗ trợ.',
     250000.00 + (n % 10) * 50000.00,
     2 + (n % 4), -- 2 đến 5 giờ
-    CASE WHEN n = 60 THEN N'Inactive' ELSE N'Active' END,
+    CASE WHEN n % 30 = 0 THEN N'Inactive' ELSE N'Active' END,
     DATEADD(DAY, -(60 - n), '2026-08-01 08:00:00')
 FROM Numbers;
 GO
 
 -- ============================================================================
--- 7. SEED BẢNG PROMOTION (Mục tiêu: 40 bản ghi)
+-- 7. SEED BẢNG PROMOTION (Mục tiêu: 1,000 bản ghi)
 -- Khuyến mãi của provider
 -- ============================================================================
-PRINT N'>> Seeding PROMOTION (40 records)...';
+PRINT N'>> Seeding PROMOTION (1,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (40) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (1000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.PROMOTION (
     provider_id, name, description, discount_type, discount_value,
     start_at, end_at, status
 )
 SELECT 
-    ((n - 1) % 20) + 1,
+    ((n - 1) % 1000) + 1,
     CASE (n % 4)
         WHEN 0 THEN N'Ưu Đãi Mùa Hè Film Lovers ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Tri Ân Thành Viên Darkroom ' + CAST(n AS NVARCHAR(10))
@@ -339,26 +336,25 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 8. SEED BẢNG RESERVATION (Mục tiêu: 500 bản ghi)
+-- 8. SEED BẢNG RESERVATION (Mục tiêu: 16,000 bản ghi)
 -- ============================================================================
-PRINT N'>> Seeding RESERVATION (500 records)...';
+PRINT N'>> Seeding RESERVATION (16,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (500) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (16000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.RESERVATION (
     user_id, package_id, start_time, end_time, status, total_amount, created_at
 )
 SELECT 
-    31 + ((n - 1) % 70), -- Người đặt là các Photographer (user_id từ 31 đến 100)
-    CASE WHEN n % 5 = 0 THEN NULL ELSE ((n - 1) % 60) + 1 END,
+    3001 + ((n - 1) % 7000), -- Người đặt là các Photographer (user_id từ 3001 đến 10000)
+    CASE WHEN n % 20 = 0 THEN NULL ELSE ((n - 1) % 3000) + 1 END,
     DATEADD(MINUTE, (n * 137) % 25000, '2026-08-01 08:00:00'),
     DATEADD(HOUR, 2 + (n % 4), DATEADD(MINUTE, (n * 137) % 25000, '2026-08-01 08:00:00')),
     CASE 
-        WHEN n <= 400 THEN N'Completed'
-        WHEN n <= 450 THEN N'Confirmed'
-        WHEN n <= 480 THEN N'Pending'
+        WHEN n <= 15000 THEN N'Completed'
+        WHEN n <= 15500 THEN N'Confirmed'
         ELSE N'Cancelled'
     END,
     300000.00 + (n % 15) * 50000.00,
@@ -367,20 +363,20 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 9. SEED BẢNG PAYMENT (Mục tiêu: 450 bản ghi)
--- Quan hệ 1:1 với RESERVATION (Áp dụng cho 450 reservation đã thanh toán)
+-- 9. SEED BẢNG PAYMENT (Mục tiêu: 10,000 bản ghi)
+-- Quan hệ 1:1 với RESERVATION (Áp dụng cho 10,000 reservation đã thanh toán)
 -- ============================================================================
-PRINT N'>> Seeding PAYMENT (450 records)...';
+PRINT N'>> Seeding PAYMENT (10,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (450) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (10000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.PAYMENT (
     reservation_id, amount, payment_method, payment_status, transaction_code, paid_at
 )
 SELECT 
-    n, -- Gán chính xác reservation_id từ 1 đến 450 (Đảm bảo UNIQUE 100%)
+    n, -- Gán duy nhất cho 10,000 reservation đầu tiên
     300000.00 + (n % 15) * 50000.00,
     CASE (n % 6)
         WHEN 0 THEN N'VNPay'
@@ -401,47 +397,47 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 10. SEED BẢNG SERVICE_SESSION (Mục tiêu: 400 bản ghi)
--- Quan hệ 1:1 với RESERVATION (Áp dụng cho 400 reservation đã thực hiện)
+-- 10. SEED BẢNG SERVICE_SESSION (Mục tiêu: 15,000 bản ghi)
+-- Quan hệ 1:1 với RESERVATION (Áp dụng cho 15,000 reservation đã thực hiện)
 -- ============================================================================
-PRINT N'>> Seeding SERVICE_SESSION (400 records)...';
+PRINT N'>> Seeding SERVICE_SESSION (15,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (400) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (15000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.SERVICE_SESSION (
     reservation_id, check_in, check_out, actual_usage_duration, status
 )
 SELECT 
-    n, -- Gán chính xác reservation_id từ 1 đến 400 (Đảm bảo UNIQUE 100%)
+    n, -- Gán duy nhất cho 15,000 reservation đã hoàn tất
     DATEADD(MINUTE, (n * 137) % 25000, '2026-08-01 08:00:00'),
     DATEADD(MINUTE, 120 + (n % 6) * 30, DATEADD(MINUTE, (n * 137) % 25000, '2026-08-01 08:00:00')),
     120 + (n % 6) * 30, -- Tự động khớp hiệu số phút
     CASE 
-        WHEN n <= 380 THEN N'Completed'
-        WHEN n <= 395 THEN N'Active'
+        WHEN n <= 14000 THEN N'Completed'
+        WHEN n <= 14500 THEN N'Active'
         ELSE N'Overtime'
     END
 FROM Numbers;
 GO
 
 -- ============================================================================
--- 11. SEED BẢNG REVIEW (Mục tiêu: 300 bản ghi)
--- Quan hệ 1:1 với RESERVATION (300 review từ reservation 1 đến 300)
+-- 11. SEED BẢNG REVIEW (Mục tiêu: 10,000 bản ghi)
+-- Quan hệ 1:1 với RESERVATION (10,000 review từ reservation 1 đến 10,000)
 -- ============================================================================
-PRINT N'>> Seeding REVIEW (300 records)...';
+PRINT N'>> Seeding REVIEW (10,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (300) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (10000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.REVIEW (
     user_id, reservation_id, rating, comment, created_at
 )
 SELECT 
-    31 + ((n - 1) % 70),
-    n, -- Gán chính xác reservation_id từ 1 đến 300 (Đảm bảo UNIQUE 100%)
+    r.user_id,
+    n, -- Gán duy nhất cho 10,000 reservation đã hoàn tất
     4 + (n % 2), -- Đánh giá 4 hoặc 5 sao
     CASE (n % 5)
         WHEN 0 THEN N'Phòng tối rất sạch sẽ, máy rọi Beseler hoạt động chuẩn xác, safe-light an toàn!'
@@ -451,23 +447,24 @@ SELECT
         ELSE N'Trải nghiệm tuyệt vời cho người mới bắt đầu đam mê bộ môn phòng tối film photography.'
     END,
     DATEADD(HOUR, 2, DATEADD(MINUTE, 120 + (n % 6) * 30, DATEADD(MINUTE, (n * 137) % 25000, '2026-08-01 08:00:00')))
-FROM Numbers;
+FROM Numbers n
+INNER JOIN dbo.RESERVATION r ON r.reservation_id = n.n;
 GO
 
 -- ============================================================================
--- 12. SEED BẢNG COMMUNITY_CONTENT (Mục tiêu: 300 bản ghi)
+-- 12. SEED BẢNG COMMUNITY_CONTENT (Mục tiêu: 5,000 bản ghi)
 -- ============================================================================
-PRINT N'>> Seeding COMMUNITY_CONTENT (300 records)...';
+PRINT N'>> Seeding COMMUNITY_CONTENT (5,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (300) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (5000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.COMMUNITY_CONTENT (
     user_id, title, content, content_type, status, created_at, updated_at
 )
 SELECT 
-    1 + ((n - 1) % 100),
+    1 + ((n - 1) % 10000),
     CASE (n % 5)
         WHEN 0 THEN N'Hướng dẫn kỹ thuật push/pull phim B&W với thuốc Rodinal ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Kinh nghiệm chọn máy rọi phim khổ 35mm và 120 cho phòng tối tại gia ' + CAST(n AS NVARCHAR(10))
@@ -490,21 +487,21 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 13. SEED BẢNG WORKSHOP (Mục tiêu: 50 bản ghi)
--- Tổ chức bởi các Expert / Provider (user_id từ 6 đến 15)
+-- 13. SEED BẢNG WORKSHOP (Mục tiêu: 500 bản ghi)
+-- Tổ chức bởi các Expert (user_id từ 501 đến 1500)
 -- ============================================================================
-PRINT N'>> Seeding WORKSHOP (50 records)...';
+PRINT N'>> Seeding WORKSHOP (500 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (50) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (500) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.WORKSHOP (
     organizer_id, title, description, topic, start_time, end_time,
     capacity, location, price, status, created_at
 )
 SELECT 
-    6 + ((n - 1) % 10), -- Experts (user_id 6 đến 15)
+    501 + ((n - 1) % 1000), -- Experts (user_id 501 đến 1500)
     CASE (n % 5)
         WHEN 0 THEN N'Masterclass: Kỹ Thuật Tráng Phim Đen Trắng Cổ Điển ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Workshop: Nghệ Thuật Rọi Ảnh Bằng Máy Phóng Beseler ' + CAST(n AS NVARCHAR(10))
@@ -538,20 +535,20 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 14. SEED BẢNG PHOTO (Mục tiêu: 500 bản ghi)
+-- 14. SEED BẢNG PHOTO (Mục tiêu: 20,000 bản ghi)
 -- Ảnh của người dùng đăng tải
 -- ============================================================================
-PRINT N'>> Seeding PHOTO (500 records)...';
+PRINT N'>> Seeding PHOTO (20,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (500) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    SELECT TOP (20000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
     FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.PHOTO (
     user_id, title, file_url, description, created_at, updated_at
 )
 SELECT 
-    1 + ((n - 1) % 100),
+    1 + ((n - 1) % 10000),
     CASE (n % 6)
         WHEN 0 THEN N'Bình minh trên cầu Long Biên (Film Tri-X 400) #' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Chân dung phố cổ Hội An (Kodak Portra 400) #' + CAST(n AS NVARCHAR(10))
@@ -568,20 +565,20 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 15. SEED BẢNG COMPLAINT (Mục tiêu: 50 bản ghi)
+-- 15. SEED BẢNG COMPLAINT (Mục tiêu: 1,000 bản ghi)
 -- Khiếu nại và xử lý khiếu nại
 -- ============================================================================
-PRINT N'>> Seeding COMPLAINT (50 records)...';
+PRINT N'>> Seeding COMPLAINT (1,000 records)...';
 
 ;WITH Numbers(n) AS (
-    SELECT TOP (50) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
-    FROM sys.all_objects
+    SELECT TOP (1000) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
 )
 INSERT INTO dbo.COMPLAINT (
     user_id, subject, description, status, created_at, resolved_at, resolution
 )
 SELECT 
-    31 + ((n - 1) % 70),
+    3001 + ((n - 1) % 7000),
     CASE (n % 4)
         WHEN 0 THEN N'Hóa chất tráng phim bị yếu hoạt tính #' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Thiết bị máy rọi bị lỏng ốc chỉnh nét #' + CAST(n AS NVARCHAR(10))
@@ -607,102 +604,142 @@ FROM Numbers;
 GO
 
 -- ============================================================================
--- 16. SEED BẢNG PACKAGE_SPACE (Mục tiêu: 120 bản ghi)
--- 60 packages x 2 spaces mỗi package = 120 bản ghi
+-- 16. SEED BẢNG PACKAGE_SPACE (Mục tiêu: 6,000 bản ghi)
+-- 3,000 packages x 2 spaces mỗi package = 6,000 bản ghi
 -- ============================================================================
-PRINT N'>> Seeding PACKAGE_SPACE (120 records)...';
+PRINT N'>> Seeding PACKAGE_SPACE (6,000 records)...';
 
 ;WITH PkgSpace(package_id, space_id) AS (
-    -- Space thứ nhất của package
-    SELECT package_id, ((package_id - 1) % 60) + 1 FROM dbo.SERVICE_PACKAGE
+    -- Hai space thuộc cùng provider với package
+    SELECT package_id, provider_id FROM dbo.SERVICE_PACKAGE
     UNION ALL
-    -- Space thứ hai của package (đảm bảo khác space thứ nhất)
-    SELECT package_id, (((package_id - 1) + 1) % 60) + 1 FROM dbo.SERVICE_PACKAGE
+    SELECT package_id, provider_id + 1000 FROM dbo.SERVICE_PACKAGE
 )
 INSERT INTO dbo.PACKAGE_SPACE (package_id, space_id)
 SELECT package_id, space_id FROM PkgSpace;
 GO
 
 -- ============================================================================
--- 17. SEED BẢNG PACKAGE_RESOURCE (Mục tiêu: 180 bản ghi)
--- 60 packages x 3 resources mỗi package = 180 bản ghi
+-- 17. SEED BẢNG PACKAGE_RESOURCE (Mục tiêu: 15,000 bản ghi)
+-- 3,000 packages x 5 resources mỗi package = 15,000 bản ghi
 -- ============================================================================
-PRINT N'>> Seeding PACKAGE_RESOURCE (180 records)...';
+PRINT N'>> Seeding PACKAGE_RESOURCE (15,000 records)...';
 
 ;WITH PkgRes(package_id, resource_id, quantity) AS (
-    SELECT package_id, ((package_id * 2 - 2) % 150) + 1, 1 FROM dbo.SERVICE_PACKAGE
+    SELECT package_id, provider_id, 1 FROM dbo.SERVICE_PACKAGE
     UNION ALL
-    SELECT package_id, ((package_id * 2 - 1) % 150) + 1, 1 FROM dbo.SERVICE_PACKAGE
+    SELECT package_id, provider_id + 1000, 1 FROM dbo.SERVICE_PACKAGE
     UNION ALL
-    SELECT package_id, ((package_id * 2) % 150) + 1, 2 FROM dbo.SERVICE_PACKAGE
+    SELECT package_id, provider_id + 2000, 2 FROM dbo.SERVICE_PACKAGE
+    UNION ALL
+    SELECT package_id, provider_id + 3000, 1 FROM dbo.SERVICE_PACKAGE
+    UNION ALL
+    SELECT package_id, provider_id + 4000, 1 FROM dbo.SERVICE_PACKAGE
 )
 INSERT INTO dbo.PACKAGE_RESOURCE (package_id, resource_id, quantity)
 SELECT package_id, resource_id, quantity FROM PkgRes;
 GO
 
 -- ============================================================================
--- 18. SEED BẢNG RESERVATION_SPACE (Mục tiêu: 600 bản ghi)
--- 500 reservations: 100 reservation đầu x 2 spaces + 400 reservation sau x 1 space = 600 bản ghi
+-- 18. SEED BẢNG RESERVATION_SPACE (Mục tiêu: 25,000 bản ghi)
+-- 16,000 reservations: 9,000 reservation đầu x 2 spaces + 7,000 reservation sau x 1 space
 -- ============================================================================
-PRINT N'>> Seeding RESERVATION_SPACE (600 records)...';
-
-;WITH ResSpace(reservation_id, space_id) AS (
-    -- Mỗi reservation trong 500 reservation có ít nhất 1 space = 500 bản ghi
-    SELECT reservation_id, ((reservation_id - 1) % 60) + 1 FROM dbo.RESERVATION
-    UNION ALL
-    -- 100 reservation đầu tiên chọn thêm 1 space thứ hai = 100 bản ghi -> Tổng 600
-    SELECT reservation_id, (((reservation_id - 1) + 5) % 60) + 1 FROM dbo.RESERVATION WHERE reservation_id <= 100
-)
+PRINT N'>> Seeding RESERVATION_SPACE (25,000 records)...';
 INSERT INTO dbo.RESERVATION_SPACE (reservation_id, space_id)
-SELECT reservation_id, space_id FROM ResSpace;
+SELECT r.reservation_id,
+      CASE WHEN r.package_id IS NOT NULL
+            THEN p.provider_id
+            ELSE 1 + ((r.reservation_id - 1) % 1000)
+      END
+FROM dbo.RESERVATION r
+LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+UNION ALL
+SELECT r.reservation_id,
+      CASE WHEN r.package_id IS NOT NULL
+            THEN p.provider_id + 1000
+            ELSE 1001 + ((r.reservation_id - 1) % 1000)
+      END
+FROM dbo.RESERVATION r
+LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+WHERE r.reservation_id <= 9000;
 GO
 
 -- ============================================================================
--- 19. SEED BẢNG RESERVATION_RESOURCE (Mục tiêu: 800 bản ghi)
--- 500 reservations: 300 reservation đầu x 2 resources + 200 reservation sau x 1 resource = 800 bản ghi
+-- 19. SEED BẢNG RESERVATION_RESOURCE (Mục tiêu: 30,000 bản ghi)
+-- 16,000 reservations: 14,000 reservation đầu x 2 resources + 2,000 reservation sau x 1 resource
 -- ============================================================================
-PRINT N'>> Seeding RESERVATION_RESOURCE (800 records)...';
+PRINT N'>> Seeding RESERVATION_RESOURCE (30,000 records)...';
 
 ;WITH ResResource(reservation_id, resource_id, quantity) AS (
-    -- 500 reservation có resource 1
-    SELECT reservation_id, ((reservation_id - 1) % 150) + 1, 1 FROM dbo.RESERVATION
+    SELECT r.reservation_id,
+           CASE WHEN r.package_id IS NOT NULL
+                    THEN p.provider_id
+                    ELSE 1 + ((r.reservation_id - 1) % 1000)
+           END,
+           1
+    FROM dbo.RESERVATION r
+    LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
     UNION ALL
-    -- 300 reservation đầu tiên có thêm resource 2 -> Tổng 800 bản ghi
-    SELECT reservation_id, (((reservation_id - 1) + 10) % 150) + 1, 1 + (reservation_id % 2) FROM dbo.RESERVATION WHERE reservation_id <= 300
+    SELECT r.reservation_id,
+           CASE WHEN r.package_id IS NOT NULL
+                    THEN p.provider_id + 1000
+                    ELSE 1001 + ((r.reservation_id - 1) % 1000)
+           END,
+           1 + (r.reservation_id % 2)
+    FROM dbo.RESERVATION r
+    LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+    WHERE r.reservation_id <= 14000
 )
 INSERT INTO dbo.RESERVATION_RESOURCE (reservation_id, resource_id, quantity)
 SELECT reservation_id, resource_id, quantity FROM ResResource;
 GO
 
 -- ============================================================================
--- 20. SEED BẢNG SESSION_RESOURCE (Mục tiêu: 600 bản ghi)
--- 400 sessions: 200 session đầu x 2 resources + 200 session sau x 1 resource = 600 bản ghi
+-- 20. SEED BẢNG SESSION_RESOURCE (Mục tiêu: 20,000 bản ghi)
+-- 15,000 sessions: 5,000 session đầu x 2 resources + 10,000 session sau x 1 resource = 20,000 bản ghi
 -- ============================================================================
-PRINT N'>> Seeding SESSION_RESOURCE (600 records)...';
+PRINT N'>> Seeding SESSION_RESOURCE (20,000 records)...';
 
 ;WITH SessResource(session_id, resource_id, quantity) AS (
-    -- 400 session có resource 1
-    SELECT session_id, ((session_id - 1) % 150) + 1, 1 FROM dbo.SERVICE_SESSION
+    -- Resource thuộc cùng provider với package của reservation (nếu có)
+    SELECT s.session_id,
+           CASE WHEN r.package_id IS NOT NULL
+                THEN p.provider_id
+                ELSE 1 + ((r.reservation_id - 1) % 1000)
+           END,
+           1
+    FROM dbo.SERVICE_SESSION s
+    INNER JOIN dbo.RESERVATION r ON r.reservation_id = s.reservation_id
+    LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
     UNION ALL
-    -- 200 session đầu có thêm resource 2 -> Tổng 600 bản ghi
-    SELECT session_id, (((session_id - 1) + 20) % 150) + 1, 1 FROM dbo.SERVICE_SESSION WHERE session_id <= 200
+    -- 5,000 session đầu có thêm resource 2 -> Tổng 20,000
+    SELECT s.session_id,
+           CASE WHEN r.package_id IS NOT NULL
+                THEN p.provider_id + 1000
+                ELSE 1001 + ((r.reservation_id - 1) % 1000)
+           END,
+           1
+    FROM dbo.SERVICE_SESSION s
+    INNER JOIN dbo.RESERVATION r ON r.reservation_id = s.reservation_id
+    LEFT JOIN dbo.SERVICE_PACKAGE p ON p.package_id = r.package_id
+    WHERE s.session_id <= 5000
 )
 INSERT INTO dbo.SESSION_RESOURCE (session_id, resource_id, quantity)
 SELECT session_id, resource_id, quantity FROM SessResource;
 GO
 
 -- ============================================================================
--- 21. SEED BẢNG WORKSHOP_REGISTRATION (Mục tiêu: 300 bản ghi)
--- 50 workshops x 6 users = 300 bản ghi
+-- 21. SEED BẢNG WORKSHOP_REGISTRATION (Mục tiêu: 5,000 bản ghi)
+-- 500 workshops x 10 users = 5,000 bản ghi
 -- ============================================================================
-PRINT N'>> Seeding WORKSHOP_REGISTRATION (300 records)...';
+PRINT N'>> Seeding WORKSHOP_REGISTRATION (5,000 records)...';
 
 ;WITH Reg(user_id, workshop_id, registered_at) AS (
-    SELECT 31 + ((w.workshop_id * 6 + u.n) % 70), w.workshop_id, DATEADD(DAY, -5, w.created_at)
+    SELECT 3001 + ((w.workshop_id * 10 + u.n) % 7000), w.workshop_id, DATEADD(DAY, -5, w.created_at)
     FROM dbo.WORKSHOP w
     CROSS JOIN (
-        SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL 
-        SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+        SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
+        SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
     ) u
 )
 INSERT INTO dbo.WORKSHOP_REGISTRATION (user_id, workshop_id, registered_at)
@@ -724,51 +761,51 @@ SELECT
     t.name AS [Tên bảng / Quan hệ],
     p.rows AS [Số bản ghi thực tế],
     CASE t.name
-        WHEN 'USER' THEN 100
-        WHEN 'SERVICE_PROVIDER' THEN 20
-        WHEN 'CREATIVE_SPACE' THEN 60
-        WHEN 'RESOURCE' THEN 150
-        WHEN 'MAINTENANCE' THEN 100
-        WHEN 'SERVICE_PACKAGE' THEN 60
-        WHEN 'PROMOTION' THEN 40
-        WHEN 'RESERVATION' THEN 500
-        WHEN 'PAYMENT' THEN 450
-        WHEN 'SERVICE_SESSION' THEN 400
-        WHEN 'REVIEW' THEN 300
-        WHEN 'COMMUNITY_CONTENT' THEN 300
-        WHEN 'WORKSHOP' THEN 50
-        WHEN 'PHOTO' THEN 500
-        WHEN 'COMPLAINT' THEN 50
-        WHEN 'PACKAGE_SPACE' THEN 120
-        WHEN 'PACKAGE_RESOURCE' THEN 180
-        WHEN 'RESERVATION_SPACE' THEN 600
-        WHEN 'RESERVATION_RESOURCE' THEN 800
-        WHEN 'SESSION_RESOURCE' THEN 600
-        WHEN 'WORKSHOP_REGISTRATION' THEN 300
+        WHEN 'USER' THEN 10000
+        WHEN 'SERVICE_PROVIDER' THEN 1000
+        WHEN 'CREATIVE_SPACE' THEN 3000
+        WHEN 'RESOURCE' THEN 15000
+        WHEN 'MAINTENANCE' THEN 18000
+        WHEN 'SERVICE_PACKAGE' THEN 3000
+        WHEN 'PROMOTION' THEN 1000
+        WHEN 'RESERVATION' THEN 16000
+        WHEN 'PAYMENT' THEN 10000
+        WHEN 'SERVICE_SESSION' THEN 15000
+        WHEN 'REVIEW' THEN 10000
+        WHEN 'COMMUNITY_CONTENT' THEN 5000
+        WHEN 'WORKSHOP' THEN 500
+        WHEN 'PHOTO' THEN 20000
+        WHEN 'COMPLAINT' THEN 1000
+        WHEN 'PACKAGE_SPACE' THEN 6000
+        WHEN 'PACKAGE_RESOURCE' THEN 15000
+        WHEN 'RESERVATION_SPACE' THEN 25000
+        WHEN 'RESERVATION_RESOURCE' THEN 30000
+        WHEN 'SESSION_RESOURCE' THEN 20000
+        WHEN 'WORKSHOP_REGISTRATION' THEN 5000
     END AS [Mục tiêu plan_db.md],
     CASE 
         WHEN p.rows = CASE t.name
-            WHEN 'USER' THEN 100
-            WHEN 'SERVICE_PROVIDER' THEN 20
-            WHEN 'CREATIVE_SPACE' THEN 60
-            WHEN 'RESOURCE' THEN 150
-            WHEN 'MAINTENANCE' THEN 100
-            WHEN 'SERVICE_PACKAGE' THEN 60
-            WHEN 'PROMOTION' THEN 40
-            WHEN 'RESERVATION' THEN 500
-            WHEN 'PAYMENT' THEN 450
-            WHEN 'SERVICE_SESSION' THEN 400
-            WHEN 'REVIEW' THEN 300
-            WHEN 'COMMUNITY_CONTENT' THEN 300
-            WHEN 'WORKSHOP' THEN 50
-            WHEN 'PHOTO' THEN 500
-            WHEN 'COMPLAINT' THEN 50
-            WHEN 'PACKAGE_SPACE' THEN 120
-            WHEN 'PACKAGE_RESOURCE' THEN 180
-            WHEN 'RESERVATION_SPACE' THEN 600
-            WHEN 'RESERVATION_RESOURCE' THEN 800
-            WHEN 'SESSION_RESOURCE' THEN 600
-            WHEN 'WORKSHOP_REGISTRATION' THEN 300
+            WHEN 'USER' THEN 10000
+            WHEN 'SERVICE_PROVIDER' THEN 1000
+            WHEN 'CREATIVE_SPACE' THEN 3000
+            WHEN 'RESOURCE' THEN 15000
+            WHEN 'MAINTENANCE' THEN 18000
+            WHEN 'SERVICE_PACKAGE' THEN 3000
+            WHEN 'PROMOTION' THEN 1000
+            WHEN 'RESERVATION' THEN 16000
+            WHEN 'PAYMENT' THEN 10000
+            WHEN 'SERVICE_SESSION' THEN 15000
+            WHEN 'REVIEW' THEN 10000
+            WHEN 'COMMUNITY_CONTENT' THEN 5000
+            WHEN 'WORKSHOP' THEN 500
+            WHEN 'PHOTO' THEN 20000
+            WHEN 'COMPLAINT' THEN 1000
+            WHEN 'PACKAGE_SPACE' THEN 6000
+            WHEN 'PACKAGE_RESOURCE' THEN 15000
+            WHEN 'RESERVATION_SPACE' THEN 25000
+            WHEN 'RESERVATION_RESOURCE' THEN 30000
+            WHEN 'SESSION_RESOURCE' THEN 20000
+            WHEN 'WORKSHOP_REGISTRATION' THEN 5000
         END THEN N'✓ Khớp 100%'
         ELSE N'✗ Chưa khớp'
     END AS [Trạng thái đối chiếu]
@@ -776,6 +813,70 @@ FROM sys.tables t
 INNER JOIN sys.partitions p ON t.object_id = p.object_id AND p.index_id IN (0, 1)
 ORDER BY [Mục tiêu plan_db.md] ASC, t.name ASC;
 GO
+
+-- Không cho phép hoàn tất im lặng nếu số lượng hoặc quan hệ nghiệp vụ bị lệch.
+DECLARE @ExpectedCounts TABLE (
+    table_name SYSNAME PRIMARY KEY,
+    expected_count INT NOT NULL
+);
+
+INSERT INTO @ExpectedCounts (table_name, expected_count)
+VALUES
+    (N'USER', 10000),
+    (N'SERVICE_PROVIDER', 1000),
+    (N'CREATIVE_SPACE', 3000),
+    (N'RESOURCE', 15000),
+    (N'MAINTENANCE', 18000),
+    (N'SERVICE_PACKAGE', 3000),
+    (N'PROMOTION', 1000),
+    (N'RESERVATION', 16000),
+    (N'PAYMENT', 10000),
+    (N'SERVICE_SESSION', 15000),
+    (N'REVIEW', 10000),
+    (N'COMMUNITY_CONTENT', 5000),
+    (N'WORKSHOP', 500),
+    (N'PHOTO', 20000),
+    (N'COMPLAINT', 1000),
+    (N'PACKAGE_SPACE', 6000),
+    (N'PACKAGE_RESOURCE', 15000),
+    (N'RESERVATION_SPACE', 25000),
+    (N'RESERVATION_RESOURCE', 30000),
+    (N'SESSION_RESOURCE', 20000),
+    (N'WORKSHOP_REGISTRATION', 5000);
+
+IF EXISTS (
+    SELECT 1
+    FROM @ExpectedCounts e
+    LEFT JOIN (
+        SELECT t.name AS table_name, p.rows AS actual_count
+        FROM sys.tables t
+        INNER JOIN sys.partitions p ON t.object_id = p.object_id AND p.index_id IN (0, 1)
+    ) a ON a.table_name = e.table_name
+    WHERE ISNULL(a.actual_count, -1) <> e.expected_count
+)
+BEGIN
+    THROW 51000, N'Seed verification failed: one or more table counts do not match plan_db.md.', 1;
+END;
+
+IF EXISTS (
+    SELECT 1
+    FROM dbo.REVIEW r
+    INNER JOIN dbo.RESERVATION res ON res.reservation_id = r.reservation_id
+    WHERE r.user_id <> res.user_id
+)
+BEGIN
+    THROW 51001, N'Seed verification failed: review users do not match reservation users.', 1;
+END;
+
+IF EXISTS (
+    SELECT 1
+    FROM dbo.SERVICE_SESSION s
+    WHERE s.check_out IS NOT NULL
+      AND s.actual_usage_duration <> DATEDIFF(MINUTE, s.check_in, s.check_out)
+)
+BEGIN
+    THROW 51002, N'Seed verification failed: service session durations are inconsistent.', 1;
+END;
 
 PRINT N'>> Data seeding and verification completed successfully!';
 GO

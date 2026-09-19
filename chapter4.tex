@@ -1,4 +1,4 @@
-﻿\chapter{Thiết kế vật lý}
+\chapter{Thiết kế vật lý}
 
 \section{Thiết kế lưu trữ vật lý}
 
@@ -66,7 +66,7 @@ Trong lý thuyết cơ sở dữ liệu, việc ước lượng số lượng kh
 
 \subsubsection{Bảng ước lượng và đo lường lưu trữ cho 21 quan hệ}
 
-Dựa trên bộ dữ liệu mẫu gồm $5{,}680$ bản ghi, bảng dưới đây kết hợp hai nhóm số liệu. Các cột $R$ trung bình, $bfr$ và số page lý thuyết $b_i$ được tính theo mô hình trang dữ liệu; các cột còn lại là số liệu đo thực tế từ SQL Server. Vì vậy, $b_i$ có thể khác `DataPages` do SQL Server còn phải lưu page quản lý, page chỉ mục và dữ liệu LOB.
+Dựa trên bộ dữ liệu mẫu hiện tại của hệ thống, bảng dưới đây kết hợp hai nhóm số liệu. Các cột $R$ trung bình, $bfr$ và số page lý thuyết $b_i$ được tính theo mô hình trang dữ liệu; các cột còn lại là số liệu đo thực tế từ SQL Server. Vì vậy, $b_i$ có thể khác `DataPages` do SQL Server còn phải lưu page quản lý, page chỉ mục và dữ liệu LOB.
 
 \begin{table}[htbp]
 \centering
@@ -78,29 +78,29 @@ Dựa trên bộ dữ liệu mẫu gồm $5{,}680$ bản ghi, bảng dưới đ�
 \hline
 \textbf{STT} & \textbf{Tên bảng} & \textbf{$r$} & \textbf{$R$ (bytes)} & \textbf{$bfr$} & \textbf{$b_i$ lý thuyết} & \textbf{TotalPages} & \textbf{UsedPages} & \textbf{DataPages} & \textbf{Reserved (KB)} & \textbf{Data (KB)} \\
 \hline
-1 & \texttt{PHOTO} & 500 & 446.58 & 18 & 28 & 58 & 34 & 30 & 464 & 240 \\
-2 & \texttt{COMMUNITY\_CONTENT} & 300 & 545.48 & 14 & 22 & 59 & 31 & 26 & 472 & 208 \\
-3 & \texttt{RESOURCE} & 150 & 438.09 & 18 & 9 & 35 & 19 & 14 & 280 & 112 \\
-4 & \texttt{PAYMENT} & 450 & 97.04 & 83 & 6 & 52 & 21 & 14 & 416 & 112 \\
-5 & \texttt{REVIEW} & 300 & 198.60 & 40 & 8 & 52 & 16 & 11 & 416 & 88 \\
-6 & \texttt{RESERVATION} & 500 & 67.76 & 118 & 5 & 36 & 16 & 10 & 288 & 80 \\
-7 & \texttt{CREATIVE\_SPACE} & 60 & 885.80 & 9 & 7 & 27 & 13 & 9 & 216 & 72 \\
-8 & \texttt{USER} & 100 & 277.94 & 28 & 4 & 36 & 15 & 9 & 288 & 72 \\
-9 & \texttt{WORKSHOP} & 50 & 587.60 & 13 & 4 & 27 & 10 & 6 & 216 & 48 \\
-10 & \texttt{MAINTENANCE} & 100 & 291.40 & 27 & 4 & 27 & 10 & 6 & 216 & 48 \\
-11 & \texttt{SERVICE\_SESSION} & 400 & 52.75 & 152 & 3 & 27 & 11 & 6 & 216 & 48 \\
-12 & \texttt{COMPLAINT} & 50 & 535.52 & 15 & 4 & 18 & 8 & 5 & 144 & 40 \\
-13 & \texttt{SERVICE\_PACKAGE} & 60 & 374.77 & 21 & 3 & 27 & 9 & 5 & 216 & 40 \\
-14 & \texttt{SESSION\_RESOURCE} & 600 & 19.00 & 424 & 2 & 18 & 9 & 5 & 144 & 40 \\
-15 & \texttt{RESERVATION\_RESOURCE} & 800 & 19.00 & 424 & 2 & 18 & 9 & 5 & 144 & 40 \\
-16 & \texttt{PROMOTION} & 40 & 310.75 & 25 & 2 & 27 & 8 & 4 & 216 & 32 \\
-17 & \texttt{RESERVATION\_SPACE} & 600 & 15.00 & 537 & 2 & 18 & 8 & 4 & 144 & 32 \\
-18 & \texttt{SERVICE\_PROVIDER} & 20 & 414.70 & 19 & 2 & 18 & 6 & 3 & 144 & 24 \\
-19 & \texttt{PACKAGE\_RESOURCE} & 180 & 19.00 & 424 & 1 & 18 & 4 & 2 & 144 & 16 \\
-20 & \texttt{PACKAGE\_SPACE} & 120 & 15.00 & 537 & 1 & 18 & 4 & 2 & 144 & 16 \\
-21 & \texttt{WORKSHOP\_REGISTRATION} & 300 & 21.00 & 383 & 1 & 18 & 4 & 2 & 144 & 16 \\
+1 & \texttt{PHOTO} & 20000 & 526.22 & 15 & 1334 & 1361 & 1340 & 1334 & 10888 & 10672 \\
+2 & \texttt{RESOURCE} & 15000 & 526.73 & 15 & 1000 & 1025 & 1005 & 1000 & 8200 & 8000 \\
+3 & \texttt{MAINTENANCE} & 18000 & 361.40 & 22 & 819 & 849 & 823 & 819 & 6792 & 6552 \\
+4 & \texttt{USER} & 10000 & 293.22 & 27 & 371 & 393 & 374 & 372 & 3144 & 2976 \\
+5 & \texttt{CREATIVE\_SPACE} & 3000 & 1096.86 & 7 & 429 & 449 & 431 & 429 & 3592 & 3432 \\
+6 & \texttt{COMMUNITY\_CONTENT} & 5000 & 668.96 & 12 & 417 & 433 & 419 & 417 & 3464 & 3336 \\
+7 & \texttt{REVIEW} & 10000 & 246.20 & 32 & 313 & 353 & 336 & 334 & 2824 & 2672 \\
+8 & \texttt{RESERVATION} & 16000 & 67.99 & 118 & 136 & 161 & 142 & 140 & 1288 & 1120 \\
+9 & \texttt{PAYMENT} & 10000 & 98.91 & 81 & 124 & 145 & 127 & 125 & 1160 & 1000 \\
+10 & \texttt{SERVICE\_PACKAGE} & 3000 & 471.89 & 17 & 177 & 193 & 179 & 177 & 1544 & 1416 \\
+11 & \texttt{SERVICE\_SESSION} & 15000 & 52.73 & 152 & 99 & 121 & 104 & 102 & 968 & 816 \\
+12 & \texttt{RESERVATION\_RESOURCE} & 30000 & 19.00 & 424 & 71 & 97 & 80 & 78 & 776 & 624 \\
+13 & \texttt{RESERVATION\_SPACE} & 25000 & 15.00 & 537 & 47 & 73 & 55 & 53 & 584 & 424 \\
+14 & \texttt{SERVICE\_PROVIDER} & 1000 & 508.92 & 15 & 67 & 89 & 69 & 67 & 712 & 536 \\
+15 & \texttt{SESSION\_RESOURCE} & 20000 & 19.00 & 424 & 48 & 73 & 54 & 52 & 584 & 416 \\
+16 & \texttt{COMPLAINT} & 1000 & 502.19 & 16 & 63 & 81 & 66 & 64 & 648 & 512 \\
+17 & \texttt{PACKAGE\_RESOURCE} & 15000 & 19.00 & 424 & 36 & 57 & 41 & 39 & 456 & 312 \\
+18 & \texttt{PROMOTION} & 1000 & 378.99 & 21 & 48 & 65 & 50 & 48 & 520 & 384 \\
+19 & \texttt{WORKSHOP} & 500 & 709.73 & 11 & 46 & 65 & 48 & 46 & 520 & 368 \\
+20 & \texttt{PACKAGE\_SPACE} & 6000 & 15.00 & 537 & 12 & 33 & 15 & 13 & 264 & 104 \\
+21 & \texttt{WORKSHOP\_REGISTRATION} & 5000 & 21.00 & 383 & 14 & 33 & 17 & 15 & 264 & 120 \\
 \hline
-\multicolumn{2}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{5,680} & -- & -- & \textbf{120} & \textbf{634} & \textbf{265} & \textbf{178} & \textbf{5,072} & \textbf{1,424} \\
+\multicolumn{2}{|c|}{\textbf{Tổng cộng toàn hệ thống}} & \textbf{229{,}500} & -- & -- & \textbf{5{,}671} & \textbf{6{,}149} & \textbf{5{,}775} & \textbf{5{,}724} & \textbf{49{,}192} & \textbf{45{,}792} \\
 \hline
 \end{tabular}
 }%
@@ -486,7 +486,7 @@ Các chỉ mục kết hợp được triển khai gồm:
 	\label{tab:composite_indexes}
 	\renewcommand{\arraystretch}{1.2}
 	\scriptsize
-	\begin{tabular}{|p{4.0cm}|p{5.5cm}|}
+	\begin{tabularx}{\linewidth}{|p{6.8cm}|X|}
 		\hline
 		\textbf{Chỉ mục} & \textbf{Các thuộc tính khóa} \\
 		\hline
@@ -526,7 +526,7 @@ Các chỉ mục kết hợp được triển khai gồm:
 		\texttt{IX\_COMPLAINT\_UserId\_Status} &
 		\texttt{(user\_id, status)} \\
 		\hline
-	\end{tabular}
+	\end{tabularx}
 	\caption{Các chỉ mục kết hợp được triển khai}
 \end{table}
 
@@ -571,7 +571,7 @@ Các workload và chỉ mục tương ứng được tổng hợp như sau:
 	\label{tab:index_workload}
 	\renewcommand{\arraystretch}{1.2}
 	\scriptsize
-	\begin{tabular}{|p{4.0cm}|p{4.2cm}|p{4.0cm}|}
+	\begin{tabularx}{\linewidth}{|X|p{5.8cm}|X|}
 		\hline
 		\textbf{Workload} &
 		\textbf{Chỉ mục} &
@@ -642,7 +642,7 @@ Các workload và chỉ mục tương ứng được tổng hợp như sau:
 		\texttt{IX\_COMPLAINT\_UserId\_Status} &
 		Lọc Complaint theo User và trạng thái. \\
 		\hline
-	\end{tabular}
+	\end{tabularx}
 	\caption{Lựa chọn chỉ mục theo workload}
 \end{table}
 
@@ -750,7 +750,7 @@ Khóa phân vùng (partition key) là thuộc tính hoặc tập thuộc tính �
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|l|l|p{4cm}|}
+\begin{tabularx}{\linewidth}{|l|l|l|X|}
 \hline
 \textbf{Quan hệ} & \textbf{Khóa phân vùng} & \textbf{Kiểu phân vùng} & \textbf{Lý do} \\
 \hline
@@ -764,7 +764,7 @@ Khóa phân vùng (partition key) là thuộc tính hoặc tập thuộc tính �
 \hline
 \texttt{CREATIVE\_SPACE} & \texttt{space\_type} & List & Tìm kiếm thường lọc theo loại không gian. \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Lựa chọn khóa phân vùng}
 \end{table}
 
@@ -779,7 +779,7 @@ Workload của hệ thống bao gồm các truy vấn được thực thi thư�
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|c|p{5cm}|p{3cm}|c|}
+\begin{tabularx}{\linewidth}{|c|X|p{3.5cm}|c|}
 \hline
 \textbf{STT} & \textbf{Truy vấn} & \textbf{Quan hệ liên quan} & \textbf{Tần suất} \\
 \hline
@@ -799,7 +799,7 @@ Workload của hệ thống bao gồm các truy vấn được thực thi thư�
 \hline
 8 & Lấy Review của một Reservation & \texttt{REVIEW} & Trung bình \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Phân tích workload các truy vấn phổ biến}
 \end{table}
 
@@ -889,7 +889,7 @@ Ví dụ, chỉ mục B+ trên \texttt{user\_id} của \texttt{RESERVATION} có 
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|p{5cm}|c|}
+\begin{tabularx}{\linewidth}{|l|X|c|}
 \hline
 \textbf{Kế hoạch} & \textbf{Mô tả} & \textbf{Chi phí (I/O)} \\
 \hline
@@ -899,7 +899,7 @@ Chỉ mục B+ trên \texttt{user\_id} & Tìm qua chỉ mục, lấy các bộ p
 \hline
 Chỉ mục Hash trên \texttt{user\_id} & Tính hash, truy cập trực tiếp bucket & $1 + k$ \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{So sánh chi phí các kế hoạch thực thi}
 \end{table}
 
@@ -922,7 +922,7 @@ Phép kết nối (join) thường là phép toán tốn kém nhất trong một
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|p{3.5cm}|l|l|p{3.5cm}|}
+\begin{tabularx}{\linewidth}{|p{3.0cm}|p{4.2cm}|p{2.8cm}|X|}
 \hline
 \textbf{Truy vấn} & \textbf{Quan hệ kết nối} & \textbf{Thuật toán} & \textbf{Lý do} \\
 \hline
@@ -934,7 +934,7 @@ Lấy Resource của Package & \texttt{PACKAGE\_RESOURCE} $\bowtie$ \texttt{RESO
 \hline
 Thống kê doanh thu & \texttt{PAYMENT} $\bowtie$ \texttt{RESERVATION} & Sort-Merge Join & Kết quả cần sắp xếp theo thời gian. \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Lựa chọn thuật toán kết nối theo từng truy vấn}
 \end{table}
 

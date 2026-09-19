@@ -78,7 +78,7 @@ Quá trình này sẽ:
 1. Kéo image `mssql/server:2022-latest` (nếu chưa có).
 2. Khởi động container `sqlserver_filmphoto`.
 3. Kiểm tra tính sẵn sàng qua healthcheck.
-4. Container `sqlserver-init` tự động chạy chuỗi script trong `SQL_src/` để tạo 21 bảng và 5,310+ bản ghi mẫu.
+4. Container `sqlserver-init` tự động chạy chuỗi script trong `SQL_src/` để tạo 21 bảng và 229.500 bản ghi mẫu.
 
 ### 3.2. Kiểm tra trạng thái và Logs
 

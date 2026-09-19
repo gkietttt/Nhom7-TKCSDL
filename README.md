@@ -152,7 +152,7 @@ ORDER BY t.name;
 GO
 ```
 
-Kết quả mong đợi là **21 bảng** và tổng cộng **5.680 bản ghi** theo `doc/plan_db.md`.
+Kết quả mong đợi là **21 bảng** và tổng cộng **229.500 bản ghi** theo `doc/plan_db.md`.
 
 ## 7. Dừng, khởi động lại và xóa dữ liệu
 

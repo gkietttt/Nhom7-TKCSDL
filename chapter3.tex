@@ -467,11 +467,25 @@ $$
 
 Lược đồ:
 
-$$ \texttt{CREATIVE\_SPACE}( \texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} ) $$
+$$
+\begin{aligned}
+\texttt{CREATIVE\_SPACE}( & \texttt{space\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \\
+& \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \\
+& \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \\
+& \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{space\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \texttt{pricing}, \texttt{status} \} $$
+$$
+\begin{aligned}
+\texttt{space\_id} \rightarrow \{ & \texttt{provider\_id}, \texttt{name}, \texttt{space\_type}, \texttt{description}, \texttt{area}, \\
+& \texttt{capacity}, \texttt{artistic\_style}, \texttt{lighting\_condition}, \texttt{ventilation}, \\
+& \texttt{acoustic\_characteristics}, \texttt{operating\_hours}, \texttt{usage\_policy}, \\
+& \texttt{pricing}, \texttt{status} \}
+\end{aligned}
+$$
 
 Mỗi \texttt{space\_id} đại diện cho đúng một không gian sáng tạo, vì vậy xác định duy nhất toàn bộ các thông tin mô tả không gian đó.
 
@@ -479,11 +493,23 @@ Mỗi \texttt{space\_id} đại diện cho đúng một không gian sáng tạo,
 
 Lược đồ:
 
-$$ \texttt{RESOURCE}( \texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} ) $$
+$$
+\begin{aligned}
+\texttt{RESOURCE}( & \texttt{resource\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \\
+& \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \\
+& \texttt{compatibility\_information}, \texttt{status} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{resource\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \texttt{compatibility\_information}, \texttt{status} \} $$
+$$
+\begin{aligned}
+\texttt{resource\_id} \rightarrow \{ & \texttt{provider\_id}, \texttt{name}, \texttt{resource\_type}, \texttt{description}, \\
+& \texttt{quantity}, \texttt{condition}, \texttt{rental\_price}, \\
+& \texttt{compatibility\_information}, \texttt{status} \}
+\end{aligned}
+$$
 
 Ý nghĩa nghiệp vụ: mỗi mã tài nguyên xác định duy nhất thông tin về một tài nguyên được quản lý.
 
@@ -491,11 +517,21 @@ $$ \texttt{resource\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \t
 
 Lược đồ:
 
-$$ \texttt{MAINTENANCE}( \texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status}) $$
+$$
+\begin{aligned}
+\texttt{MAINTENANCE}( & \texttt{maintenance\_id}, \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \\
+& \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{maintenance\_id} \rightarrow \{ \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} \} $$
+$$
+\begin{aligned}
+\texttt{maintenance\_id} \rightarrow \{ & \texttt{resource\_id}, \texttt{maintenance\_type}, \texttt{description}, \\
+& \texttt{scheduled\_at}, \texttt{completed\_at}, \texttt{cost}, \texttt{status} \}
+\end{aligned}
+$$
 
 Mỗi hoạt động bảo trì có một mã riêng và xác định duy nhất tài nguyên được bảo trì cùng các thông tin của hoạt động đó.
 
@@ -503,33 +539,41 @@ Mỗi hoạt động bảo trì có một mã riêng và xác định duy nhất
 
 Lược đồ:
 
-$$ \texttt{SERVICE\_PACKAGE}( \texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at}) $$
+$$
+\begin{aligned}
+\texttt{SERVICE\_PACKAGE}( & \texttt{package\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \\
+& \texttt{price}, \texttt{duration}, \texttt{status}, \texttt{created\_at} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
 $$
-\texttt{package\_id}
-\rightarrow
-\{
-\texttt{provider\_id},
-\texttt{name},
-\texttt{description},
-\texttt{price},
-\texttt{duration},
-\texttt{status},
-\texttt{created\_at}
-\}
+\begin{aligned}
+\texttt{package\_id} \rightarrow \{ & \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{price}, \\
+& \texttt{duration}, \texttt{status}, \texttt{created\_at} \}
+\end{aligned}
 $$
 
 \paragraph{7. Quan hệ \texttt{PROMOTION}}\mbox{}\par
 
 Lược đồ:
 
-$$ \texttt{PROMOTION}( \texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status}) $$
+$$
+\begin{aligned}
+\texttt{PROMOTION}( & \texttt{promotion\_id}, \texttt{provider\_id}, \texttt{name}, \texttt{description}, \\
+& \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{promotion\_id} \rightarrow \{ \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} \} $$
+$$
+\begin{aligned}
+\texttt{promotion\_id} \rightarrow \{ & \texttt{provider\_id}, \texttt{name}, \texttt{description}, \texttt{discount\_type}, \\
+& \texttt{discount\_value}, \texttt{start\_at}, \texttt{end\_at}, \texttt{status} \}
+\end{aligned}
+$$
 
 \paragraph{8. Quan hệ \texttt{RESERVATION}}\mbox{}\par
 
@@ -675,21 +719,43 @@ $$
 
 Lược đồ:
 
-$$ \texttt{COMMUNITY\_CONTENT}( \texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at}) $$
+$$
+\begin{aligned}
+\texttt{COMMUNITY\_CONTENT}( & \texttt{content\_id}, \texttt{user\_id}, \texttt{title}, \texttt{content}, \\
+& \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{content\_id} \rightarrow \{ \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \} $$
+$$
+\begin{aligned}
+\texttt{content\_id} \rightarrow \{ & \texttt{user\_id}, \texttt{title}, \texttt{content}, \texttt{content\_type}, \\
+& \texttt{status}, \texttt{created\_at}, \texttt{updated\_at} \}
+\end{aligned}
+$$
 
 \paragraph{13. Quan hệ \texttt{WORKSHOP}}\mbox{}\par
 
 Lược đồ:
 
-$$ \texttt{WORKSHOP}( \texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at}) $$
+$$
+\begin{aligned}
+\texttt{WORKSHOP}( & \texttt{workshop\_id}, \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \\
+& \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \\
+& \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{workshop\_id} \rightarrow \{ \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \texttt{price}, \texttt{status}, \texttt{created\_at} \} $$
+$$
+\begin{aligned}
+\texttt{workshop\_id} \rightarrow \{ & \texttt{organizer\_id}, \texttt{title}, \texttt{description}, \texttt{topic}, \\
+& \texttt{start\_time}, \texttt{end\_time}, \texttt{capacity}, \texttt{location}, \\
+& \texttt{price}, \texttt{status}, \texttt{created\_at} \}
+\end{aligned}
+$$
 
 \paragraph{14. Quan hệ \texttt{PHOTO}}\mbox{}\par
 
@@ -700,27 +766,31 @@ $$ \texttt{PHOTO}( \texttt{photo\_id}, \texttt{user\_id}, \texttt{title}, \textt
 Phụ thuộc hàm:
 
 $$
-\texttt{photo\_id}
-\rightarrow
-\{
-\texttt{user\_id},
-\texttt{title},
-\texttt{file\_url},
-\texttt{description},
-\texttt{created\_at},
-\texttt{updated\_at}
-\}
+\begin{aligned}
+\texttt{photo\_id} \rightarrow \{ & \texttt{user\_id}, \texttt{title}, \texttt{file\_url}, \\
+& \texttt{description}, \texttt{created\_at}, \texttt{updated\_at} \}
+\end{aligned}
 $$
 
 \paragraph{15. Quan hệ \texttt{COMPLAINT}}\mbox{}\par
 
 Lược đồ:
 
-$$ \texttt{COMPLAINT}( \texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution}) $$
+$$
+\begin{aligned}
+\texttt{COMPLAINT}( & \texttt{complaint\_id}, \texttt{user\_id}, \texttt{subject}, \texttt{description}, \\
+& \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} )
+\end{aligned}
+$$
 
 Phụ thuộc hàm:
 
-$$ \texttt{complaint\_id} \rightarrow \{ \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \} $$
+$$
+\begin{aligned}
+\texttt{complaint\_id} \rightarrow \{ & \texttt{user\_id}, \texttt{subject}, \texttt{description}, \texttt{status}, \\
+& \texttt{created\_at}, \texttt{resolved\_at}, \texttt{resolution} \}
+\end{aligned}
+$$
 
 \paragraph{c. Phụ thuộc hàm của các quan hệ trung gian}\mbox{}\par
 
@@ -2444,7 +2514,7 @@ Phụ thuộc bộ phận chỉ phát sinh khi khóa chính là khóa ghép. Cá
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|l|l|c|}
+\begin{tabularx}{\linewidth}{|l|X|l|c|}
 \hline
 \textbf{Quan hệ} & \textbf{Khóa ghép} & \textbf{Thuộc tính không khóa} & \textbf{Phụ thuộc đầy đủ?} \\
 \hline
@@ -2460,7 +2530,7 @@ Phụ thuộc bộ phận chỉ phát sinh khi khóa chính là khóa ghép. Cá
 \hline
 \texttt{WORKSHOP\_REGISTRATION} & \texttt{user\_id, workshop\_id} & Không có & -- \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kiểm tra 2NF cho các quan hệ trung gian}
 \end{table}
 
@@ -2495,7 +2565,7 @@ Trong thiết kế hiện tại, \texttt{actual\_usage\_duration} được giữ
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|p{5cm}|c|}
+\begin{tabularx}{\linewidth}{|l|X|c|}
 \hline
 \textbf{Quan hệ} & \textbf{Phụ thuộc bắc cầu} & \textbf{Đạt 3NF?} \\
 \hline
@@ -2529,7 +2599,7 @@ Trong thiết kế hiện tại, \texttt{actual\_usage\_duration} được giữ
 \hline
 \texttt{COMPLAINT} & Không có & Có \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kiểm tra 3NF cho các quan hệ chính}
 \end{table}
 
@@ -2547,7 +2617,7 @@ Trong hệ thống hiện tại, mỗi quan hệ chính chỉ có một khóa �
 
 \begin{table}[htbp]
 \centering
-\begin{tabular}{|l|l|l|c|}
+\begin{tabularx}{\linewidth}{|l|X|p{3.2cm}|c|}
 \hline
 \textbf{Quan hệ} & \textbf{Phụ thuộc hàm} & \textbf{Vế trái là siêu khóa?} & \textbf{Đạt BCNF?} \\
 \hline
@@ -2561,7 +2631,7 @@ Trong hệ thống hiện tại, mỗi quan hệ chính chỉ có một khóa �
 \hline
 \texttt{SERVICE\_SESSION} & \texttt{\{check\_in, check\_out\}} $\rightarrow$ \texttt{actual\_usage\_duration} & Không (không là siêu khóa) & Cần xem xét \\
 \hline
-\end{tabular}
+\end{tabularx}
 \caption{Kiểm tra BCNF cho một số quan hệ tiêu biểu}
 \end{table}
 

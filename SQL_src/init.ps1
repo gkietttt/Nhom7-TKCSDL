@@ -8,7 +8,6 @@ param (
     [string]$Password = "FilmPhoto2026!DB"
 )
 
-$PSScriptRoot = Split-Path -Parent -MyInvocation.MyCommand.Definition
 $files = @(
     "01_create_database.sql",
     "02_create_tables.sql",
@@ -25,7 +24,7 @@ Write-Host "==========================================================" -Foregro
 foreach ($file in $files) {
     $filePath = Join-Path $PSScriptRoot $file
     Write-Host ">> Executing: $file..." -ForegroundColor Yellow
-    sqlcmd -S $Server -U $User -P $Password -C -i $filePath
+    sqlcmd -S $Server -U $User -P $Password -C -b -i $filePath
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed executing $file"
         exit $LASTEXITCODE
