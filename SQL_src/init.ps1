@@ -24,7 +24,7 @@ Write-Host "==========================================================" -Foregro
 foreach ($file in $files) {
     $filePath = Join-Path $PSScriptRoot $file
     Write-Host ">> Executing: $file..." -ForegroundColor Yellow
-    sqlcmd -S $Server -U $User -P $Password -C -b -i $filePath
+        sqlcmd -S $Server -U $User -P $Password -C -b -f 65001 -i $filePath
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed executing $file"
         exit $LASTEXITCODE

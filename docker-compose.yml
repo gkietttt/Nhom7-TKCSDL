@@ -42,7 +42,7 @@ services:
       echo 'Executing database initialization scripts...';
       for file in /usr/src/app/sql/0*.sql; do
         echo \"Executing $$file...\";
-        $$SQLCMD -S sqlserver -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -b -i \"$$file\";
+          $$SQLCMD -S sqlserver -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -b -f 65001 -i \"$$file\";
       done;
       echo 'Database initialization completed successfully!';
       "
