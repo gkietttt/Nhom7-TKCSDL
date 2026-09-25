@@ -149,14 +149,14 @@ SELECT
     CASE (n % 4)
         WHEN 0 THEN N'Darkroom Classic Room ' + CAST(n AS NVARCHAR(10))
         WHEN 1 THEN N'Studio Ánh Sáng Tự Nhiên ' + CAST(n AS NVARCHAR(10))
-        WHEN 2 THEN N'Studio Chụp Chân Dung Vintage ' + CAST(n AS NVARCHAR(10))
-        ELSE N'Không Gian Đa Năng Hybrid ' + CAST(n AS NVARCHAR(10))
+        WHEN 2 THEN N'Không Gian Đa Năng Hybrid ' + CAST(n AS NVARCHAR(10))
+        ELSE N'Không Gian Triển Lãm Exhibition ' + CAST(n AS NVARCHAR(10))
     END,
     CASE (n % 4)
         WHEN 0 THEN N'Darkroom'
         WHEN 1 THEN N'Studio'
-        WHEN 2 THEN N'Studio'
-        ELSE N'Hybrid'
+        WHEN 2 THEN N'Hybrid'
+        ELSE N'Exhibition'
     END,
     N'Không gian trang bị đầy đủ hệ thống ánh sáng đỏ chuyên dụng, bồn rửa hóa chất inox, hệ thống hút khí độc tiêu chuẩn.',
     25.00 + (n % 10) * 5.0,

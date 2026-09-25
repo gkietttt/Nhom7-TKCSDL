@@ -197,27 +197,27 @@ Sau khi nạp dữ liệu mẫu từ `05_seed_data.sql`, toàn bộ 21 quan hệ
 
 | STT | Tên Quan hệ (Bảng) | Số bản ghi thực tế | Mục tiêu `plan_db.md` | Ý nghĩa nghiệp vụ | Trạng thái |
 | --: | :--- | --: | --: | :--- | :---: |
-| 1 | `USER` | **100** | 100 | Photographer (70), Provider (15), Expert (10), Admin (5) | ✓ Khớp 100% |
-| 2 | `SERVICE_PROVIDER` | **20** | 20 | Nhà cung cấp phòng tối, lab tráng rọi, studio | ✓ Khớp 100% |
-| 3 | `CREATIVE_SPACE` | **60** | 60 | Buồng tối, studio tự nhiên, studio chân dung, hybrid | ✓ Khớp 100% |
-| 4 | `RESOURCE` | **150** | 150 | Máy ảnh film, lens, enlarger, scanner, đèn, hóa chất | ✓ Khớp 100% |
-| 5 | `MAINTENANCE` | **100** | 100 | Lịch bảo dưỡng, căn chỉnh quang học, vệ sinh thiết bị | ✓ Khớp 100% |
-| 6 | `SERVICE_PACKAGE` | **60** | 60 | Gói tráng rọi, gói thuê studio, gói masterclass | ✓ Khớp 100% |
-| 7 | `PROMOTION` | **40** | 40 | Khuyến mãi theo tỷ lệ % hoặc số tiền cố định | ✓ Khớp 100% |
-| 8 | `RESERVATION` | **500** | 500 | Giao dịch đặt chỗ không gian và dịch vụ | ✓ Khớp 100% |
-| 9 | `PAYMENT` | **450** | 450 | Giao dịch thanh toán qua VNPay, Momo, Chuyển khoản | ✓ Khớp 100% |
-| 10 | `SERVICE_SESSION` | **400** | 400 | Phiên sử dụng thực tế (check-in, check-out, duration) | ✓ Khớp 100% |
-| 11 | `REVIEW` | **300** | 300 | Đánh giá sao (1..5) và nhận xét của nhiếp ảnh gia | ✓ Khớp 100% |
-| 12 | `COMMUNITY_CONTENT` | **300** | 300 | Bài viết chia sẻ kỹ thuật, hướng dẫn, đánh giá film | ✓ Khớp 100% |
-| 13 | `WORKSHOP` | **50** | 50 | Workshop đào tạo tráng rọi, scan phim do Expert tổ chức | ✓ Khớp 100% |
-| 14 | `PHOTO` | **500** | 500 | Ảnh tác phẩm analog do thành viên đăng tải | ✓ Khớp 100% |
-| 15 | `COMPLAINT` | **50** | 50 | Khiếu nại và biên bản xử lý chất lượng dịch vụ | ✓ Khớp 100% |
-| 16 | `PACKAGE_SPACE` | **120** | 120 | Bảng trung gian Gói dịch vụ - Không gian (M:N) | ✓ Khớp 100% |
-| 17 | `PACKAGE_RESOURCE` | **180** | 180 | Bảng trung gian Gói dịch vụ - Tài nguyên (M:N) | ✓ Khớp 100% |
-| 18 | `RESERVATION_SPACE` | **600** | 600 | Bảng trung gian Đặt chỗ - Không gian (M:N) | ✓ Khớp 100% |
-| 19 | `RESERVATION_RESOURCE` | **800** | 800 | Bảng trung gian Đặt chỗ - Tài nguyên (M:N) | ✓ Khớp 100% |
-| 20 | `SESSION_RESOURCE` | **600** | 600 | Bảng trung gian Phiên sử dụng - Tài nguyên (M:N) | ✓ Khớp 100% |
-| 21 | `WORKSHOP_REGISTRATION` | **300** | 300 | Bảng trung gian Đăng ký tham gia Workshop (M:N) | ✓ Khớp 100% |
+| 1 | `USER` | **10,000** | 10,000 | Photographer (7,000), Provider (1,500), Expert (1,000), Admin (500) | ✓ Khớp 100% |
+| 2 | `SERVICE_PROVIDER` | **1,000** | 1,000 | Nhà cung cấp phòng tối, lab tráng rọi, studio | ✓ Khớp 100% |
+| 3 | `CREATIVE_SPACE` | **3,000** | 3,000 | Darkroom, studio, hybrid và exhibition | ✓ Khớp 100% |
+| 4 | `RESOURCE` | **15,000** | 15,000 | Máy ảnh film, lens, enlarger, scanner, đèn, hóa chất | ✓ Khớp 100% |
+| 5 | `MAINTENANCE` | **18,000** | 18,000 | Lịch bảo dưỡng, căn chỉnh quang học, vệ sinh thiết bị | ✓ Khớp 100% |
+| 6 | `SERVICE_PACKAGE` | **3,000** | 3,000 | Gói tráng rọi, gói thuê studio, gói masterclass | ✓ Khớp 100% |
+| 7 | `PROMOTION` | **1,000** | 1,000 | Khuyến mãi theo tỷ lệ % hoặc số tiền cố định | ✓ Khớp 100% |
+| 8 | `RESERVATION` | **16,000** | 16,000 | Giao dịch đặt chỗ không gian và dịch vụ | ✓ Khớp 100% |
+| 9 | `PAYMENT` | **10,000** | 10,000 | Giao dịch thanh toán qua VNPay, Momo, Chuyển khoản | ✓ Khớp 100% |
+| 10 | `SERVICE_SESSION` | **15,000** | 15,000 | Phiên sử dụng thực tế (check-in, check-out, duration) | ✓ Khớp 100% |
+| 11 | `REVIEW` | **10,000** | 10,000 | Đánh giá sao (1..5) và nhận xét của nhiếp ảnh gia | ✓ Khớp 100% |
+| 12 | `COMMUNITY_CONTENT` | **5,000** | 5,000 | Bài viết chia sẻ kỹ thuật, hướng dẫn, đánh giá film | ✓ Khớp 100% |
+| 13 | `WORKSHOP` | **500** | 500 | Workshop đào tạo tráng rọi, scan phim do Expert tổ chức | ✓ Khớp 100% |
+| 14 | `PHOTO` | **20,000** | 20,000 | Ảnh tác phẩm analog do thành viên đăng tải | ✓ Khớp 100% |
+| 15 | `COMPLAINT` | **1,000** | 1,000 | Khiếu nại và biên bản xử lý chất lượng dịch vụ | ✓ Khớp 100% |
+| 16 | `PACKAGE_SPACE` | **6,000** | 6,000 | Bảng trung gian Gói dịch vụ - Không gian (M:N) | ✓ Khớp 100% |
+| 17 | `PACKAGE_RESOURCE` | **15,000** | 15,000 | Bảng trung gian Gói dịch vụ - Tài nguyên (M:N) | ✓ Khớp 100% |
+| 18 | `RESERVATION_SPACE` | **25,000** | 25,000 | Bảng trung gian Đặt chỗ - Không gian (M:N) | ✓ Khớp 100% |
+| 19 | `RESERVATION_RESOURCE` | **30,000** | 30,000 | Bảng trung gian Đặt chỗ - Tài nguyên (M:N) | ✓ Khớp 100% |
+| 20 | `SESSION_RESOURCE` | **20,000** | 20,000 | Bảng trung gian Phiên sử dụng - Tài nguyên (M:N) | ✓ Khớp 100% |
+| 21 | `WORKSHOP_REGISTRATION` | **5,000** | 5,000 | Bảng trung gian Đăng ký tham gia Workshop (M:N) | ✓ Khớp 100% |
 
 ### 6.1. Câu truy vấn kiểm tra số lượng bản ghi
 

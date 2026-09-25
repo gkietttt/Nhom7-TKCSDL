@@ -61,8 +61,8 @@ ORDER BY tong_gia_tri DESC, so_lan_dat DESC;
 --     từng người dùng, ORDER BY + TOP lấy 10 người cao nhất.
 --   * 16.000 Reservation chia cho 7.000 Photographer => mỗi người khoảng 2-3 lần
 --     đặt, nên chênh lệch giữa các khách hàng trong dữ liệu mẫu không lớn.
---   * Dùng total_amount của Reservation thay vì PAYMENT vì dữ liệu mẫu chỉ có
---     420 Payment ở trạng thái Success.
+--   * Dùng total_amount của Reservation thay vì PAYMENT để thống nhất với
+--     toàn bộ giao dịch đặt chỗ; seed hiện có 9.200 Payment ở trạng thái Success.
 
 -- ----------------------------------------------------------------------------
 -- U3. Kiểm tra quy tắc nghiệp vụ: Reservation chỉ do Photographer tạo
@@ -104,12 +104,10 @@ FROM dbo.[USER] u
 INNER JOIN dbo.RESERVATION r ON r.user_id = u.user_id
 WHERE r.created_at < u.created_at;
 -- PHÂN TÍCH:
---   * Kết quả dự kiến: khoảng 9.846 tài khoản có created_at sau 25/09/2026
---     (muộn nhất năm 2053) => LỖI DỮ LIỆU MẪU.
---   * Nguyên nhân: công thức DATEADD(DAY, -(100 - id), '2026-08-01') cộng thêm
---     ngày khi id > 100, nên id càng lớn ngày tạo càng xa về tương lai.
---   * Hệ quả: Photographer "được tạo" sau cả Reservation của họ (tháng 8/2026),
---     trái logic nghiệp vụ. Đề xuất sửa seed (xem ghi chú cuối file).
+--   * Kết quả dự kiến với seed hiện tại: 0 tài khoản được tạo sau 25/09/2026
+--     và 0 tài khoản được tạo sau Reservation của chính nó.
+--   * Công thức hiện tại là DATEADD(DAY, -(id % 730), '2026-07-01'), nên
+--     created_at luôn nằm trước thời điểm các Reservation bắt đầu từ cuối 07/2026.
 
 -- ############################################################################
 -- PHẦN 2: BẢNG SERVICE_PROVIDER
@@ -282,14 +280,9 @@ FROM dbo.CREATIVE_SPACE
 GROUP BY space_type
 ORDER BY so_luong DESC;
 -- PHÂN TÍCH:
---   * Kết quả dự kiến:
---       Studio   1.500 | giá TB 207.500 | 145.000 - 270.000 | 47,5 m2 | 4,5 người
---       Darkroom   750 | giá TB 170.000 | 120.000 - 220.000 | 45,0 m2 | 4,0 người
---       Hybrid     750 | giá TB 245.000 | 195.000 - 295.000 | 50,0 m2 | 5,0 người
---   * Darkroom rẻ nhất, Hybrid đắt nhất - hợp lý vì Hybrid kết hợp nhiều chức năng.
---   * CHECK constraint cho phép 4 loại (Darkroom, Studio, Hybrid, Exhibition) nhưng
---     dữ liệu mẫu không có Exhibition. Báo cáo Chương 1-2 chỉ nêu darkroom và
---     photography studio, nên cần bổ sung mô tả 2 loại Hybrid, Exhibition.
+--   * Kết quả dự kiến: mỗi loại có 750 không gian; giá và sức chứa thay đổi theo
+--     công thức n % 8 và n % 6 trong seed.
+--   * Dữ liệu mẫu hiện có đủ 4 loại: Darkroom, Studio, Hybrid và Exhibition.
 --   * AVG(1.0 * capacity): nhân 1.0 để tránh chia nguyên (capacity kiểu INT).
 
 -- ----------------------------------------------------------------------------
@@ -468,12 +461,12 @@ ORDER BY r.start_time;
 -- PHÂN TÍCH:
 --   * Đối chiếu 2 quy tắc ở Chương 1: "Resource đang bảo trì không được phân bổ
 --     cho Reservation" và "Ràng buộc Maintenance: không trùng thời gian phân bổ".
---   * Kết quả dự kiến: khoảng 494 dòng vi phạm (các Reservation Confirmed dùng
---     resource 1-500 đang có lịch bảo trì In_Progress).
---   * Kết luận: CSDL hiện chưa có trigger nào thực thi 2 quy tắc này nên dữ liệu
---     vi phạm vẫn được lưu. Đề xuất bổ sung trigger kiểm tra trên
---     RESERVATION_RESOURCE (khi INSERT/UPDATE) để chặn phân bổ tài nguyên đang
---     bảo trì.
+--   * Kết quả dự kiến với seed hiện tại: 0 dòng vi phạm. Các resource đang
+--     In_Progress được đặt trong dải 10001-12700, không trùng resource được
+--     phân bổ cho Reservation.
+--   * Trigger trg_RESERVATION_RESOURCE_CheckMaintenance chặn INSERT/UPDATE
+--     nếu resource đang có trạng thái Maintenance. Quy tắc trùng khoảng thời
+--     gian với lịch bảo trì chưa được kiểm tra độc lập bằng trigger.
 
 -- ############################################################################
 -- PHẦN 5: BẢNG MAINTENANCE
