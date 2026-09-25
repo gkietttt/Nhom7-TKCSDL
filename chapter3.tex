@@ -2492,7 +2492,7 @@ Tất cả 15 quan hệ chính và 6 quan hệ trung gian trong hệ thống đ�
 
 \textbf{Lưu ý về thuộc tính địa chỉ:}
 
-Thuộc tính \texttt{address} trong quan hệ \texttt{SERVICE\_PROVIDER} hiện được lưu dưới dạng chuỗi ký tự đơn. Ở mức thiết kế logic, nên tách thành các thành phần nguyên tố: \texttt{street\_number}, \texttt{street}, \texttt{district}, \texttt{city} để hỗ trợ tìm kiếm và lọc theo vị trí địa lý.
+Thuộc tính \texttt{address} trong quan hệ \texttt{SERVICE\_PROVIDER} được lưu dưới dạng một chuỗi ký tự đơn nguyên vẹn. Trong phạm vi nghiệp vụ hiện tại của hệ thống, địa chỉ được xử lý như một giá trị nguyên tố phục vụ lưu trữ, hiển thị thông tin và tích hợp với các dịch vụ bản đồ/định vị bên ngoài; hệ thống không có yêu cầu truy vấn hay ràng buộc logic độc lập trên từng thành phần số nhà, tên đường hay quận huyện. Do đó, thuộc tính này hoàn toàn thỏa mãn tính nguyên tố của dạng chuẩn 1NF. Trong các giai đoạn phát triển mở rộng tiếp theo, nếu phát sinh nhu cầu phân tích và lọc nâng cao theo từng cấp đơn vị hành chính, thuộc tính này có thể được phân rã thành các cột chi tiết tương ứng.
 
 \textbf{Kết luận:} Toàn bộ các quan hệ trong hệ thống đạt dạng chuẩn 1NF.
 

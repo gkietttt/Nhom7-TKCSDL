@@ -236,6 +236,52 @@ BEGIN
 END;
 GO
 
+-- Trigger: Tài nguyên đang bảo trì không được phân bổ vào Service Session (Quy tắc Chương 1)
+IF OBJECT_ID('dbo.trg_SESSION_RESOURCE_CheckMaintenance', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_SESSION_RESOURCE_CheckMaintenance;
+GO
+
+CREATE TRIGGER dbo.trg_SESSION_RESOURCE_CheckMaintenance
+ON dbo.SESSION_RESOURCE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.RESOURCE r ON r.resource_id = i.resource_id
+        WHERE r.status = N'Maintenance'
+    )
+        THROW 51010, N'Cannot allocate resource currently under maintenance to session.', 1;
+END;
+GO
+
+-- Trigger: Không cho phép sửa đổi phiên sử dụng dịch vụ sau khi đã hoàn thành (Completed)
+IF OBJECT_ID('dbo.trg_SERVICE_SESSION_PreventUpdateCompleted', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_SERVICE_SESSION_PreventUpdateCompleted;
+GO
+
+CREATE TRIGGER dbo.trg_SERVICE_SESSION_PreventUpdateCompleted
+ON dbo.SERVICE_SESSION
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN deleted d ON i.session_id = d.session_id
+        WHERE d.status = N'Completed'
+          AND (UPDATE(check_in) OR UPDATE(check_out))
+          AND (i.check_in <> d.check_in OR ISNULL(i.check_out, '1900-01-01') <> ISNULL(d.check_out, '1900-01-01'))
+    )
+        THROW 51011, N'Cannot modify check-in/check-out time of a completed service session.', 1;
+END;
+GO
+
 -- ============================================================================
 -- 2. VIEWS (KHUNG NHÌN BÁO CÁO & TRUY VẤN TỔNG HỢP)
 -- ============================================================================

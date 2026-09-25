@@ -1,9 +1,16 @@
 % ---- Select text fonts ----
 
-% Support Vietnamese Unicode source text and accents
-\usepackage[utf8]{inputenc}
-\usepackage[T5]{fontenc}
-\usepackage[vietnamese]{babel}
+% Use a Unicode engine so Vietnamese characters are not dropped during encoding.
+\usepackage{iftex}
+\ifPDFTeX
+	\usepackage[utf8]{inputenc}
+	\usepackage[T5]{fontenc}
+	\usepackage[vietnamese]{babel}
+\else
+	\usepackage{fontspec}
+	\usepackage[vietnamese,english]{babel}
+	\setmainfont{Source Serif 4}
+\fi
 
 % Remove nonessential external font packages that trigger MiKTeX font expansion errors
 

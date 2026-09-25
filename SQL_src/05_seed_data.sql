@@ -268,7 +268,7 @@ SELECT
     N'Bảo trì định kỳ: lau thấu kính, bôi trơn bánh răng, kiểm tra tốc độ màn trập và độ chính xác ánh sáng đèn.',
     CASE 
         WHEN n <= 17100 THEN DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00')
-        ELSE DATEADD(DAY, 1 + (n % 30), '2026-08-10 10:00:00') -- Scheduled đặt lịch trong tương lai
+        ELSE DATEADD(DAY, 1 + (n % 30), '2026-12-01 10:00:00') -- Scheduled đặt lịch trong tương lai
     END,
     CASE 
         WHEN n <= 14400 THEN DATEADD(HOUR, 4 + (n % 8), DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00'))
@@ -754,7 +754,7 @@ GO
 PRINT N'>> Seeding WORKSHOP_REGISTRATION (5,000 records)...';
 
 ;WITH Reg(user_id, workshop_id, registered_at) AS (
-    SELECT 3001 + ((w.workshop_id * 10 + u.n) % 7000), w.workshop_id, DATEADD(DAY, -5, w.created_at)
+    SELECT 3001 + ((w.workshop_id * 10 + u.n) % 7000), w.workshop_id, DATEADD(DAY, 1 + (u.n % 3), w.created_at)
     FROM dbo.WORKSHOP w
     CROSS JOIN (
         SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
@@ -863,6 +863,9 @@ VALUES
     (N'SESSION_RESOURCE', 20000),
     (N'WORKSHOP_REGISTRATION', 5000);
 
+-- Bật lại toàn bộ Trigger trước khi thực hiện kiểm tra xác minh (đảm bảo không bị tắt trigger nếu THROW lỗi)
+EXEC sp_MSforeachtable "ALTER TABLE ? ENABLE TRIGGER ALL";
+
 IF EXISTS (
     SELECT 1
     FROM @ExpectedCounts e
@@ -896,9 +899,6 @@ IF EXISTS (
 BEGIN
     THROW 51002, N'Seed verification failed: service session durations are inconsistent.', 1;
 END;
-
--- Bật lại các Trigger
-EXEC sp_MSforeachtable "ALTER TABLE ? ENABLE TRIGGER ALL";
 
 PRINT N'>> Data seeding and verification completed successfully!';
 GO

@@ -974,17 +974,18 @@ Tổng hợp lại toàn bộ quá trình phân tích, dưới đây là đặc 
 \subsection{Kiểu dữ liệu}
 \begin{itemize}
     \item \textbf{Định danh (ID):} Khóa chính và khóa ngoại sử dụng kiểu \texttt{INT} ($4\text{ bytes}$) kết hợp thuộc tính \texttt{IDENTITY(1,1)} tự tăng để tối ưu không gian và giúp cây chỉ mục cân bằng.
-    \item \textbf{Chuỗi văn bản:} Ưu tiên dùng \texttt{NVARCHAR} để hỗ trợ lưu trữ Tiếng Việt có dấu. Phân bổ: \texttt{NVARCHAR(100)} cho tên gọi, tiêu đề; \texttt{NVARCHAR(MAX)} cho nội dung bài viết, mô tả không gian. Các trường không chứa dấu như \texttt{email}, \texttt{phone} sử dụng \texttt{VARCHAR} để tiết kiệm một nửa dung lượng so với NVARCHAR.
+    \item \textbf{Chuỗi văn bản:} Sử dụng \texttt{NVARCHAR} thống nhất cho toàn bộ các trường chuỗi ký tự trong hệ thống nhằm bảo đảm khả năng tương thích Unicode hoàn hảo (chuẩn UTF-16 của SQL Server) và tránh lỗi mã hóa ký tự khi tích hợp đa nền tảng. Cụ thể: \texttt{NVARCHAR(100)} cho họ tên, tiêu đề và \texttt{email}; \texttt{NVARCHAR(20)} cho \texttt{phone}; \texttt{NVARCHAR(MAX)} cho nội dung bài viết kỹ thuật, mô tả không gian chi tiết.
     \item \textbf{Thời gian:} Sử dụng \texttt{DATETIME2(0)} ($6\text{ bytes}$) thay cho \texttt{DATETIME} cũ ($8\text{ bytes}$) do nghiệp vụ đặt phòng/workshop chỉ cần độ chính xác đến phần nguyên của giây.
     \item \textbf{Tiền tệ:} Sử dụng \texttt{DECIMAL(12, 2)} ($9\text{ bytes}$) cho các trường \texttt{price}, \texttt{total\_amount} nhằm bảo toàn độ chính xác tuyệt đối trong giao dịch kế toán, tránh sai số làm tròn của kiểu \texttt{FLOAT}.
 \end{itemize}
 
 \subsection{Các ràng buộc vật lý (Constraints)}
 \begin{itemize}
-    \item \textbf{PRIMARY KEY \& FOREIGN KEY:} Khai báo toàn vẹn trên 21 quan hệ. Các khóa ngoại áp dụng quy tắc mặc định \texttt{ON DELETE NO ACTION} để bảo vệ dữ liệu (ví dụ: không thể xóa một Nhà cung cấp nếu họ đang có giao dịch chưa hoàn tất).
+    \item \textbf{PRIMARY KEY \& FOREIGN KEY:} Khai báo toàn vẹn trên 21 quan hệ. Trong đó, các khóa ngoại của các thực thể nghiệp vụ độc lập áp dụng quy tắc an toàn \texttt{ON DELETE NO ACTION} để bảo vệ dữ liệu (ví dụ: không thể xóa một Nhà cung cấp nếu họ đang có giao dịch chưa hoàn tất). Riêng đối với 6 bảng liên kết quan hệ nhiều--nhiều (\texttt{PACKAGE\_SPACE}, \texttt{PACKAGE\_RESOURCE}, \texttt{RESERVATION\_SPACE}, \texttt{RESERVATION\_RESOURCE}, \texttt{SESSION\_RESOURCE}, \texttt{WORKSHOP\_REGISTRATION}), hệ thống áp dụng cấu hình \texttt{ON DELETE CASCADE} để tự động xóa sạch các bản ghi chi tiết ánh xạ trung gian khi thực thể cha bị xóa, tránh để lại các bản ghi mồ côi (Orphan Records).
     \item \textbf{UNIQUE:} Khởi tạo chỉ mục duy nhất (Unique Index) để chống trùng lặp dữ liệu quan trọng (\texttt{email}, \texttt{phone}).
     \item \textbf{CHECK:} Đảm bảo tính hợp lệ dữ liệu ngay từ tầng vật lý. Ví dụ: \texttt{CHECK (rating BETWEEN 1 AND 5)} trong bảng \texttt{REVIEW}; \texttt{CHECK (end\_time > start\_time)} trong bảng \texttt{RESERVATION}.
     \item \textbf{DEFAULT:} Hỗ trợ tự động điền dữ liệu, ví dụ: \texttt{status = 'Active'}, hoặc \texttt{created\_at = GETDATE()}.
+    \item \textbf{TRIGGER:} Thực thi các quy tắc nghiệp vụ phức hợp mà ràng buộc khai báo tĩnh (CHECK) không biểu diễn được, bao gồm: kiểm tra xung đột thời gian bảo trì và đặt chỗ, kiểm soát tính đồng nhất về Nhà cung cấp giữa gói dịch vụ và tài nguyên/không gian kèm theo, và tự động tính toán lũy kế thời lượng sử dụng thực tế (\texttt{actual\_usage\_duration}).
 \end{itemize}
 
 \subsection{Các chỉ mục (Indexes)}
