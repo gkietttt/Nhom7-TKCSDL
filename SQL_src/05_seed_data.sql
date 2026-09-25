@@ -11,8 +11,9 @@ SET NOCOUNT ON;
 
 PRINT N'>> Starting data seeding process...';
 
--- Tắt kiểm tra ràng buộc tạm thời trong quá trình nạp để tối ưu hiệu năng
+-- Tắt kiểm tra ràng buộc và triggers tạm thời trong quá trình nạp để tối ưu hiệu năng
 EXEC sp_MSforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL";
+EXEC sp_MSforeachtable "ALTER TABLE ? DISABLE TRIGGER ALL";
 GO
 
 -- Xóa sạch dữ liệu cũ
@@ -94,7 +95,7 @@ SELECT
         ELSE N'Photographer'
     END,
     CASE WHEN id % 25 = 0 THEN N'Inactive' ELSE N'Active' END,
-    DATEADD(DAY, -(100 - id), '2026-08-01 08:00:00')
+    DATEADD(DAY, -(id % 730), '2026-07-01 08:00:00')
 FROM Names;
 GO
 
@@ -124,7 +125,7 @@ SELECT
         ELSE CAST(n * 21 AS NVARCHAR(10)) + N' Phan Đăng Lưu, Phú Nhuận, TP. Hồ Chí Minh'
     END,
     CASE WHEN n % 20 = 0 THEN N'Pending_Approval' ELSE N'Active' END,
-    DATEADD(DAY, -(50 - n), '2026-08-05 09:00:00')
+    DATEADD(DAY, -(n % 365), '2026-07-01 09:00:00')
 FROM Numbers;
 GO
 
@@ -233,7 +234,7 @@ SELECT
         WHEN 2 THEN N'Ngàm Bowens tiêu chuẩn'
         ELSE N'Sử dụng chung cho tất cả dòng máy'
     END,
-    CASE WHEN n % 20 = 0 THEN N'Maintenance' ELSE N'Available' END
+    N'Available'
 FROM Numbers;
 GO
 
@@ -252,7 +253,11 @@ INSERT INTO dbo.MAINTENANCE (
     completed_at, cost, status
 )
 SELECT 
-    ((n - 1) % 15000) + 1,
+    CASE 
+        WHEN n <= 14400 THEN ((n - 1) % 15000) + 1
+        WHEN n <= 17100 THEN 10001 + (n - 14401) -- 2,700 thiết bị đang In_Progress tại kho (không trùng tài nguyên đặt chỗ)
+        ELSE ((n - 1) % 15000) + 1
+    END,
     CASE (n % 5)
         WHEN 0 THEN N'Routine'
         WHEN 1 THEN N'Repair'
@@ -261,7 +266,10 @@ SELECT
         ELSE N'Inspection'
     END,
     N'Bảo trì định kỳ: lau thấu kính, bôi trơn bánh răng, kiểm tra tốc độ màn trập và độ chính xác ánh sáng đèn.',
-    DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00'),
+    CASE 
+        WHEN n <= 17100 THEN DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00')
+        ELSE DATEADD(DAY, 1 + (n % 30), '2026-08-10 10:00:00') -- Scheduled đặt lịch trong tương lai
+    END,
     CASE 
         WHEN n <= 14400 THEN DATEADD(HOUR, 4 + (n % 8), DATEADD(DAY, -(120 - (n % 120)), '2026-08-10 10:00:00'))
         ELSE NULL 
@@ -273,6 +281,17 @@ SELECT
         ELSE N'Scheduled'
     END
 FROM Numbers;
+GO
+
+-- Đồng bộ trạng thái Resource: Các tài nguyên đang bảo trì (In_Progress) chuyển sang trạng thái Maintenance
+UPDATE res 
+SET res.status = N'Maintenance'
+FROM dbo.RESOURCE res
+WHERE EXISTS (
+    SELECT 1 FROM dbo.MAINTENANCE m
+    WHERE m.resource_id = res.resource_id
+      AND m.status = N'In_Progress'
+);
 GO
 
 -- ============================================================================
@@ -300,7 +319,7 @@ SELECT
     250000.00 + (n % 10) * 50000.00,
     2 + (n % 4), -- 2 đến 5 giờ
     CASE WHEN n % 30 = 0 THEN N'Inactive' ELSE N'Active' END,
-    DATEADD(DAY, -(60 - n), '2026-08-01 08:00:00')
+    DATEADD(DAY, -(n % 365), '2026-07-01 08:00:00')
 FROM Numbers;
 GO
 
@@ -329,8 +348,8 @@ SELECT
     N'Giảm giá trực tiếp khi đặt phòng tối hoặc gói studio trọn gói qua hệ thống trực tuyến.',
     CASE WHEN n % 2 = 0 THEN N'Percentage' ELSE N'Fixed_Amount' END,
     CASE WHEN n % 2 = 0 THEN 10.00 + (n % 4) * 5.00 ELSE 50000.00 + (n % 5) * 20000.00 END,
-    DATEADD(DAY, -(30 - n), '2026-08-01 00:00:00'),
-    DATEADD(DAY, 60 + n, '2026-08-01 23:59:59'),
+    DATEADD(DAY, -(n % 60), '2026-08-01 00:00:00'),
+    DATEADD(DAY, 30 + (n % 60), '2026-08-01 23:59:59'),
     CASE WHEN n % 10 = 0 THEN N'Expired' ELSE N'Active' END
 FROM Numbers;
 GO
@@ -387,8 +406,8 @@ SELECT
         ELSE N'Cash'
     END,
     CASE 
-        WHEN n <= 420 THEN N'Success'
-        WHEN n <= 440 THEN N'Pending'
+        WHEN n <= 9200 THEN N'Success'
+        WHEN n <= 9600 THEN N'Pending'
         ELSE N'Refunded'
     END,
     N'TXN2026' + RIGHT(N'000000' + CAST(n AS NVARCHAR(10)), 6) + N'FP',
@@ -877,6 +896,9 @@ IF EXISTS (
 BEGIN
     THROW 51002, N'Seed verification failed: service session durations are inconsistent.', 1;
 END;
+
+-- Bật lại các Trigger
+EXEC sp_MSforeachtable "ALTER TABLE ? ENABLE TRIGGER ALL";
 
 PRINT N'>> Data seeding and verification completed successfully!';
 GO

@@ -214,6 +214,28 @@ BEGIN
 END;
 GO
 
+-- Trigger: Tài nguyên đang bảo trì không được phân bổ cho Reservation (Quy tắc Chương 1)
+IF OBJECT_ID('dbo.trg_RESERVATION_RESOURCE_CheckMaintenance', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.trg_RESERVATION_RESOURCE_CheckMaintenance;
+GO
+
+CREATE TRIGGER dbo.trg_RESERVATION_RESOURCE_CheckMaintenance
+ON dbo.RESERVATION_RESOURCE
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN dbo.RESOURCE r ON r.resource_id = i.resource_id
+        WHERE r.status = N'Maintenance'
+    )
+        THROW 51009, N'Cannot allocate resource currently under maintenance.', 1;
+END;
+GO
+
 -- ============================================================================
 -- 2. VIEWS (KHUNG NHÌN BÁO CÁO & TRUY VẤN TỔNG HỢP)
 -- ============================================================================

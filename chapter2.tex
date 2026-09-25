@@ -73,9 +73,9 @@ Bảng mô tả các thực thể
 \toprule
 STT & Thực thể & Ý nghĩa nghiệp vụ \\
 \midrule
-1 & \textbf{User} & Đại diện cho người dùng của hệ thống. Người dùng có thể đảm nhận các vai trò như Photographer, Service Provider, Photography Expert hoặc Administrator. \\
+1 & \textbf{User} & Đại diện cho người dùng của hệ thống. Người dùng có thể đảm nhận các vai trò như Photographer, Service Provider, Photography Expert (mã định danh CSDL: Expert) hoặc Administrator. \\
 2 & \textbf{Service Provider} & Đại diện cho cá nhân hoặc tổ chức cung cấp và quản lý các creative space, resource và service package trên nền tảng. \\
-3 & \textbf{Creative Space} & Đại diện cho các không gian sáng tạo như darkroom và photography studio, cùng các thông tin về đặc điểm, điều kiện sử dụng, giá và thời gian hoạt động. \\
+3 & \textbf{Creative Space} & Đại diện cho các không gian sáng tạo bao gồm Darkroom, Studio, Hybrid (đa năng) và Exhibition (triển lãm), cùng các thông tin về đặc điểm, điều kiện sử dụng, giá và thời gian hoạt động. \\
 4 & \textbf{Resource} & Đại diện cho các tài nguyên được quản lý và sử dụng trong hệ thống, bao gồm thiết bị chụp ảnh, thiết bị darkroom và vật tư tiêu hao. \\
 5 & \textbf{Maintenance} & Đại diện cho các hoạt động hoặc lịch bảo trì tài nguyên, phục vụ việc theo dõi tình trạng và vòng đời của Resource. \\
 6 & \textbf{Service Package} & Đại diện cho các gói dịch vụ do Service Provider cung cấp, có thể kết hợp creative space, resource và các dịch vụ hỗ trợ. \\
@@ -221,7 +221,7 @@ Thuộc tính & Ý nghĩa nghiệp vụ \\
 \midrule
 \texttt{space\_id} & Định danh duy nhất của không gian sáng tạo. \\
 \texttt{name} & Tên của darkroom, studio hoặc không gian sáng tạo. \\
-\texttt{space\_type} & Loại không gian, chẳng hạn darkroom hoặc photography studio. \\
+\texttt{space\_type} & Loại không gian, bao gồm Darkroom, Studio, Hybrid hoặc Exhibition. \\
 \texttt{description} & Mô tả chi tiết về không gian. \\
 \texttt{area} & Diện tích của không gian. \\
 \texttt{capacity} & Số người tối đa có thể sử dụng không gian. \\

@@ -814,22 +814,22 @@ Cây truy vấn (query tree) biểu diễn truy vấn dưới dạng cây đại
 \begin{verbatim}
 SELECT cs.space_id, cs.name, cs.pricing
 FROM CREATIVE_SPACE cs
-WHERE cs.space_type = 'darkroom'
-  AND cs.status = 'active'
+WHERE cs.space_type = 'Darkroom'
+  AND cs.status = 'Available'
   AND cs.space_id NOT IN (
       SELECT rs.space_id
       FROM RESERVATION_SPACE rs
       JOIN RESERVATION r ON rs.reservation_id = r.reservation_id
-      WHERE r.start_time < '2025-10-01 18:00'
-        AND r.end_time > '2025-10-01 08:00'
-        AND r.status IN ('confirmed', 'pending')
+      WHERE r.start_time < '2026-10-01 18:00'
+        AND r.end_time > '2026-10-01 08:00'
+        AND r.status IN ('Confirmed', 'Pending')
   )
 \end{verbatim}
 
 \textbf{Nguyên tắc tối ưu cây truy vấn:}
 
 \begin{itemize}
-    \item \textbf{Đẩy phép chọn xuống sớm nhất có thể (Push Selection Down):} Áp dụng điều kiện \texttt{space\_type = 'darkroom'} và \texttt{status = 'active'} ngay khi quét \texttt{CREATIVE\_SPACE}, giảm số bộ cần xử lý ở các bước tiếp theo.
+    \item \textbf{Đẩy phép chọn xuống sớm nhất có thể (Push Selection Down):} Áp dụng điều kiện \texttt{space\_type = 'Darkroom'} và \texttt{status = 'Available'} ngay khi quét \texttt{CREATIVE\_SPACE}, giảm số bộ cần xử lý ở các bước tiếp theo.
     \item \textbf{Đẩy phép chiếu xuống (Push Projection Down):} Chỉ giữ lại các thuộc tính cần thiết (\texttt{space\_id}, \texttt{name}, \texttt{pricing}) sau phép chọn.
     \item \textbf{Kết hợp các phép chọn liên tiếp:} Gộp nhiều điều kiện \texttt{WHERE} vào một phép chọn duy nhất.
     \item \textbf{Thay thế tích Đề-các bằng kết nối:} Biểu diễn kết nối giữa \texttt{RESERVATION\_SPACE} và \texttt{RESERVATION} dưới dạng phép kết nối thay vì tích Đề-các kèm phép chọn.
@@ -853,19 +853,19 @@ Với điều kiện chọn $\sigma_{A = v}(R)$, số bộ kết quả ước l�
 
 $$|\sigma_{A=v}(R)| = \frac{|R|}{V(A, R)}$$
 
-Ví dụ, quan hệ \texttt{CREATIVE\_SPACE} có $|R| = 1000$ bộ và \texttt{space\_type} có $V = 2$ giá trị phân biệt (\textit{darkroom} và \textit{studio}). Sau phép chọn \texttt{space\_type = 'darkroom'}:
+Ví dụ, quan hệ \texttt{CREATIVE\_SPACE} có $|R| = 3000$ bộ và \texttt{space\_type} có $V = 4$ giá trị phân biệt (\textit{Darkroom}, \textit{Studio}, \textit{Hybrid}, \textit{Exhibition}). Sau phép chọn \texttt{space\_type = 'Darkroom'}:
 
-$$|\sigma| = \frac{1000}{2} = 500 \text{ bộ}$$
+$$|\sigma| = \frac{3000}{4} = 750 \text{ bộ}$$
 
 \textbf{Ước lượng kích thước sau phép kết nối:}
 
 Với phép kết nối tự nhiên $R \bowtie S$ trên thuộc tính $A$:
 
-$$|R \bowtie S| \approx \frac{|R| \times |S|}{max(V(A,R), V(A,S))}$$
+$$|R \bowtie S| \approx \frac{|R| \times |S|}{\max(V(A,R), V(A,S))}$$
 
-Ví dụ, kết nối \texttt{RESERVATION\_SPACE} ($|RS| = 5000$) với \texttt{RESERVATION} ($|R| = 3000$) trên \texttt{reservation\_id} ($V = 3000$):
+Ví dụ, kết nối \texttt{RESERVATION\_SPACE} ($|RS| = 25000$) với \texttt{RESERVATION} ($|R| = 16000$) trên \texttt{reservation\_id} ($V = 16000$):
 
-$$|RS \bowtie R| \approx \frac{5000 \times 3000}{3000} = 5000 \text{ bộ}$$
+$$|RS \bowtie R| \approx \frac{25000 \times 16000}{16000} = 25000 \text{ bộ}$$
 
 \subsection{Ước lượng chi phí truy vấn}
 
