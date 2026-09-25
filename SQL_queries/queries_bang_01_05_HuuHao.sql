@@ -508,7 +508,8 @@ FROM dbo.MAINTENANCE
 GROUP BY YEAR(scheduled_at), MONTH(scheduled_at)
 ORDER BY nam, thang;
 -- PHÂN TÍCH:
---   * Dữ liệu mẫu trải từ 04/2026 đến 08/2026.
+--   * Kết quả dự kiến: 04/2026: 2.716 | 05: 4.433 | 06: 4.271 | 07: 4.402 |
+--     08: 1.278 | 12/2026: 900 (các phiếu Scheduled đặt lịch trong tương lai).
 --   * GROUP BY theo biểu thức YEAR()/MONTH() nên không dùng được thứ tự của
 --     IX_MAINTENANCE_Scheduled_Status để nhóm, nhưng index vẫn giúp nếu thêm
 --     điều kiện WHERE scheduled_at BETWEEN ... (lọc theo khoảng thời gian).
@@ -534,8 +535,9 @@ ORDER BY tong_chi_phi_bao_tri DESC;
 -- PHÂN TÍCH:
 --   * Minh họa quan hệ Resource - Maintenance (1:N, Chương 2): một tài nguyên có
 --     nhiều lịch sử bảo trì trong vòng đời.
---   * Kết quả dự kiến: 3.000 tài nguyên có 2 lần bảo trì (18.000 phiếu chia cho
---     15.000 tài nguyên), 12.000 tài nguyên có 1 lần.
+--   * Kết quả dự kiến: 3.600 tài nguyên có 2 lần bảo trì, 10.800 tài nguyên có
+--     1 lần và 600 tài nguyên (14401-15000) chưa bảo trì lần nào; tổng 18.000
+--     phiếu.
 --   * JOIN dùng IX_MAINTENANCE_ResourceId nên không phải quét toàn bảng
 --     MAINTENANCE cho mỗi tài nguyên.
 
@@ -557,25 +559,17 @@ INNER JOIN dbo.RESOURCE res ON res.resource_id = m.resource_id
 WHERE m.status = N'In_Progress'
   AND res.status = N'Available';
 -- PHÂN TÍCH:
---   * Kết quả dự kiến: 900 phiếu Scheduled có ngày dự kiến trong quá khứ và
---     2.565 tài nguyên đang bảo trì nhưng vẫn ghi Available.
---   * Trạng thái của RESOURCE và MAINTENANCE đang được cập nhật độc lập nên dễ
---     lệch nhau. Đây cũng là nguyên nhân gốc của các vi phạm ở truy vấn R4.
+--   * Kết quả dự kiến với seed hiện tại: cả 2 dòng đều bằng 0.
+--       - 900 phiếu Scheduled được đặt lịch trong 12/2026 (tương lai).
+--       - Seed đã đồng bộ RESOURCE.status = 'Maintenance' cho mọi tài nguyên có
+--         phiếu In_Progress.
+--   * Ở bản seed cũ, truy vấn này phát hiện 900 phiếu Scheduled quá hạn và 2.565
+--     tài nguyên lệch trạng thái; đây là ví dụ dùng truy vấn để kiểm thử chất
+--     lượng dữ liệu: phát hiện lỗi, sửa seed, chạy lại để xác nhận.
 
 -- ============================================================================
--- GHI CHÚ: ĐỀ XUẤT SỬA DỮ LIỆU MẪU (05_seed_data.sql) - CẦN THỐNG NHẤT VỚI NHÓM
--- ============================================================================
--- 1. USER.created_at:
---      thay  DATEADD(DAY, -(100 - id), '2026-08-01 08:00:00')
---      bằng  DATEADD(DAY, -(id % 730), '2026-07-01 08:00:00')
--- 2. SERVICE_PROVIDER.created_at:
---      thay  DATEADD(DAY, -(50 - n), '2026-08-05 09:00:00')
---      bằng  DATEADD(DAY, -(n % 365), '2026-07-01 09:00:00')
--- 3. Đồng bộ trạng thái Resource sau khi seed MAINTENANCE:
---      UPDATE res SET res.status = N'Maintenance'
---      FROM dbo.RESOURCE res
---      WHERE EXISTS (SELECT 1 FROM dbo.MAINTENANCE m
---                    WHERE m.resource_id = res.resource_id
---                      AND m.status = N'In_Progress');
--- Sau khi sửa, chạy lại U4, M4 để xác nhận còn 0 dòng bất thường.
+-- GHI CHÚ: Các lỗi dữ liệu mẫu từng được phát hiện bởi U4, R4, M4 đã được sửa
+-- trong 05_seed_data.sql: ngày tạo USER/SERVICE_PROVIDER, đồng bộ trạng thái
+-- RESOURCE với MAINTENANCE, lịch Scheduled chuyển sang 12/2026, và trigger
+-- trg_RESERVATION_RESOURCE_CheckMaintenance chặn phân bổ tài nguyên đang bảo trì.
 -- ============================================================================

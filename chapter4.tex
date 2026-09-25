@@ -985,7 +985,7 @@ Tổng hợp lại toàn bộ quá trình phân tích, dưới đây là đặc 
     \item \textbf{UNIQUE:} Khởi tạo chỉ mục duy nhất (Unique Index) để chống trùng lặp dữ liệu quan trọng (\texttt{email}, \texttt{phone}).
     \item \textbf{CHECK:} Đảm bảo tính hợp lệ dữ liệu ngay từ tầng vật lý. Ví dụ: \texttt{CHECK (rating BETWEEN 1 AND 5)} trong bảng \texttt{REVIEW}; \texttt{CHECK (end\_time > start\_time)} trong bảng \texttt{RESERVATION}.
     \item \textbf{DEFAULT:} Hỗ trợ tự động điền dữ liệu, ví dụ: \texttt{status = 'Active'}, hoặc \texttt{created\_at = GETDATE()}.
-    \item \textbf{TRIGGER:} Thực thi các quy tắc nghiệp vụ phức hợp mà ràng buộc khai báo tĩnh (CHECK) không biểu diễn được, bao gồm: kiểm tra xung đột thời gian bảo trì và đặt chỗ, kiểm soát tính đồng nhất về Nhà cung cấp giữa gói dịch vụ và tài nguyên/không gian kèm theo, và tự động tính toán lũy kế thời lượng sử dụng thực tế (\texttt{actual\_usage\_duration}).
+    \item \textbf{TRIGGER:} Thực thi các quy tắc nghiệp vụ phức hợp mà ràng buộc khai báo tĩnh (CHECK) không biểu diễn được, bao gồm: chặn phân bổ tài nguyên đang ở trạng thái bảo trì cho Reservation và Service Session; bảo đảm gói dịch vụ, không gian và tài nguyên đi kèm thuộc cùng một Nhà cung cấp; chỉ cho phép người đã đặt chỗ viết Review; không cho sửa thời gian check-in/check-out của phiên đã hoàn thành; và tự động tính thời lượng sử dụng thực tế (\texttt{actual\_usage\_duration}) của từng phiên.
 \end{itemize}
 
 \subsection{Các chỉ mục (Indexes)}

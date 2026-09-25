@@ -545,7 +545,7 @@ Mỗi User chỉ có một vai trò tại một thời điểm. Tài khoản có
     \item Trước khi xác nhận Reservation, hệ thống phải kiểm tra khả dụng của Creative Space và Resource trong khoảng thời gian \texttt{start\_time} đến \texttt{end\_time}. Nếu phát hiện xung đột lịch, Reservation không được xác nhận.
     \item Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc: $\texttt{start\_time} < \texttt{end\_time}$.
     \item Một Reservation có thể có tối đa một \textbf{Payment}. Payment chỉ được tạo sau khi Reservation được xác nhận.
-    \item Một Reservation có thể có tối đa một \textbf{Service Session}. Service Session chỉ được tạo sau khi Payment hoàn tất.
+    \item Một Reservation có thể có tối đa một \textbf{Service Session}. Service Session được tạo khi Photographer check-in sử dụng dịch vụ của Reservation đã được xác nhận. Việc thanh toán có thể thực hiện trước (thanh toán trực tuyến) hoặc sau khi sử dụng (thanh toán tại chỗ, ví dụ tiền mặt), do đó việc tạo Service Session không phụ thuộc vào trạng thái của Payment.
     \item Trong Service Session, \texttt{check\_out} phải lớn hơn \texttt{check\_in}; \texttt{actual\_usage\_duration} được tính từ hiệu số đó.
 \end{itemize}
 
